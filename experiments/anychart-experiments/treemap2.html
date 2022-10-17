@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My First JavaScript Treemap Chart</title>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-treemap.min.js"></script>
+    <style>
+      html, body, #container {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      anychart.onDocumentReady(function() {
+
+        /*  create data */
+        var data = [
+          {name: "World", children: [
+            {name: "Asia", children: [
+              {name: "East", value: 1000},
+              {name: "Southern", value: 803},
+              {name: "Southeast", value: 415},
+              {name: "Western", value: 182},
+              {name: "Central", value: 36}
+            ]},
+            {name: "America", children: [
+              {name: "North", value: 346},
+              {name: "South", value: 316},
+              {name: "Central", value: 114},
+              {name: "Caribbean", value: 23}
+            ]},
+            {name: "Europe", children: [
+              {name: "Eastern", value: 233},
+              {name: "Western", value: 183},
+              {name: "Southern", value: 135},
+              {name: "Northern", value: 100}
+            ]},  
+            {name: "Africa", children: [
+              {name: "Western", value: 158},
+              {name: "Eastern", value: 140},
+              {name: "Northern", value: 121},
+              {name: "Southern", value: 34},
+              {name: "Middle", value: 20}
+            ]},  
+            {name: "Oceania", children: [
+              {name: "Oceania", value: 29}
+            ]}  
+          ]} 
+        ];
+  
+        /*  create a data tree */
+        var treeData = anychart.data.tree(data, "as-tree");
+
+        /*  create a treemap chart visualizing the data tree */
+        var chart = anychart.treeMap(treeData);
+  
+        /*  add a title for the chart */
+        chart.title("Internet Audience Worldwide (in million users)");
+
+        /*  specify the container id */
+        chart.container("container");
+
+        /*  draw the chart */
+        chart.draw();
+  
+      });
+    </script>
+    <div id="container"></div>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html class="zc-html">
+
+<head>
+  <meta charset="utf-8">
+  <title>ZingSoft Demo</title>
+  <script nonce="undefined" src="https://cdn.zingchart.com/zingchart.min.js"></script>
+  <style>
+    .chart--container {
+      height: 50%;
+      width: 90%;
+      min-height: 200px;
+      max-height: fit-content;
+    }
+
+    .zc-ref {
+      display: none;
+    }
+  </style>
+</head>
+​
+
+<body class="zc-body">
+  ​
+  <div id="myChart" class="chart--container">
+    <a href="https://www.zingchart.com/" rel="noopener" class="zc-ref">Powered by ZingChart</a>
+  </div>
+
+  <script>
+    ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"]; 
+    let chartConfig = {
+      gui: {
+        contextMenu: {
+          alpha: 0.9,
+          button: {
+            visible: true
+          },
+          docked: true,
+          item: {
+            textAlpha: 1
+          },
+          position: 'right'
+        }
+      },
+      graphset: [{
+        type: 'line',
+        borderColor: '#cccccc',
+        borderRadius: '2px',
+        borderWidth: '1px',
+        timezone: 8,
+        utc: true,
+        plot: {
+          aspect: 'spline'
+        },
+        plotarea: {
+          margin: 'dynamic'
+        },
+        scaleX: {
+          itemsOverlap: true,
+          maxItems: 7,
+          minValue: 1546301782000,
+          step: 'day',
+          zooming: true,
+          transform: {
+            type: 'date',
+            all: '%D %M %mm<br>%Y'
+          }
+        },
+        scaleY: {
+          step: 5,
+          guide: {
+            lineStyle: 'solid'
+          },
+          label: {
+            text: 'Bus Factor'
+          }
+        },
+        crosshairX: {
+          lineColor: '#555',
+          marker: {
+            borderColor: '#fff',
+            borderWidth: '1px',
+            size: '5px'
+          },
+          plotLabel: {
+            backgroundColor: '#fff',
+            borderRadius: '2px',
+            borderWidth: '2px',
+            multiple: true
+          }
+        },
+        tooltip: {
+          visible: false
+        },
+        series: [{
+            text: 'Bus Factor',
+            values: [27.99, 6.28, 7.51, 20.33, 3.92, 28.08, 27.56, 3.27, 21.33, 09.9, 5.42, 25.34, 20.5, 5.68, 6.52, 1.37, 1.64, 28.78, 7.09, 3.76, 8, 3.49, 9.48, 6.01, 13.32, 0.45, 7.67, 18.33, 4.86, 8.06, 2.93, 10.63, 3.72, 20.82, 14.85, 8.83, 5.13, 0.5, 18.75, 6.97, 21.44, 4.66, 0.73, 21.21, 1.51, 16.84, 4.64, 4.45, 22.11, 12.81, 3.36, 13.04, 9.81, 6.17, 5.91, 18.64, 23.82, 3.7, 15.87, 19.42, 9.9, 08.34, 7.32, 13.9, 8.88, 21.92, 3.2, 3.1, 14.64, 0.35, 2.28, 28.16, 8.68, 2.51, 1.16, 5.38, 3.64, 4.02, 14.63, 16.29, 14.14, 3.5, 13.88, 15.93, 5.63, 3.41, 12.46, 4.54, 7.86, 4.97],
+            legendItem: {
+              backgroundColor: '#29A2CC',
+              borderRadius: '2px'
+            }
+          }
+        ]
+      }]
+    };
+
+    zingchart.render({
+      id: 'myChart',
+      height: '50%',
+      width: '100%',
+      data: chartConfig
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>JavaScript Treemap Chart</title>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-treemap.min.js"></script>
+    <style type="text/css">  	
+      html, body, #container {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+ 
+    <script>
+ 
+      anychart.onDocumentReady(function () {
+ 
+        /* create the data */
+        var dataSet = [
+          {name: "Galaxies", children: [
+            {name: "Elliptical", children: [
+              {name: "IC 1101", value: 4000000},
+              {name: "Hercules A", value: 1500000},
+              {name: "A2261-BCG", value: 1000000},
+              {name: "ESO 306-17", value: 1000000},
+              {name: "ESO 444-46", value: 402200},
+            ]},
+            {name: "Spiral", children: [	
+              {name: "Rubin's Galaxy", value: 832000},
+              {name: "Comet Galaxy", value: 600000},
+              {name: "Condor Galaxy", value: 522000},
+              {name: "Tadpole Galaxy", value: 280000},
+              {name: "Andromeda Galaxy", value: 220000} 
+            ]}
+          ]}
+        ];
+
+        /* create the treemap chart and set the data */
+        var chart = anychart.treeMap(dataSet, "as-tree");
+ 
+        /*  set the chart title */
+        chart.title("The 10 Largest Galaxies in the Known Universe");
+
+        /*  set a custom color scale */
+        var customColorScale = anychart.scales.linearColor();
+        customColorScale.colors(['#37B8F7', '#ffcc00']);
+        chart.colorScale(customColorScale);
+        chart.colorRange().enabled(true);
+        chart.colorRange().length('90%');
+
+        /*  format the labels */
+        chart.labels().useHtml(true);
+        chart.labels().format(
+          "<span style='font-size: 24px; color: #00076f'>{%name}</span><br>{%value}"
+        );
+  
+        /*  format the tooltips */
+        chart.tooltip().format(
+          "Scale: {%value} light years"
+        );
+
+        /*  sort in ascending order */
+        chart.sort("asc");
+ 
+        /*  set the container id for the chart */
+        chart.container("container");
+ 
+        /*  initiate drawing the chart */
+        chart.draw();
+ 
+      });
+ 
+    </script>
+  </body>
+</html>

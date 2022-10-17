@@ -1,0 +1,32 @@
+{
+    "name": "project",
+    "children": [
+        {
+            "name": "test",
+            "size": 501,
+            "busFactor": 3
+        },
+        {
+            "name": "docs",
+            "size": 253,
+            "busFactor": 5
+        },
+        {
+            "name": "src",
+            "size": 1368,
+            "busFactor": 1,
+            "children": [
+                {
+                    "name": "def.py",
+                    "size": 1100,
+                    "busFactor": 7
+                },
+                {
+                    "name": "abc.java",
+                    "size": 268,
+                    "busFactor": 1
+                }
+            ]
+        }
+    ]
+}

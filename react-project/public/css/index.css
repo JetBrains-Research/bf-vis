@@ -1,0 +1,14 @@
+.header {
+    text-align: center;
+  }
+
+.App {
+  background: #eeeeee;
+}
+
+.panel {
+  box-shadow: 5px 5px 5px lightgray ;
+  background: #efefef;
+  border: 2px solid gray;
+  border-radius: 0.5em;
+}

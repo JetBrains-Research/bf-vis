@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>ZingSoft Demo</title>
+
+  <script nonce="undefined" src="https://cdn.zingchart.com/zingchart.min.js"></script>
+  <style>
+    html,
+    body,
+    #myChart {
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id='myChart'></div>
+  <script>
+    ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
+    let chartConfig = {
+      type: 'treemap',
+      plotarea: {},
+      tooltip: {},
+      options: {
+        maxChildren: 9999,
+        maxDepth: 9999,
+      },
+      series: [{
+        text: "test - bus factor 3",
+        value: 22,
+        backgroundColor: 'red'
+      }, {
+        text: "docs - bus factor 4",
+        value: 31,
+        backgroundColor: 'green'
+      },
+      {
+        text: "src - bus factor 1",
+        legendMarker: {
+          backgroundColor: 'black'
+        },
+        children: [{
+          text: 'abc.java - bus factor 2',
+          value: 31,
+          backgroundColor: 'green'
+        },
+        {
+          text: 'def.py - bus factor 1',
+          value: 29,
+          backgroundColor: 'green'
+        }]
+      },
+      ]
+    };
+
+    zingchart.render({
+      id: 'myChart',
+      data: chartConfig,
+      height: '100%',
+      width: '100%'
+    });
+  </script>
+</body>
+
+</html>
