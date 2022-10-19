@@ -182,7 +182,7 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
             }
         })
         .append("xhtml:div")
-        .attr("class", (d) => d.depth > 0 ? "row px-1 align-items-center fw-semibold h-80" : "row px-1 fw-semibold")
+        .attr("class", (d) => d.depth > 0 ? "row p-0 m-0 align-items-center fw-semibold h-100" : "row px-1 fw-semibold")
         .on("mouseover", (e, d) => {
             if (d.depth > 0) {
                 const pElement = d3.select(`#p-${d.nodeUid.id}`);
@@ -204,7 +204,6 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
                 .ease(d3.easeElastic)
                 .style("stroke-width", null);
         })
-        .style("height", "100%")
         .append("div")
 
     textBox
@@ -212,7 +211,7 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
         .append("xhtml:i")
         .attr("class", "bi bi-folder2")
         .style("color", (d) => pickTextColorBasedOnBgColor(d.color, "#CDCDCD", "#343434"))
-        .style("font-size", "2rem");
+        .style("font-size", "1.5em");
 
     textBox.append("xhtml:p")
         .text(d => {
