@@ -1,5 +1,5 @@
 import React from "react";
-import StatsPane from "./DetailsPane";
+import StatsPane from "./StatsPane";
 
 function RightColumn(props) {
 

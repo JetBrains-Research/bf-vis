@@ -38,8 +38,8 @@ function StatsPane(props) {
                 <label htmlFor="authorNumberSelecter" className="form-label">Number of Authors to show: {numOfAuthors} </label>
                 <input type="range" className="form-range" defaultValue={1} onChange={(e) => setNumOfAuthors(e.target.value)} min="1" max={(authorsList) ? authorsList.length : 0} id="authorNumberSelecter"></input>
                 <div className="list-group list-group-flush overflow-scroll" style={{
-                    "max-height": "30vh",
-                    "max-width": "14vw"
+                    "maxHeight": "30vh",
+                    "maxWidth": "14vw"
                 }}>
                     {(authorsList && topAuthors) ? topAuthors.map(
                         (authorScorePair) =>
