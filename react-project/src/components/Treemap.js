@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { selectFilters } from '../reducers/defaultSlice';
 import { createSVGInContainer, clearCanvas } from '../d3/svgCanvas';
 import { generateTreemapLayoutFromData, drawTreemapFromGeneratedLayout } from '../d3/treemap';
 import { LAYOUT_CONSTANTS, treemapSvgId, treemapContainerId } from '../config';
+import { selectAllFilters } from '../reducers/filterSlice';
 
 function TreeMap(props) {
     const dispatch = props.dispatch;
-    const filters = useSelector(selectFilters);
+    const filters = useSelector(selectAllFilters);
     
     useEffect(() => {
 

@@ -1,11 +1,12 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { reset, scopeOut, addExtensionExcludeFilter, removeExtensionExcludeFilter, selectFilters, scopeIn, addFileNamePrefixExcludeFilter, removeFileNamePrefixExcludeFilter } from '../reducers/defaultSlice';
+import { addExclusionExtensionFilter, addExclusionFilenamePrefixesFilter, filter, removeExclusionExtensionFilter, removeExclusionFilenamePrefixesFilter, selectAllFilters } from "../reducers/filterSlice";
+import { returnTreemapHome, scope, scopeTreemapIn, scopeTreemapOut } from "../reducers/treemapSlice";
 
 function Navigator(props) {
     const dispatch = props.dispatch;
     const currentPath = props.path;
-    const currentFilters = useSelector(selectFilters);
+    const currentFilters = useSelector(selectAllFilters);
     const [currentFilterInput, setFilterInput] = React.useState("");
     const [checked, setChecked] = React.useState(false);
 
@@ -31,55 +32,33 @@ function Navigator(props) {
     const handleFilterExtensionSubmit = (event) => {
         event.preventDefault()
         if (currentFilterInput.startsWith('.') && currentFilterInput.length > 1) {
-            dispatch(addExtensionExcludeFilter({
-                filters: {
-                    exclude: {
-                        extensions: [currentFilterInput]
-                    }
-                }
-            }));
+            dispatch(filter(addExclusionExtensionFilter([currentFilterInput,])));
         }
     }
 
     const handleFilterExtensionRemoval = (extension) => {
         if (extension) {
-            dispatch(removeExtensionExcludeFilter({
-                filters: {
-                    exclude: {
-                        extensions: [extension,]
-                    }
-                }
-            }))
+            dispatch(filter(removeExclusionExtensionFilter([extension,])));
         }
     }
-
 
     const handleDotFilterSwitch = (event) => {
         // event.preventDefault();
         setChecked(!checked);
 
         if (event.target.checked) {
-            dispatch(
-                addFileNamePrefixExcludeFilter(
-                    {
-                        filters: {
-                            exclude: {
-                                fileNamePrefix: ['.',]
-                            }
-                        }
-                    }
-                ))
+            dispatch(filter(addExclusionFilenamePrefixesFilter(['.',])));
         }
 
         else if (!event.target.checked) {
-            dispatch(removeFileNamePrefixExcludeFilter({
-                filters: {
-                    exclude: {
-                        fileNamePrefix: ['.',]
-                    }
-                }
-            }))
+            dispatch(filter(removeExclusionFilenamePrefixesFilter(['.',])));
         }
+    }
+
+    const generateBreadcrumb = (i, currentPath) => {
+        return i < currentPath.split('/').length ?
+            currentPath.split('/').slice(0, i + 1).join('/') :
+            currentPath.split('/')[0]
     }
 
     return (
@@ -94,9 +73,10 @@ function Navigator(props) {
                             (pathElement, i) =>
                                 <li className={i < currentPath.split('/').length - 1 ? "btn btn-link breadcrumb-item p-1" : "btn btn-link breadcrumb-item active p-1"}
                                     key={pathElement}
-                                    onClick={() => dispatch(scopeIn({
-                                        path: i < currentPath.split('/').length ? currentPath.split('/').slice(0, i + 1).join('/') : currentPath.split('/')[0]
-                                    }))}>
+                                    onClick={() => dispatch(scope (scopeTreemapIn(
+                                        generateBreadcrumb(i, currentPath)
+                                    ))
+                                    )}>
                                     {pathElement}
                                 </li>
                         )}
@@ -111,12 +91,12 @@ function Navigator(props) {
                             color: "white"
 
                         }}
-                        id="back" onClick={() => dispatch(scopeOut())}>Back</button>
+                        id="back" onClick={() => dispatch(scope(scopeTreemapOut()))}>Back</button>
                     <button type="button" className="btn" style={{
-                            backgroundColor: "#FE2857",
-                            color: "white"
+                        backgroundColor: "#FE2857",
+                        color: "white"
 
-                        }}id="reset" onClick={() => dispatch(reset())}>Reset</button>
+                    }} id="reset" onClick={() => dispatch(scope(returnTreemapHome()))}>Reset</button>
                 </div>
 
             </div>
@@ -144,7 +124,7 @@ function Navigator(props) {
                 </div>
 
                 <div className="container mb-3">
-                    {currentFilters.exclude.extensions.map(extension =>
+                    {currentFilters.exclusion.extensions.map(extension =>
                         <div className="d-inline-flex"
                             key={extension}
                             extensionid={extension}

@@ -3,7 +3,8 @@ import 'd3-transition';
 import { pickTextColorBasedOnBgColor } from '../utils/color';
 import { LAYOUT_CONSTANTS } from '../config';
 import uid from './uid';
-import { scopeIn, stats } from '../reducers/defaultSlice';
+import { scopeStatsIn, scopeTreemapIn } from '../reducers/treemapSlice';
+
 
 /*
     This file has all the methods related to the d3 treemap including calculation and rendering
@@ -56,16 +57,16 @@ function applyFilters(hierarchy, filters) {
         hierarchy.eachAfter(d => {
             if (filters) {
 
-                if (filters.exclude) {
-                    if (filters.exclude.fileNamePrefix) {
-                        filters.exclude.fileNamePrefix.forEach((prefix) => {
+                if (filters.exclusion) {
+                    if (filters.exclusion.fileNamePrefixes) {
+                        filters.exclusion.fileNamePrefixes.forEach((prefix) => {
                             if (d.data.name.startsWith(prefix)) {
                                 d.value = 0;
                             }
                         })
                     }
-                    if (filters.exclude.extensions) {
-                        if (filters.exclude.extensions.includes(d.data.extension)) {
+                    if (filters.exclusion.extensions) {
+                        if (filters.exclusion.extensions.includes(d.data.extension)) {
                             d.value = 0;
                         }
                     }
@@ -171,14 +172,11 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
         .attr("width", d => d.tileWidth)
         .attr("height", d => d.tileHeight)
         .on('click', (e, d) => {
-            const payload = {
-                path: d.data.path
-            }
             if ("children" in d.data) {
-                dispatch(scopeIn(payload));
+                dispatch(scopeTreemapIn(d.data.path));
             }
             else {
-                dispatch(stats(payload))
+                dispatch(scopeStatsIn(d.data.path))
             }
         })
         .append("xhtml:div")

@@ -1,14 +1,15 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { selectCurrentVisualizationData, selectCurrentVisualizationPath, selectCurrentStatsData, selectFilters } from '../reducers/defaultSlice';
 import LeftColumn from './Navigator';
 import TreeMap from './Treemap';
 import RightColumn from './RightColumn';
+import { selectCurrentStatsData, selectCurrentVisualizationData, selectCurrentVisualizationPath } from '../reducers/treemapSlice';
+import { selectExclusionFilters } from '../reducers/filterSlice';
 
 function App() {
     const currentVisualizationData = useSelector(selectCurrentVisualizationData);
     const currentVisualizationPath = useSelector(selectCurrentVisualizationPath);
     const currentStatsData = useSelector(selectCurrentStatsData);
-    const filters = useSelector(selectFilters);
+    const filters = useSelector(selectExclusionFilters);
     const dispatch = useDispatch();
 
     return (
@@ -20,7 +21,7 @@ function App() {
                     <LeftColumn path={currentVisualizationPath} filters={filters} dispatch={dispatch}></LeftColumn>
                 </div>
                 <div className='col-md-auto'>
-                    <TreeMap data={currentVisualizationData} filters={filters} dispatch={dispatch} />
+                    <TreeMap data={currentVisualizationData} filters={filters} dispatch={dispatch} ></TreeMap>
                 </div>
                 <div className='col'>
                     <RightColumn data={currentStatsData}></RightColumn>
