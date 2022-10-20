@@ -1,15 +1,27 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
+
+import { LAYOUT_CONSTANTS, treemapSvgId, treemapContainerId } from '../config';
+
+import { selectAllFilters } from '../reducers/filterSlice';
+
 import { createSVGInContainer, clearCanvas } from '../d3/svgCanvas';
 import { generateTreemapLayoutFromData, drawTreemapFromGeneratedLayout } from '../d3/treemap';
-import { LAYOUT_CONSTANTS, treemapSvgId, treemapContainerId } from '../config';
-import { selectAllFilters } from '../reducers/filterSlice';
+import { scopeTreemapIn } from '../reducers/treemapSlice';
+import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 
 function TreeMap(props) {
     const dispatch = props.dispatch;
     const filters = useSelector(selectAllFilters);
-    
+    const [searchParams, setSearchParams] = useSearchParams();
+
     useEffect(() => {
+        const path = searchParams.get("path") || "";
+
+        setSearchParams({
+            "path": props.data.path,
+        })
 
         // set data source
         const data = props.data;
@@ -26,7 +38,7 @@ function TreeMap(props) {
         // Drawing the treemap from the generated data
         drawTreemapFromGeneratedLayout(svg, rootNode, dispatch, filters);
 
-    }, [props.data, filters, dispatch]
+    }, [props.data, filters, dispatch, setSearchParams]
     )
 
     return (
