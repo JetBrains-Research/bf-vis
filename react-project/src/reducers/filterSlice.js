@@ -13,44 +13,49 @@ const defaultState = {
     }
 }
 
-const filterSlice = createSlice(
-    {
-        name: "filter",
-        initialState: defaultState,
-        reducers: {
-            addExclusionExtensionFilter: (state, action) => {
-                const newExtensions = action.payload.extensions;
+const filterSlice = createSlice({
+    name: "filter",
+    initialState: defaultState,
+    reducers: {
+        addExclusionExtensionsFilter: (state, action) => {
+            const newExtensions = action.payload;
 
-                        if (newExtensions) {
-                            state.exclusion.extensions = [...new Set(state.exclusion.extensions.concat(newExtensions))]
-                        }
-            },
-            removeExclusionExtensionFilter: (state, action) => {
-                const extensionsToRemove = action.payload.extensions.toString();
+            if (Array.isArray(newExtensions) && newExtensions.length > 0) {
+                state.exclusion.extensions = [...new Set(state.exclusion.extensions.concat(newExtensions))]
+            }
+        },
+        removeExclusionExtensionsFilter: (state, action) => {
+            const extensionsToRemove = action.payload;
 
-                        if (extensionsToRemove) {
-                            state.exclusion.extensions = state.exclusion.extensions.filter((element) => !extensionsToRemove.includes(element))
-                        }
-            },
-            addExclusionFileNamePrefixFilter: (state, action) => {
-                if ("fileNamePrefixes" in action.payload && Array.isArray(action.payload.extension)) {
-                    const fileNamePrefixesToAdd = action.payload.fileNamePrefixes;
-                    state.exclusion.fileNamePrefixes = [...new Set(state.exclusion.fileNamePrefixes.concat(fileNamePrefixesToAdd))]
-                }
-            },
-            removeExclusionFileNamePrefixFilter: (state, action) => {
-                if ("fileNamePrefixes" in action.payload && Array.isArray(action.payload.extension)) {
-                    const fileNamePrefixesToRemove = action.payload.fileNamePrefixes;
-                    state.exclusion.fileNamePrefixes = state.exclusion.fileNamePrefixes.filter((element) => fileNamePrefixesToRemove.includes())
-                }
-            },
+            if (Array.isArray(extensionsToRemove) && extensionsToRemove.length > 0) {
+                state.exclusion.extensions = state.exclusion.extensions.filter((element) => !extensionsToRemove.includes(element))
+            }
+        },
+        addExclusionFilenamePrefixesFilter: (state, action) => {
+            const fileNamePrefixesToAdd = action.payload;
 
-        }
+            if (Array.isArray(fileNamePrefixesToAdd) && fileNamePrefixesToAdd.length > 0) {
+                state.exclusion.fileNamePrefixes = [...new Set(state.exclusion.fileNamePrefixes.concat(fileNamePrefixesToAdd))]
+            }
+        },
+        removeExclusionFilenamePrefixesFilter: (state, action) => {
+            const fileNamePrefixesToRemove = action.payload;
+
+            if (Array.isArray(fileNamePrefixesToRemove) && fileNamePrefixesToRemove.length > 0) {
+                state.exclusion.fileNamePrefixes = state.exclusion.fileNamePrefixes.filter((element) => fileNamePrefixesToRemove.includes())
+            }
+        },
     }
-)
+});
 
 
-export const { addExclusionExtensionFilter, removeExclusionExtensionFilter, addExclusionFilenamePrefixesFilter, removeExclusionFilenamePrefixesFilter } = filterSlice.actions;
+export const
+    {
+        addExclusionExtensionsFilter,
+        removeExclusionExtensionsFilter,
+        addExclusionFilenamePrefixesFilter,
+        removeExclusionFilenamePrefixesFilter
+    } = filterSlice.actions;
 export const selectAllFilters = (state) => state.filter;
 export const selectInclusionFilters = (state) => state.filter.inclusion;
 export const selectExclusionFilters = (state) => state.filter.exclusion;

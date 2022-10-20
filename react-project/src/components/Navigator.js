@@ -2,10 +2,9 @@ import React from "react";
 import { useSelector } from "react-redux";
 import
 {
-    addExclusionExtensionFilter,
+    addExclusionExtensionsFilter,
+    removeExclusionExtensionsFilter,
     addExclusionFilenamePrefixesFilter,
-    filter,
-    removeExclusionExtensionFilter,
     removeExclusionFilenamePrefixesFilter,
     selectAllFilters
 }
@@ -42,26 +41,25 @@ function Navigator(props) {
     const handleFilterExtensionSubmit = (event) => {
         event.preventDefault()
         if (currentFilterInput.startsWith('.') && currentFilterInput.length > 1) {
-            dispatch(filter(addExclusionExtensionFilter([currentFilterInput,])));
+            dispatch(addExclusionExtensionsFilter([currentFilterInput,]));
         }
     }
 
     const handleFilterExtensionRemoval = (extension) => {
         if (extension) {
-            dispatch(filter(removeExclusionExtensionFilter([extension,])));
+            dispatch(removeExclusionExtensionsFilter([extension,]));
         }
     }
 
     const handleDotFilterSwitch = (event) => {
-        // event.preventDefault();
         setChecked(!checked);
 
         if (event.target.checked) {
-            dispatch(filter(addExclusionFilenamePrefixesFilter(['.',])));
+            dispatch(addExclusionFilenamePrefixesFilter(['.',]));
         }
 
         else if (!event.target.checked) {
-            dispatch(filter(removeExclusionFilenamePrefixesFilter(['.',])));
+            dispatch(removeExclusionFilenamePrefixesFilter(['.',]));
         }
     }
 
