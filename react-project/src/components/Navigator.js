@@ -72,7 +72,7 @@ function Navigator(props) {
     return (
         <div className='col p-1' id='controls'>
 
-            <div className="row pt-2 pb-2 mb-3 panel">
+            <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Current Path:</h4>
 
                 <nav aria-label="breadcrumb">
@@ -108,7 +108,7 @@ function Navigator(props) {
 
             </div>
 
-            <div className="row pt-2 pb-2 mb-3 panel">
+            <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Filters</h4>
 
                 <div className="input-group">
