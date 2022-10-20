@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 
@@ -19,9 +19,12 @@ function TreeMap(props) {
     useEffect(() => {
         const path = searchParams.get("path") || "";
 
-        setSearchParams({
-            "path": props.data.path,
-        })
+        if (path && path !== props.data.path) {
+            dispatch(scopeTreemapIn(payloadGenerator("path", path)));
+        }
+    }, [searchParams, props.data.path])
+
+    useEffect(() => {
 
         // set data source
         const data = props.data;
@@ -38,13 +41,21 @@ function TreeMap(props) {
         // Drawing the treemap from the generated data
         drawTreemapFromGeneratedLayout(svg, rootNode, dispatch, filters);
 
-    }, [props.data, filters, dispatch, setSearchParams]
+    }, [props.data, filters, dispatch, searchParams]
     )
+
+    useEffect(() => {
+        setSearchParams({
+            "path": props.data.path,
+        })
+    }, [setSearchParams, props.data.path])
 
     return (
         <div id={treemapContainerId} className='container-fluid'>
         </div>
     )
+
+
 }
 
 export default TreeMap;
