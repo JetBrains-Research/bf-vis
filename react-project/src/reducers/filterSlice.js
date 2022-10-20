@@ -1,4 +1,5 @@
 import { createAction, createSlice } from "@reduxjs/toolkit";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
 
 // Action Names
 const ADD_EXCLUSION_EXTENSION_FILTER = "FILTER/EXCLUSION/EXTENSION/ADD";
@@ -16,16 +17,6 @@ const REMOVE_INCLUSION_FILENAME_FILTER = "FILTER/INCLUSION/FILENAME/REMOVE";
 const REMOVE_INCLUSION_FILENAMEPREFIX_FILTER = "FILTER/INCLUSION/FILENAMEPREFIX/REMOVE";
 
 const RESET_FILTERS = "RESET_FILTERS";
-
-// Action Creator Helper functions
-
-const payloadGenerator = (propertyName, propertyValue) => {
-    return {
-        payload: {
-            propertyName: propertyValue
-        }
-    }
-}
 
 // Action Creators
 const addExclusionExtensionFilter = createAction(ADD_EXCLUSION_EXTENSION_FILTER, (extensions) => payloadGenerator("extension", extensions));

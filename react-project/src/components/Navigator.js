@@ -1,7 +1,17 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { addExclusionExtensionFilter, addExclusionFilenamePrefixesFilter, filter, removeExclusionExtensionFilter, removeExclusionFilenamePrefixesFilter, selectAllFilters } from "../reducers/filterSlice";
-import { returnTreemapHome, scope, scopeTreemapIn, scopeTreemapOut } from "../reducers/treemapSlice";
+import
+{
+    addExclusionExtensionFilter,
+    addExclusionFilenamePrefixesFilter,
+    filter,
+    removeExclusionExtensionFilter,
+    removeExclusionFilenamePrefixesFilter,
+    selectAllFilters
+}
+    from "../reducers/filterSlice";
+import { returnTreemapHome, scopeTreemapIn, scopeTreemapOut } from "../reducers/treemapSlice";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
 
 function Navigator(props) {
     const dispatch = props.dispatch;
@@ -73,9 +83,8 @@ function Navigator(props) {
                             (pathElement, i) =>
                                 <li className={i < currentPath.split('/').length - 1 ? "btn btn-link breadcrumb-item p-1" : "btn btn-link breadcrumb-item active p-1"}
                                     key={pathElement}
-                                    onClick={() => dispatch(scope (scopeTreemapIn(
-                                        generateBreadcrumb(i, currentPath)
-                                    ))
+                                    onClick={() => dispatch(scopeTreemapIn(payloadGenerator("path", generateBreadcrumb(i, currentPath))
+                                    )
                                     )}>
                                     {pathElement}
                                 </li>
@@ -91,12 +100,12 @@ function Navigator(props) {
                             color: "white"
 
                         }}
-                        id="back" onClick={() => dispatch(scope(scopeTreemapOut()))}>Back</button>
+                        id="back" onClick={() => dispatch(scopeTreemapOut())}>Back</button>
                     <button type="button" className="btn" style={{
                         backgroundColor: "#FE2857",
                         color: "white"
 
-                    }} id="reset" onClick={() => dispatch(scope(returnTreemapHome()))}>Reset</button>
+                    }} id="reset" onClick={() => dispatch(returnTreemapHome())}>Reset</button>
                 </div>
 
             </div>

@@ -4,6 +4,7 @@ import { pickTextColorBasedOnBgColor } from '../utils/color';
 import { LAYOUT_CONSTANTS } from '../config';
 import uid from './uid';
 import { scopeStatsIn, scopeTreemapIn } from '../reducers/treemapSlice';
+import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 
 
 /*
@@ -173,10 +174,10 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
         .attr("height", d => d.tileHeight)
         .on('click', (e, d) => {
             if ("children" in d.data) {
-                dispatch(scopeTreemapIn(d.data.path));
+                dispatch(scopeTreemapIn(payloadGenerator ("path", d.data.path)));
             }
             else {
-                dispatch(scopeStatsIn(d.data.path))
+                dispatch(scopeStatsIn(payloadGenerator ("path", d.data.path)));
             }
         })
         .append("xhtml:div")
