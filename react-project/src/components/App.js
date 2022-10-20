@@ -1,16 +1,19 @@
 import { useDispatch, useSelector } from 'react-redux';
-import LeftColumn from './Navigator';
-import TreeMap from './Treemap';
-import RightColumn from './RightColumn';
+
 import { selectCurrentStatsData, selectCurrentVisualizationData, selectCurrentVisualizationPath } from '../reducers/treemapSlice';
 import { selectExclusionFilters } from '../reducers/filterSlice';
 
+import LeftColumn from './Navigator';
+import TreeMap from './Treemap';
+import RightColumn from './RightColumn';
+
 function App() {
+    const dispatch = useDispatch();
+    
     const currentVisualizationData = useSelector(selectCurrentVisualizationData);
     const currentVisualizationPath = useSelector(selectCurrentVisualizationPath);
     const currentStatsData = useSelector(selectCurrentStatsData);
     const filters = useSelector(selectExclusionFilters);
-    const dispatch = useDispatch();
 
     return (
         <div className="App container-fluid text-center">
