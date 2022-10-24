@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import 'd3-transition';
 import { pickTextColorBasedOnBgColor } from '../utils/color';
-import { LAYOUT_CONSTANTS } from '../config';
+import { CONSTANTS } from '../config';
 import uid from './uid';
 import { scopeStatsIn, scopeTreemapIn } from '../reducers/treemapSlice';
 import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
@@ -12,7 +12,17 @@ import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 */
 
 // get max val from data and use it to set the upper limit in color selection
-export const color = d3.scaleSequential([0, 10], d3.interpolateRdYlGn)
+const JETBRAINS_COLORS = CONSTANTS.general.colors.jetbrains;
+const MAX_BUS_FACTOR_COLOR_VALUE = CONSTANTS.treemap.logic.maxBusFactorValue;
+export const colorSequence = [
+    JETBRAINS_COLORS.darkRed,
+    JETBRAINS_COLORS.orange,
+    JETBRAINS_COLORS.yellow,
+    JETBRAINS_COLORS.green,
+    JETBRAINS_COLORS.blue
+]
+export const color = d3.scaleQuantize().domain([0, MAX_BUS_FACTOR_COLOR_VALUE]).range(colorSequence);
+// export const color = d3.scaleSequential([0, 10], d3.interpolateRdYlGn);
 export const formatSI = d3.format(".2s")
 
 export function normalizeD3DataValues(node) {
@@ -97,8 +107,8 @@ export function generateTreemapLayoutFromData(data, height, width, filters) {
 
     const treemap = (data) => d3.treemap()
         .size([width, height])
-        .padding(LAYOUT_CONSTANTS.treemap.overallPadding)
-        .paddingTop(LAYOUT_CONSTANTS.treemap.topPadding)
+        .padding(CONSTANTS.treemap.layout.overallPadding)
+        .paddingTop(CONSTANTS.treemap.layout.topPadding)
         .round(false)
         .tile(d3.treemapSquarify)
         (data);
@@ -120,7 +130,7 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
     // Start 'painting'
     const node = svg.selectAll("g")
         .data(d3.group(root.descendants().filter(function (d) {
-            return (d.depth < LAYOUT_CONSTANTS.treemap.max_depth)
+            return (d.depth < CONSTANTS.treemap.logic.maxDepth)
         }), d => d.data.path))
         .join("g")
         .selectAll("g")
@@ -174,10 +184,10 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
         .attr("height", d => d.tileHeight)
         .on('click', (e, d) => {
             if ("children" in d.data) {
-                dispatch(scopeTreemapIn(payloadGenerator ("path", d.data.path)));
+                dispatch(scopeTreemapIn(payloadGenerator("path", d.data.path)));
             }
             else {
-                dispatch(scopeStatsIn(payloadGenerator ("path", d.data.path)));
+                dispatch(scopeStatsIn(payloadGenerator("path", d.data.path)));
             }
         })
         .append("xhtml:div")
