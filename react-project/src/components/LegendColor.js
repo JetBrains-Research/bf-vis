@@ -31,10 +31,10 @@ function LegendColor(props) {
     return (
         <div id="legend-size-container" className='row panel-right mt-2 pt-2 pb-2' >
             <h4>Bus Factor</h4>
-            <p className='small'>We map the bus factor to an interpolation of colors ranging from red to green. Red is lower, green is higher</p>
+            <p className='small'>Red is lower, green is higher</p>
             {scale.map(element => {
                 return (
-                    <div className="row justify-content-center align-items-center g-1">
+                    <div key={element.label} className="row justify-content-center align-items-center g-1">
                         <div className="col-1">{generateSvgSquare("1.5rem", element.color)}</div>
                         <div className="col-9">{element.label}</div>
                     </div>
