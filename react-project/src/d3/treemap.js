@@ -20,7 +20,8 @@ export const colorSequence = [
     JETBRAINS_COLORS.yellow,
     JETBRAINS_COLORS.green,
     JETBRAINS_COLORS.blue
-]
+];
+
 export const color = d3.scaleQuantize().domain([0, MAX_BUS_FACTOR_COLOR_VALUE]).range(colorSequence);
 // export const color = d3.scaleSequential([0, 10], d3.interpolateRdYlGn);
 export const formatSI = d3.format(".2s")
@@ -99,6 +100,64 @@ function addDimensionsToTreemap(treemap) {
 }
 
 
+function addColorsToTreemap(treemap) {
+    treemap.eachAfter((d) => {
+        const color = chooseRectangleFillColor(d)
+        d.bgColor = color;
+        d.textColor = pickTextColorBasedOnBgColor(color, JETBRAINS_COLORS.gray, JETBRAINS_COLORS.black);
+    })
+}
+
+
+function chooseRectangleFillColor(d) {
+
+    if ("busFactor" in d.data.busFactorStatus) {
+        return color(d.data.busFactorStatus.busFactor);
+    }
+
+    else return JETBRAINS_COLORS.gray;
+}
+
+
+function rectangleOnClickHandler(d, dispatch) {
+
+    if ("children" in d.data) {
+        dispatch(scopeTreemapIn(payloadGenerator("path", d.data.path)));
+    }
+    else {
+        dispatch(scopeStatsIn(payloadGenerator("path", d.data.path)));
+    }
+
+}
+
+
+function rectangleOnMouseOverHandler(d) {
+
+    if (d.depth > 0) {
+        const pElement = d3.select(`#p-${d.nodeUid.id}`);
+        pElement.classed("text-truncate", false);
+
+        const rects = d3.select(d.nodeUid.href)
+        rects.transition().duration(500)
+            .ease(d3.easeExpOut)
+            .style("stroke-width", "0.3rem")
+            .style("stroke", JETBRAINS_COLORS.darkGray);
+    }
+}
+
+
+function rectangleOnMouseOutHandler(d) {
+    
+    const pElement = d3.select(`p${`#p-${d.nodeUid.id}`}`);
+    pElement.classed("text-truncate", true);
+
+    const rects = d3.select(d.nodeUid.href)
+    rects.transition().duration(CONSTANTS.treemap.children.rect.transitionDuration)
+        .ease(d3.easeElastic)
+        .style("stroke-width", null);
+}
+
+
 export function generateTreemapLayoutFromData(data, height, width, filters) {
 
     // Construct nodes and calculate drawing coordinates from filtered data
@@ -114,15 +173,24 @@ export function generateTreemapLayoutFromData(data, height, width, filters) {
         (data);
 
     // Applying filters
-    let hiearchyFiltered = applyFilters(hierarchicalData, filters);
+    let hierarchyFiltered = applyFilters(hierarchicalData, filters);
 
     // Applying the log base 2 function to the size
-    let hierarchyNormalized = applyNormalizationToD3Hierarchy(hiearchyFiltered, Math.log2);
-    hierarchyNormalized.sort((a, b) => b.size - a.size);
-    const root = treemap(hierarchyNormalized);
-    const rootDimensioned = addDimensionsToTreemap(root)
+    let hierarchyNormalized = applyNormalizationToD3Hierarchy(hierarchyFiltered, Math.log2);
 
-    return rootDimensioned;
+    // Sort the nodes
+    hierarchyNormalized.sort((a, b) => b.size - a.size);
+
+    // Form treemap
+    const root = treemap(hierarchyNormalized);
+
+    // Populate dimensions to prevent repeated calculation of the same values
+    addDimensionsToTreemap(root)
+
+    // Calculate color of background and text
+    addColorsToTreemap(root)
+
+    return root;
 }
 
 
@@ -141,40 +209,28 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
     // Tooltip
     node.append("title")
         .text(d => `${d.ancestors().reverse().map(d => d.data.name).join("/")}
-        bytes: ${formatSI(d.size)}
-        bus factor: ${("busFactor" in d.data.busFactorStatus) ? d.data.busFactorStatus.busFactor : "?"}
-        d3-value: ${d.value}`);
+bytes: ${formatSI(d.size)}
+bus factor: ${("busFactor" in d.data.busFactorStatus) ? d.data.busFactorStatus.busFactor : "?"}
+d3-value: ${d.value}`);
 
     // Tiles
     node.filter((d) => d.depth > 0).append("rect")
-        .style("rx", 5)
-        .style("ry", 5)
+        .style("rx", CONSTANTS.treemap.children.rect.rx)
+        .style("ry", CONSTANTS.treemap.children.rect.ry)
         .attr("width", d => d.tileWidth)
-        .transition("firstRender").duration(500)
+        .transition("firstRender").duration(CONSTANTS.treemap.children.rect.transitionDuration)
         .ease(d3.easeSin)
-        .style("fill", d => {
-            if ("busFactor" in d.data.busFactorStatus) {
-                d.color = color(d.data.busFactorStatus.busFactor)
-            }
-            else d.color = "rgb(200,200,200)";
-            return d.color;
-        })
-        .style("stroke", "#7D7D7D")
+        .style("fill", (d) => chooseRectangleFillColor(d))
+        .style("stroke", JETBRAINS_COLORS.black)
         .attr("id", d => (d.nodeUid = uid("node")).id)
         .attr("height", d => d.tileHeight);
 
     node.filter((d) => d.depth === 0).append("rect")
-        .style("fill", d => {
-            if ("busFactor" in d.data.busFactorStatus) {
-                d.color = color(d.data.busFactorStatus.busFactor)
-            }
-            else d.color = "rgb(200,200,200)";
-            return d.color;
-        })
-        .style("stroke", "black")
-        .style("opacity", 0.75)
-        .style("rx", 5)
-        .style("ry", 5)
+        .style("fill", d => chooseRectangleFillColor(d))
+        .style("stroke", JETBRAINS_COLORS.black)
+        .style("opacity", CONSTANTS.treemap.children.rect.parentOpacity)
+        .style("rx", CONSTANTS.treemap.children.rect.rx)
+        .style("ry", CONSTANTS.treemap.children.rect.ry)
         .attr("width", d => d.tileWidth)
         .attr("id", d => (d.nodeUid = uid("node")).id)
         .attr("height", d => d.tileHeight);
@@ -183,45 +239,19 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
         .append("foreignObject")
         .attr("width", d => d.tileWidth)
         .attr("height", d => d.tileHeight)
-        .on('click', (e, d) => {
-            if ("children" in d.data) {
-                dispatch(scopeTreemapIn(payloadGenerator("path", d.data.path)));
-            }
-            else {
-                dispatch(scopeStatsIn(payloadGenerator("path", d.data.path)));
-            }
-        })
+        .on('click', (_e, d) => rectangleOnClickHandler(d, dispatch))
         .append("xhtml:div")
-        .attr("class", (d) => d.depth > 0 ? "row p-0 m-0 align-items-center fw-semibold h-100" : "row px-1 fw-semibold")
-        .on("mouseover", (e, d) => {
-            if (d.depth > 0) {
-                const pElement = d3.select(`#p-${d.nodeUid.id}`);
-                pElement.classed("text-truncate", false);
-
-                const rects = d3.select(d.nodeUid.href)
-                rects.transition().duration(500)
-                    .ease(d3.easeExpOut)
-                    .style("stroke-width", "0.3rem")
-                    .style("stroke", "#7D7D7D");
-            }
-        })
-        .on("mouseout", (e, d) => {
-            const pElement = d3.select(`p${`#p-${d.nodeUid.id}`}`);
-            pElement.classed("text-truncate", true);
-
-            const rects = d3.select(d.nodeUid.href)
-            rects.transition().duration(500)
-                .ease(d3.easeElastic)
-                .style("stroke-width", null);
-        })
+        .attr("class", (d) => d.depth > 0 ? CONSTANTS.treemap.classes.rectWrapperChild : CONSTANTS.treemap.classes.rectWrapperParent)
+        .on("mouseover", (_e, d) => rectangleOnMouseOverHandler(d))
+        .on("mouseout", (_e, d) => rectangleOnMouseOutHandler(d))
         .append("div")
 
     textBox
         .filter((d) => d.data.children && d.depth > 0)
         .append("xhtml:i")
-        .attr("class", "bi bi-folder2")
-        .style("color", (d) => pickTextColorBasedOnBgColor(d.color, "#CDCDCD", "#343434"))
-        .style("font-size", "1.5em");
+        .attr("class", CONSTANTS.treemap.classes.folderIcon )
+        .style("color", (d) => d.textColor)
+        .style("font-size", CONSTANTS.treemap.children.icon.fontSize);
 
     textBox.append("xhtml:p")
         .text(d => {
@@ -230,6 +260,6 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
         .attr("class", "text-truncate")
         .attr("id", (d) => `p-${d.nodeUid.id}`)
         .style("overflow-wrap", "break-word")
-        .style("color", (d) => pickTextColorBasedOnBgColor(d.color, "#CDCDCD", "#343434"))
-        .style("font-size", "0.8rem")
+        .style("color", (d) => d.textColor)
+        .style("font-size", CONSTANTS.treemap.children.p.fontSize)
 }

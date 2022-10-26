@@ -37,8 +37,28 @@ export const CONSTANTS = {
             maxBusFactorValue: 10,
         },
         classes: {
+            rectWrapperChild: "row p-0 m-0 align-items-center fw-semibold h-100",
+            rectWrapperParent: "row px-1 fw-semibold",
+            folderIcon: "bi bi-folder2"
 
         },
+        children: {
+            rect: {
+                rx: 5,
+                ry: 5,
+                transitionDuration: 500,
+                parentOpacity: 0.75,
+            },
+            textBox: {
+                
+            },
+            icon: {
+                fontSize: "1.5em"
+            },
+            p: {
+                fontSize: "0.8em"
+            }
+        }
     },
     legend: {
         layout: {
