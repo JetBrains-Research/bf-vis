@@ -8,8 +8,8 @@ function RightColumn(props) {
 
     return (
         <div className='col p-1'>
-            <StatsPane data={data}></StatsPane>
             <LegendColor></LegendColor>
+            <StatsPane data={data}></StatsPane>
         </div>)
 
 }
