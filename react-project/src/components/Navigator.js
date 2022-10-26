@@ -1,55 +1,19 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import
-{
+import {
     addExclusionExtensionsFilter,
     removeExclusionExtensionsFilter,
     addExclusionFilenamePrefixesFilter,
     removeExclusionFilenamePrefixesFilter,
-    selectAllFilters
 }
     from "../reducers/filterSlice";
 import { returnTreemapHome, scopeTreemapIn, scopeTreemapOut } from "../reducers/treemapSlice";
 import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
+import FilterWithInput from "./FilterWithInput";
 
 function Navigator(props) {
     const dispatch = props.dispatch;
     const currentPath = props.path;
-    const currentFilters = useSelector(selectAllFilters);
-    const [currentFilterInput, setFilterInput] = React.useState("");
     const [checked, setChecked] = React.useState(false);
-
-    const clickableTagStyle = {
-        cursor: "pointer"
-    }
-
-    const handleTextChange = (event) => {
-        if (event.target.value) {
-            let filterExtension = String(event.target.value).trim();
-            if (filterExtension.length > 1) {
-                setFilterInput(`.${filterExtension}`);
-            }
-            else {
-                setFilterInput("");
-            }
-        }
-        else {
-            setFilterInput("");
-        }
-    }
-
-    const handleFilterExtensionSubmit = (event) => {
-        event.preventDefault()
-        if (currentFilterInput.startsWith('.') && currentFilterInput.length > 1) {
-            dispatch(addExclusionExtensionsFilter([currentFilterInput,]));
-        }
-    }
-
-    const handleFilterExtensionRemoval = (extension) => {
-        if (extension) {
-            dispatch(removeExclusionExtensionsFilter([extension,]));
-        }
-    }
 
     const handleDotFilterSwitch = (event) => {
         setChecked(!checked);
@@ -110,40 +74,11 @@ function Navigator(props) {
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Filters</h4>
+                <FilterWithInput filterPropertyType="File extension" addFunction={addExclusionExtensionsFilter} removeFunction={removeExclusionExtensionsFilter} dispatch={dispatch} addDefaultPrefix="." >
+                </FilterWithInput>
 
-                <div className="input-group">
-                    <input type="text"
-                        className="form-control"
-                        placeholder="File extension"
-                        aria-label="File extension"
-                        aria-describedby="input-file-extension"
-                        onChange={handleTextChange}>
-                    </input>
-
-                    <button
-                        className="btn btn-dark"
-                        type="button"
-                        id="button-filter-add"
-                        onClick={handleFilterExtensionSubmit}>
-                        Add
-                    </button>
-
-                </div>
-
-                <div className="container mb-3">
-                    {currentFilters.exclusion.extensions.map(extension =>
-                        <div className="d-inline-flex"
-                            key={extension}
-                            extensionid={extension}
-                            style={clickableTagStyle}
-                            onClick={() => handleFilterExtensionRemoval(extension)}>
-                            <span
-                                className="badge text-bg-danger m-1">
-                                {extension}
-                                <i className="m-1 bi bi-x-circle"></i>
-                            </span>
-                        </div>)}
-                </div>
+                <FilterWithInput filterPropertyType="File name"> </FilterWithInput>
+                <FilterWithInput filterPropertyType="File name prefix"> </FilterWithInput>
 
                 <div className="col ps-5 form-check form-switch">
                     <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked={checked} onChange={handleDotFilterSwitch}></input>
