@@ -172,6 +172,7 @@ export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
             return d.color;
         })
         .style("stroke", "black")
+        .style("opacity", 0.75)
         .style("rx", 5)
         .style("ry", 5)
         .attr("width", d => d.tileWidth)
