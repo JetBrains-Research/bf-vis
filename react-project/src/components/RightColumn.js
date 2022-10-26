@@ -1,5 +1,6 @@
 import React from "react";
-import StatsPane from "./DetailsPane";
+import LegendColor from "./LegendColor";
+import StatsPane from "./StatsPane";
 
 function RightColumn(props) {
 
@@ -7,6 +8,7 @@ function RightColumn(props) {
 
     return (
         <div className='col p-1'>
+            <LegendColor></LegendColor>
             <StatsPane data={data}></StatsPane>
         </div>)
 
