@@ -1,14 +1,11 @@
-import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { scopeTreemapIn, selectCurrentStatsData, selectCurrentVisualizationData, selectCurrentVisualizationPath } from '../reducers/treemapSlice';
+import { selectCurrentStatsData, selectCurrentStatsPath, selectCurrentVisualizationData, selectCurrentVisualizationPath } from '../reducers/treemapSlice';
 import { selectExclusionFilters } from '../reducers/filterSlice';
 
 import LeftColumn from './Navigator';
 import TreeMap from './Treemap';
 import RightColumn from './RightColumn';
-import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 
 
 function App() {
@@ -17,19 +14,8 @@ function App() {
     const currentVisualizationData = useSelector(selectCurrentVisualizationData);
     const currentVisualizationPath = useSelector(selectCurrentVisualizationPath);
     const currentStatsData = useSelector(selectCurrentStatsData);
+    const currentStatsPath = useSelector(selectCurrentStatsPath);
     const filters = useSelector(selectExclusionFilters);
-
-    const [searchParams, setSearchParams] = useSearchParams();
-
-    // useEffect(() => {
-    //     const path = searchParams.get("path") || "";
-
-    //     if (path && path !== currentVisualizationPath) {
-    //         dispatch(scopeTreemapIn(payloadGenerator("path", path)));
-    //     }
-
-    // }, [searchParams, setSearchParams, currentVisualizationPath, dispatch])
-
 
     return (
         <div className="App container-fluid text-center">
@@ -40,7 +26,7 @@ function App() {
                     <LeftColumn path={currentVisualizationPath} filters={filters} dispatch={dispatch}></LeftColumn>
                 </div>
                 <div className='col-md-auto'>
-                    <TreeMap data={currentVisualizationData} filters={filters} dispatch={dispatch} ></TreeMap>
+                    <TreeMap data={currentVisualizationData} dataPath={currentVisualizationPath} statsPath={currentStatsPath} filters={filters} dispatch={dispatch}  ></TreeMap>
                 </div>
                 <div className='col'>
                     <RightColumn data={currentStatsData}></RightColumn>

@@ -119,13 +119,15 @@ function chooseRectangleFillColor(d) {
 }
 
 
-function rectangleOnClickHandler(d, dispatch) {
+function rectangleOnClickHandler(d, setPathFunction) {
 
     if ("children" in d.data) {
-        dispatch(scopeTreemapIn(payloadGenerator("path", d.data.path)));
+        setPathFunction(d.data.path);
+        // dispatch(scopeTreemapIn(payloadGenerator("path", d.data.path)));
     }
     else {
-        dispatch(scopeStatsIn(payloadGenerator("path", d.data.path)));
+        setPathFunction("", d.data.path);
+        // dispatch(scopeStatsIn(payloadGenerator("path", d.data.path)));
     }
 
 }
@@ -194,7 +196,7 @@ export function generateTreemapLayoutFromData(data, height, width, filters) {
 }
 
 
-export function drawTreemapFromGeneratedLayout(svg, root, dispatch) {
+export function drawTreemapFromGeneratedLayout(svg, root, setPathFunction) {
     // Start 'painting'
     const node = svg.selectAll("g")
         .data(d3.group(root.descendants().filter(function (d) {
@@ -239,7 +241,7 @@ d3-value: ${d.value}`);
         .append("foreignObject")
         .attr("width", d => d.tileWidth)
         .attr("height", d => d.tileHeight)
-        .on('click', (_e, d) => rectangleOnClickHandler(d, dispatch))
+        .on('click', (_e, d) => rectangleOnClickHandler(d, setPathFunction))
         .append("xhtml:div")
         .attr("class", (d) => d.depth > 0 ? CONSTANTS.treemap.classes.rectWrapperChild : CONSTANTS.treemap.classes.rectWrapperParent)
         .on("mouseover", (_e, d) => rectangleOnMouseOverHandler(d))
