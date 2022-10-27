@@ -7,21 +7,21 @@ function StatsPane(props) {
 
     const nodeData = props.data;
     const nodeBusFactor = ("busFactor" in nodeData.busFactorStatus) ? nodeData.busFactorStatus.busFactor : "N/A";
-    const authorsList = ("usersFormatted" in nodeData) ? [...nodeData.usersFormatted] : undefined;
+    const authorsList = ("users" in nodeData) ? [...nodeData.users] : undefined;
     let topAuthors = undefined;
     let authorsListContributionPercentage = undefined;
     const totalNumOfAuthors = (authorsList) ? authorsList.length : 0;
     const [numOfAuthors, setNumOfAuthors] = useState(0);
 
     if (authorsList) {
-        authorsList.sort((a, b) => b.contributionScore - a.contributionScore);
-        let cumulativeAuthorContributionScore = authorsList.map(element => element.contributionScore).reduce((prevValue, currentValue) => prevValue + currentValue, 0);
+        authorsList.sort((a, b) => b.authorship - a.authorship);
+        let cumulativeAuthorship = authorsList.map(element => element.authorship).reduce((prevValue, currentValue) => prevValue + currentValue, 0);
 
         authorsListContributionPercentage = authorsList.map((authorContributionPair) => {
             return {
                 "email": authorContributionPair.email,
-                "contributionScore": authorContributionPair.contributionScore,
-                "relativeScore": authorContributionPair.contributionScore / cumulativeAuthorContributionScore
+                "authorship": authorContributionPair.authorship,
+                "relativeScore": authorContributionPair.authorship / cumulativeAuthorship
             }
         });
         topAuthors = authorsListContributionPercentage.slice(0, numOfAuthors);
@@ -61,18 +61,12 @@ function StatsPane(props) {
                                 <p className="small text-break text-wrap">
                                     {authorScorePair["email"]}
                                 </p>
-                                <h6 className="small">{formatSI(authorScorePair["contributionScore"])}</h6>
+                                <h6 className="small">{formatSI(authorScorePair["authorship"])}</h6>
                                 <span className="small">({formatPercentage(authorScorePair["relativeScore"])})</span>
                             </div>
                     )
                         : <p className="small fw-bold">N/A</p>}
                 </div>
-            </div>
-            <div>
-                <p>Click the button below to learn more about color and sizing of the treemap tiles</p>
-                <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#legendModal">
-                    Legend
-                </button>
             </div>
         </div>
     )
