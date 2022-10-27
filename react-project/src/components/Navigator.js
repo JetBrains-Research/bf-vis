@@ -6,13 +6,13 @@ import {
     removeExclusionFilenamePrefixesFilter,
 }
     from "../reducers/filterSlice";
-import { returnTreemapHome, scopeTreemapIn, scopeTreemapOut } from "../reducers/treemapSlice";
-import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
+import { returnTreemapHome } from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 
 function Navigator(props) {
     const dispatch = props.dispatch;
     const currentPath = props.path;
+    const setPathFunc = props.setPathFunc;
     const [checked, setChecked] = React.useState(false);
 
     const handleDotFilterSwitch = (event) => {
@@ -45,9 +45,7 @@ function Navigator(props) {
                             (pathElement, i) =>
                                 <li className={i < currentPath.split('/').length - 1 ? "btn btn-link breadcrumb-item p-1" : "btn btn-link breadcrumb-item active p-1"}
                                     key={pathElement}
-                                    onClick={() => dispatch(scopeTreemapIn(payloadGenerator("path", generateBreadcrumb(i, currentPath))
-                                    )
-                                    )}>
+                                    onClick={() => setPathFunc(generateBreadcrumb(i, currentPath))}>
                                     {pathElement}
                                 </li>
                         )}
@@ -62,7 +60,7 @@ function Navigator(props) {
                             color: "white"
 
                         }}
-                        id="back" onClick={() => dispatch(scopeTreemapOut())}>Back</button>
+                        id="back" onClick={() => currentPath.split('/').length > 0 ? setPathFunc(currentPath.split('/').slice(0, -1).join('/')): setPathFunc(".")}>Back</button>
                     <button type="button" className="btn" style={{
                         backgroundColor: "#FE2857",
                         color: "white"
