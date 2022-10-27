@@ -1,4 +1,4 @@
-import React, { useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import { CONSTANTS, treemapSvgId, treemapContainerId } from '../config';
@@ -9,8 +9,10 @@ import { createSVGInContainer, clearCanvas } from '../d3/svgCanvas';
 import { generateTreemapLayoutFromData, drawTreemapFromGeneratedLayout } from '../d3/treemap';
 
 
+
 function TreeMap(props) {
-    const dispatch = props.dispatch;
+    const currentDataPath = props.dataPath;
+    const setPathFunc = props.setPathFunc;
     const filters = useSelector(selectAllFilters);
 
     useEffect(() => {
@@ -28,10 +30,10 @@ function TreeMap(props) {
         const rootNode = generateTreemapLayoutFromData(data, CONSTANTS.treemap.layout.height, CONSTANTS.treemap.layout.width, filters);
 
         // Drawing the treemap from the generated data
-        drawTreemapFromGeneratedLayout(svg, rootNode, dispatch, filters);
+        drawTreemapFromGeneratedLayout(svg, rootNode, setPathFunc);
 
 
-    }, [props.data, filters, dispatch]
+    }, [props.data, setPathFunc, currentDataPath, filters]
     )
 
     return (
