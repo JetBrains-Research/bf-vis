@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import * as d3 from 'd3';
+import { dispatch } from "d3";
+import { disableSimulationMode, enableSimulationMode, isSimulationMode, removedAuthors, simulateAuthorRemoval, undoAuthorRemoval } from "../reducers/simulationModeSlice";
+import { useSelector } from "react-redux";
 
 function StatsPane(props) {
     const formatPercentage = d3.format(",.1%");
@@ -11,7 +14,32 @@ function StatsPane(props) {
     let topAuthors = undefined;
     let authorsListContributionPercentage = undefined;
     const totalNumOfAuthors = (authorsList) ? authorsList.length : 0;
+
     const [numOfAuthors, setNumOfAuthors] = useState(0);
+    const [inSimulationMode, setSimulationMode] = useState(false);
+    const removedAuthorsList = useSelector(removedAuthors);
+
+    const handleSimulationModeSwitch = (event) => {
+        setSimulationMode(!inSimulationMode);
+
+        if (inSimulationMode) {
+            dispatch(enableSimulationMode())
+        }
+
+        if (!inSimulationMode) {
+            dispatch(disableSimulationMode());
+        }
+    }
+
+    const handleAuthorRemovalSwitch = (event) => {
+        if (event.target.checked) {
+            dispatch(undoAuthorRemoval(event.target.props.email))
+        }
+        else {
+            dispatch(simulateAuthorRemoval(event.target.props.email))
+        }
+    }
+
 
     if (authorsList) {
         authorsList.sort((a, b) => b.authorship - a.authorship);
@@ -27,11 +55,22 @@ function StatsPane(props) {
         topAuthors = authorsListContributionPercentage.slice(0, numOfAuthors);
     }
 
+
+
     return (
         <div id="details-container" className='row panel-right mt-2 pt-2 pb-2'>
             <h4>Stats <i className='bi bi-info-circle-fill'></i></h4>
             <div className="col-12" >
-                <p className="small">Here are some details about the selected node</p>
+            <p className="small">Here are some details about the selected node</p>
+                <div id="simulation-mode-container">
+                    <h5>Simulation Mode</h5>
+                    <p className="small">Using this mode, we can highlight if the bus factor changes if a certain author leaves</p>
+                    <div className="col ps-5 form-check form-switch">
+                        <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" defaultChecked={inSimulationMode} onChange={handleSimulationModeSwitch}></input>
+                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">Toggle Simulation Mode</label>
+                    </div>
+
+                </div>
 
                 <h5>Bus Factor</h5>
                 <p className="small">The bus factor of <span className="fw-italic">{nodeData.name}</span> is: <span
@@ -63,10 +102,16 @@ function StatsPane(props) {
                                 </p>
                                 <h6 className="small">{formatSI(authorScorePair["authorship"])}</h6>
                                 <span className="small">({formatPercentage(authorScorePair["relativeScore"])})</span>
+                                <div className="col ps-5 form-check form-switch">
+                                    <input className="form-check-input" type="checkbox" email={authorScorePair["email"]} role="switch" id="flexSwitchCheckDefault" defaultChecked={removedAuthorsList.includes(authorScorePair["email"])} onChange={handleAuthorRemovalSwitch}></input>
+                                    <label className="form-check-label small" htmlFor="flexSwitchCheckDefault">Remove Author</label>
+                                </div>
                             </div>
                     )
                         : <p className="small fw-bold">N/A</p>}
                 </div>
+
+
             </div>
         </div>
     )
