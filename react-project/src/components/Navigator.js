@@ -4,6 +4,11 @@ import {
     removeExclusionExtensionsFilter,
     addExclusionFilenamePrefixesFilter,
     removeExclusionFilenamePrefixesFilter,
+    addExclusionFilenameFilter,
+    removeExclusionFilenameFilter,
+    selectExclusionExtensionFilters,
+    selectExclusionFileNamesFilters,
+    selectExclusionFileNamePrefixFilters,
 }
     from "../reducers/filterSlice";
 import { returnTreemapHome } from "../reducers/treemapSlice";
@@ -60,7 +65,7 @@ function Navigator(props) {
                             color: "white"
 
                         }}
-                        id="back" onClick={() => currentPath.split('/').length > 0 ? setPathFunc(currentPath.split('/').slice(0, -1).join('/')): setPathFunc(".")}>Back</button>
+                        id="back" onClick={() => currentPath.split('/').length > 0 ? setPathFunc(currentPath.split('/').slice(0, -1).join('/')) : setPathFunc(".")}>Back</button>
                     <button type="button" className="btn" style={{
                         backgroundColor: "#FE2857",
                         color: "white"
@@ -72,11 +77,12 @@ function Navigator(props) {
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Filters</h4>
-                <FilterWithInput filterPropertyType="File extension" addFunction={addExclusionExtensionsFilter} removeFunction={removeExclusionExtensionsFilter} dispatch={dispatch} addDefaultPrefix="." >
+                <FilterWithInput key="File extension" filterPropertyType="File extension" addFunction={addExclusionExtensionsFilter} removeFunction={removeExclusionExtensionsFilter} selector={selectExclusionExtensionFilters} dispatch={dispatch} addDefaultPrefix="." >
                 </FilterWithInput>
 
-                <FilterWithInput filterPropertyType="File name"> </FilterWithInput>
-                <FilterWithInput filterPropertyType="File name prefix"> </FilterWithInput>
+                <FilterWithInput key="File name" filterPropertyType="File name" addFunction={addExclusionFilenameFilter} removeFunction={removeExclusionFilenameFilter} selector={selectExclusionFileNamesFilters} dispatch={dispatch}> </FilterWithInput>
+                
+                <FilterWithInput key="File name prefix" filterPropertyType="File name prefix" addFunction={addExclusionFilenamePrefixesFilter} removeFunction={removeExclusionFilenamePrefixesFilter} selector={selectExclusionFileNamePrefixFilters} dispatch={dispatch}> </FilterWithInput>
 
                 <div className="col ps-5 form-check form-switch">
                     <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked={checked} onChange={handleDotFilterSwitch}></input>

@@ -108,12 +108,28 @@ const filterSlice = createSlice({
 
 export const
     {
+        // exclusion filter methods
         addExclusionExtensionsFilter,
         removeExclusionExtensionsFilter,
         addExclusionFilenamePrefixesFilter,
-        removeExclusionFilenamePrefixesFilter
+        removeExclusionFilenamePrefixesFilter,
+        addExclusionFilenameFilter,
+        removeExclusionFilenameFilter,
+        // inclusion filter methods
+        addInclusionExtensionsFilter,
+        removeInclusionExtensionsFilter,
+        addInclusionFilenameFilter,
+        removeInclusionFilenameFilter,
+        addInclusionFilenamePrefixesFilter,
+        removeInclusionFilenamePrefixesFilter
     } = filterSlice.actions;
 export const selectAllFilters = (state) => state.filter;
 export const selectInclusionFilters = (state) => state.filter.inclusion;
 export const selectExclusionFilters = (state) => state.filter.exclusion;
+export const selectExclusionExtensionFilters = (state) => state.filter.exclusion.extensions;
+export const selectExclusionFileNamePrefixFilters = (state) => state.filter.exclusion.fileNamePrefixes;
+export const selectExclusionFileNamesFilters = (state) => state.filter.exclusion.fileNames;
+export const selectInclusionExtensionFilters = (state) => state.filter.inclusion.extensions;
+export const selectInclusionFileNamePrefixFilters = (state) => state.filter.inclusion.fileNamePrefixes;
+export const selectInclusionFileNamesFilters = (state) => state.filter.inclusion.fileNames;
 export default filterSlice.reducer;

@@ -80,6 +80,13 @@ function applyFilters(hierarchy, filters) {
                             d.value = 0;
                         }
                     }
+                    if (filters.exclusion.fileNames) {
+                        filters.exclusion.fileNames.forEach((element) => {
+                            if (d.data.name === element) {
+                                d.value = 0;
+                            }
+                        })
+                    }
                 }
             }
         })
