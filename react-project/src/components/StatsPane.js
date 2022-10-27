@@ -29,7 +29,7 @@ function StatsPane(props) {
 
     return (
         <div id="details-container" className='row panel-right mt-2 pt-2 pb-2'>
-            <h4>Stats</h4>
+            <h4>Stats <i className='bi bi-info-circle-fill'></i></h4>
             <div className="col-12" >
                 <p className="small">Here are some details about the selected node</p>
 

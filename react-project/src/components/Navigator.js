@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import { batch } from "react-redux";
+import { CONSTANTS } from "../config";
 import {
     addExclusionExtensionsFilter,
     removeExclusionExtensionsFilter,
     addExclusionFilenamePrefixesFilter,
     removeExclusionFilenamePrefixesFilter,
+    addExclusionFilenameFilter,
+    removeExclusionFilenameFilter,
+    selectExclusionExtensionFilters,
+    selectExclusionFileNamesFilters,
+    selectExclusionFileNamePrefixFilters,
 }
     from "../reducers/filterSlice";
 import { returnTreemapHome } from "../reducers/treemapSlice";
@@ -13,7 +20,9 @@ function Navigator(props) {
     const dispatch = props.dispatch;
     const currentPath = props.path;
     const setPathFunc = props.setPathFunc;
+    const filterTemplates = CONSTANTS.filters;
     const [checked, setChecked] = React.useState(false);
+    const [currentTemplate, setCurrentTemplate] = useState()
 
     const handleDotFilterSwitch = (event) => {
         setChecked(!checked);
@@ -25,6 +34,16 @@ function Navigator(props) {
         else if (!event.target.checked) {
             dispatch(removeExclusionFilenamePrefixesFilter(['.',]));
         }
+    }
+
+    const handleFilterDropdown = (event) => {
+        const dropdownSelection = event.target.innerText;
+        setCurrentTemplate(dropdownSelection)
+        batch(() => {
+            dispatch(addExclusionExtensionsFilter(filterTemplates[dropdownSelection].extensions))
+            dispatch(addExclusionFilenameFilter(filterTemplates[dropdownSelection].fileNames))
+            dispatch(addExclusionFilenamePrefixesFilter(filterTemplates[dropdownSelection].fileNamePrefixes))
+        })
     }
 
     const generateBreadcrumb = (i, currentPath) => {
@@ -60,7 +79,7 @@ function Navigator(props) {
                             color: "white"
 
                         }}
-                        id="back" onClick={() => currentPath.split('/').length > 0 ? setPathFunc(currentPath.split('/').slice(0, -1).join('/')): setPathFunc(".")}>Back</button>
+                        id="back" onClick={() => currentPath.split('/').length > 0 ? setPathFunc(currentPath.split('/').slice(0, -1).join('/')) : setPathFunc(".")}>Back</button>
                     <button type="button" className="btn" style={{
                         backgroundColor: "#FE2857",
                         color: "white"
@@ -71,12 +90,24 @@ function Navigator(props) {
             </div>
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
-                <h4>Filters</h4>
-                <FilterWithInput filterPropertyType="File extension" addFunction={addExclusionExtensionsFilter} removeFunction={removeExclusionExtensionsFilter} dispatch={dispatch} addDefaultPrefix="." >
+                <h4>Filters <i className='bi bi-info-circle-fill'></i></h4>
+                <div className="dropdown open">
+                    <a className="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        Filter Templates
+                    </a>
+                    <div className="dropdown-menu" aria-labelledby="triggerId">
+                        {Object.keys(filterTemplates).map((template) => {
+                            return <button className={template === currentTemplate ? "dropdown-item active" : "dropdown-item"} key={template} template={template} onClick={handleFilterDropdown} >{template}</button>
+                        })}
+                    </div>
+                </div>
+                <FilterWithInput key="File extension" filterPropertyType="File extension" addFunction={addExclusionExtensionsFilter} removeFunction={removeExclusionExtensionsFilter} selector={selectExclusionExtensionFilters} dispatch={dispatch} addDefaultPrefix="." >
                 </FilterWithInput>
 
-                <FilterWithInput filterPropertyType="File name"> </FilterWithInput>
-                <FilterWithInput filterPropertyType="File name prefix"> </FilterWithInput>
+                <FilterWithInput key="File name" filterPropertyType="File name" addFunction={addExclusionFilenameFilter} removeFunction={removeExclusionFilenameFilter} selector={selectExclusionFileNamesFilters} dispatch={dispatch}> </FilterWithInput>
+
+                <FilterWithInput key="File name prefix" filterPropertyType="File name prefix" addFunction={addExclusionFilenamePrefixesFilter} removeFunction={removeExclusionFilenamePrefixesFilter} selector={selectExclusionFileNamePrefixFilters} dispatch={dispatch}> </FilterWithInput>
 
                 <div className="col ps-5 form-check form-switch">
                     <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked={checked} onChange={handleDotFilterSwitch}></input>

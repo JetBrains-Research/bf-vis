@@ -67,7 +67,7 @@ function applyFilters(hierarchy, filters) {
         hierarchy.eachAfter(d => {
             if (filters) {
 
-                if (filters.exclusion) {
+                if (filters.exclusion.fileNamePrefixes) {
                     if (filters.exclusion.fileNamePrefixes) {
                         filters.exclusion.fileNamePrefixes.forEach((prefix) => {
                             if (d.data.name.startsWith(prefix)) {
@@ -79,6 +79,13 @@ function applyFilters(hierarchy, filters) {
                         if (filters.exclusion.extensions.includes(d.data.extension)) {
                             d.value = 0;
                         }
+                    }
+                    if (filters.exclusion.fileNames) {
+                        filters.exclusion.fileNames.forEach((element) => {
+                            if (d.data.name === element) {
+                                d.value = 0;
+                            }
+                        })
                     }
                 }
             }
@@ -140,8 +147,7 @@ function rectangleOnMouseOverHandler(d) {
         const rects = d3.select(d.nodeUid.href)
         rects.transition().duration(500)
             .ease(d3.easeExpOut)
-            .style("stroke-width", "0.3rem")
-            .style("stroke", JETBRAINS_COLORS.darkGray);
+            .style("stroke-width", "0.3rem");
     }
 }
 
@@ -154,7 +160,7 @@ function rectangleOnMouseOutHandler(d) {
     const rects = d3.select(d.nodeUid.href)
     rects.transition().duration(CONSTANTS.treemap.children.rect.transitionDuration)
         .ease(d3.easeElastic)
-        .style("stroke-width", null);
+        .style("stroke-width", "0.1rem");
 }
 
 

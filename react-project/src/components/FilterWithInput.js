@@ -1,8 +1,6 @@
-import { filter } from "d3";
 import React from "react";
 import { useSelector } from "react-redux";
 import { CONSTANTS } from "../config";
-import { selectAllFilters } from "../reducers/filterSlice";
 
 
 function FilterWithInput(props) {
@@ -10,8 +8,9 @@ function FilterWithInput(props) {
     const filterPropertyType = props.filterPropertyType;
     const addFunction = props.addFunction;
     const removeFunction = props.removeFunction;
+    const selector = props.selector;
     const [currentFilterInput, setFilterInput] = React.useState("");
-    const currentFilters = useSelector(selectAllFilters);
+    const currentFilters = useSelector(selector);
 
     const clickableTagStyle = {
         cursor: "pointer",
@@ -36,16 +35,16 @@ function FilterWithInput(props) {
         }
     }
 
-    const handleFilterExtensionSubmit = (event) => {
+    const handleFilterElementSubmit = (event) => {
         event.preventDefault()
-        if (currentFilterInput.startsWith('.') && currentFilterInput.length > 1) {
+        if (currentFilterInput.length > 1) {
             dispatch(addFunction([currentFilterInput,]));
         }
     }
 
-    const handleFilterExtensionRemoval = (extension) => {
-        if (extension) {
-            dispatch(removeFunction([extension,]));
+    const handleFilterElementRemoval = (filterElement) => {
+        if (filterElement) {
+            dispatch(removeFunction([filterElement,]));
         }
     }
 
@@ -65,22 +64,22 @@ function FilterWithInput(props) {
                     className="btn btn-dark"
                     type="button"
                     id="button-filter-add"
-                    onClick={handleFilterExtensionSubmit}>
+                    onClick={handleFilterElementSubmit}>
                     Add
                 </button>
             </div>
 
             <div className="container mb-3">
-                {currentFilters.exclusion.extensions.map(extension =>
+                {currentFilters.map(filterElement =>
                     <div className="d-inline-flex"
-                        key={extension}
-                        extensionid={extension}
+                        key={filterElement}
+                        extensionid={filterElement}
                         style={clickableTagStyle}
-                        onClick={() => handleFilterExtensionRemoval(extension)}>
+                        onClick={() => handleFilterElementRemoval(filterElement)}>
                         <span
                             className="badge rounded-pill m-1"
                             style={pillStyle}>
-                            {extension}
+                            {filterElement}
                             <i className="m-1 bi bi-x-circle"></i>
                         </span>
                     </div>)}

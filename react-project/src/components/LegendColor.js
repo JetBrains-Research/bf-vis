@@ -30,7 +30,7 @@ function LegendColor(props) {
 
     return (
         <div id="legend-size-container" className='row panel-right mt-2 pt-2 pb-2' >
-            <h4>Bus Factor</h4>
+            <h4>Bus Factor <i className='bi bi-info-circle-fill'></i></h4>
             <p className='small'>Red is lower, green is higher</p>
             {scale.map(element => {
                 return (
