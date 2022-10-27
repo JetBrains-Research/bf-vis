@@ -3,8 +3,6 @@ import 'd3-transition';
 import { pickTextColorBasedOnBgColor } from '../utils/color';
 import { CONSTANTS } from '../config';
 import uid from './uid';
-import { scopeStatsIn, scopeTreemapIn } from '../reducers/treemapSlice';
-import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 
 
 /*
