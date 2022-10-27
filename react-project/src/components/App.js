@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
+import { useDispatch, useSelector, batch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { scopeTreemapIn, selectCurrentStatsData, selectCurrentVisualizationData, selectCurrentVisualizationPath } from '../reducers/treemapSlice';
+import { scopeStatsIn, scopeTreemapIn, selectCurrentStatsData, selectCurrentStatsPath, selectCurrentVisualizationData, selectCurrentVisualizationPath } from '../reducers/treemapSlice';
+
 import { selectExclusionFilters } from '../reducers/filterSlice';
+import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 
 import LeftColumn from './Navigator';
 import TreeMap from './Treemap';
 import RightColumn from './RightColumn';
-import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 
 
 function App() {
@@ -17,19 +18,47 @@ function App() {
     const currentVisualizationData = useSelector(selectCurrentVisualizationData);
     const currentVisualizationPath = useSelector(selectCurrentVisualizationPath);
     const currentStatsData = useSelector(selectCurrentStatsData);
+    const currentStatsPath = useSelector(selectCurrentStatsPath);
     const filters = useSelector(selectExclusionFilters);
-
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // useEffect(() => {
-    //     const path = searchParams.get("path") || "";
+    const setURLPath = (dataPath, statsPath) => {
+        if (dataPath) {
+            setSearchParams({
+                "dataPath": dataPath || "",
+                "statsPath": dataPath
+            })
+        }
+        else if (statsPath) {
+            setSearchParams({
+                "dataPath": searchParams.get("dataPath") || "",
+                "statsPath": statsPath
+            })
+        }
+    }
 
-    //     if (path && path !== currentVisualizationPath) {
-    //         dispatch(scopeTreemapIn(payloadGenerator("path", path)));
-    //     }
+    useEffect(() => {
 
-    // }, [searchParams, setSearchParams, currentVisualizationPath, dispatch])
+        const urlDataPath = searchParams.get("dataPath") || "";
+        const urlStatsPath = searchParams.get("statsPath") || "";
 
+        if (urlDataPath && urlDataPath !== currentVisualizationPath) {
+
+            if (urlStatsPath && urlStatsPath !== urlDataPath) {
+                batch(() => {
+                    dispatch(scopeTreemapIn(payloadGenerator("path", urlDataPath)));
+                    dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
+                })
+            }
+            else {
+                dispatch(scopeTreemapIn(payloadGenerator("path", urlDataPath)));
+            }
+        }
+
+        if (urlStatsPath && urlStatsPath !== currentStatsPath && urlStatsPath !== urlDataPath)
+            dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
+
+    }, [searchParams, setSearchParams, currentStatsPath, currentVisualizationPath, dispatch])
 
     return (
         <div className="App container-fluid text-center">
@@ -37,10 +66,10 @@ function App() {
             <div className='row justify-content-evenly'>
                 <div className='col'>
                     <h1>BFViz</h1>
-                    <LeftColumn path={currentVisualizationPath} filters={filters} dispatch={dispatch}></LeftColumn>
+                    <LeftColumn path={currentVisualizationPath} filters={filters} dispatch={dispatch} setPathFunc={setURLPath}></LeftColumn>
                 </div>
                 <div className='col-md-auto'>
-                    <TreeMap data={currentVisualizationData} filters={filters} dispatch={dispatch} ></TreeMap>
+                    <TreeMap data={currentVisualizationData} dataPath={currentVisualizationPath} setPathFunc={setURLPath} filters={filters}></TreeMap>
                 </div>
                 <div className='col'>
                     <RightColumn data={currentStatsData}></RightColumn>
