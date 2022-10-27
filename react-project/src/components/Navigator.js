@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { batch } from "react-redux";
+import { CONSTANTS } from "../config";
 import {
     addExclusionExtensionsFilter,
     removeExclusionExtensionsFilter,
@@ -18,7 +20,9 @@ function Navigator(props) {
     const dispatch = props.dispatch;
     const currentPath = props.path;
     const setPathFunc = props.setPathFunc;
+    const filterTemplates = CONSTANTS.filters;
     const [checked, setChecked] = React.useState(false);
+    const [currentTemplate, setCurrentTemplate] = useState()
 
     const handleDotFilterSwitch = (event) => {
         setChecked(!checked);
@@ -30,6 +34,16 @@ function Navigator(props) {
         else if (!event.target.checked) {
             dispatch(removeExclusionFilenamePrefixesFilter(['.',]));
         }
+    }
+
+    const handleFilterDropdown = (event) => {
+        const dropdownSelection = event.target.innerText;
+        setCurrentTemplate(dropdownSelection)
+        batch(() => {
+            dispatch(addExclusionExtensionsFilter(filterTemplates[dropdownSelection].extensions))
+            dispatch(addExclusionFilenameFilter(filterTemplates[dropdownSelection].fileNames))
+            dispatch(addExclusionFilenamePrefixesFilter(filterTemplates[dropdownSelection].fileNamePrefixes))
+        })
     }
 
     const generateBreadcrumb = (i, currentPath) => {
@@ -76,12 +90,23 @@ function Navigator(props) {
             </div>
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
-                <h4>Filters</h4>
+                <h4>Filters <i className='bi bi-info-circle-fill'></i></h4>
+                <div className="dropdown open">
+                    <a className="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        Filter Templates
+                    </a>
+                    <div className="dropdown-menu" aria-labelledby="triggerId">
+                        {Object.keys(filterTemplates).map((template) => {
+                            return <button className={template === currentTemplate ? "dropdown-item active" : "dropdown-item"} key={template} template={template} onClick={handleFilterDropdown} >{template}</button>
+                        })}
+                    </div>
+                </div>
                 <FilterWithInput key="File extension" filterPropertyType="File extension" addFunction={addExclusionExtensionsFilter} removeFunction={removeExclusionExtensionsFilter} selector={selectExclusionExtensionFilters} dispatch={dispatch} addDefaultPrefix="." >
                 </FilterWithInput>
 
                 <FilterWithInput key="File name" filterPropertyType="File name" addFunction={addExclusionFilenameFilter} removeFunction={removeExclusionFilenameFilter} selector={selectExclusionFileNamesFilters} dispatch={dispatch}> </FilterWithInput>
-                
+
                 <FilterWithInput key="File name prefix" filterPropertyType="File name prefix" addFunction={addExclusionFilenamePrefixesFilter} removeFunction={removeExclusionFilenamePrefixesFilter} selector={selectExclusionFileNamePrefixFilters} dispatch={dispatch}> </FilterWithInput>
 
                 <div className="col ps-5 form-check form-switch">

@@ -65,5 +65,17 @@ export const CONSTANTS = {
             height: "100%",
             width: "100%",
         }
+    },
+    filters: {
+        general: {
+            extensions: [".md", ".1"],
+            fileNames: [".git"],
+            fileNamePrefixes: ["jdk"],
+        },
+        "test": {
+            extensions: [".json", ".js"],
+            fileNames: ["src"],
+            fileNamePrefixes: ["java"]
+        }
     }
 }
