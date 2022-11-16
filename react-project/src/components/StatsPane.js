@@ -62,15 +62,6 @@ function StatsPane(props) {
             <h4>Stats <i className='bi bi-info-circle-fill'></i></h4>
             <div className="col-12" >
             <p className="small">Here are some details about the selected node</p>
-                <div id="simulation-mode-container">
-                    <h5>Simulation Mode</h5>
-                    <p className="small">Using this mode, we can highlight if the bus factor changes if a certain author leaves</p>
-                    <div className="col ps-5 form-check form-switch">
-                        <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" defaultChecked={inSimulationMode} onChange={handleSimulationModeSwitch}></input>
-                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">Toggle Simulation Mode</label>
-                    </div>
-
-                </div>
 
                 <h5>Bus Factor</h5>
                 <p className="small">The bus factor of <span className="fw-italic">{nodeData.name}</span> is: <span
@@ -102,10 +93,10 @@ function StatsPane(props) {
                                 </p>
                                 <h6 className="small">{formatSI(authorScorePair["authorship"])}</h6>
                                 <span className="small">({formatPercentage(authorScorePair["relativeScore"])})</span>
-                                <div className="col ps-5 form-check form-switch">
+                                {/* <div className="col ps-5 form-check form-switch">
                                     <input className="form-check-input" type="checkbox" email={authorScorePair["email"]} role="switch" id="flexSwitchCheckDefault" defaultChecked={removedAuthorsList.includes(authorScorePair["email"])} onChange={handleAuthorRemovalSwitch}></input>
                                     <label className="form-check-label small" htmlFor="flexSwitchCheckDefault">Remove Author</label>
-                                </div>
+                                </div> */}
                             </div>
                     )
                         : <p className="small fw-bold">N/A</p>}
