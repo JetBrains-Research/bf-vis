@@ -44,25 +44,25 @@ function SimulationModeModal(props) {
             <h4>Simulation Mode <i className='bi bi-info-circle-fill'></i></h4>
             <div>
                 <p className="small">Using this mode, we can highlight if the bus factor changes if a certain author leaves</p>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Configure Simulation
                 </button>
             </div>
 
             {/* Modal */}
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1 className="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
+                        <div className="modal-body">
                             <div className="col-auto">
                                 <div className="input-group">
                                     <input type="text"
                                         className="form-control"
-                                        onChange={ handleSearchTextChange }
+                                        onChange={handleSearchTextChange}
                                         aria-describedby="input-file-extension"
                                     >
                                     </input>
@@ -77,12 +77,15 @@ function SimulationModeModal(props) {
                                 </div>
                             </div>
                             <table className="table table-striped">
+
                                 <thead>
-                                    <th>#</th>
-                                    <th>Included?</th>
-                                    <th>Email</th>
-                                    <th>Authorship</th>
-                                    <th>Relative Contribution (to current location)</th>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Included?</th>
+                                        <th>Email</th>
+                                        <th>Authorship</th>
+                                        <th>Relative Contribution (to current location)</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     {
@@ -92,19 +95,19 @@ function SimulationModeModal(props) {
                                                     {index + 1}
                                                 </td>
                                                 <td>
-                                                    <i class="bi bi-check2-circle"></i>
+                                                    <i className="bi bi-check2-circle"></i>
                                                 </td>
                                                 <td>{authorScorePair["email"]}</td>
-                                                <td> { formatSI(authorScorePair["authorship"])}</td>
-                                                <td>{ formatPercentage(authorScorePair["relativeScore"]) }</td>
+                                                <td> {formatSI(authorScorePair["authorship"])}</td>
+                                                <td>{formatPercentage(authorScorePair["relativeScore"])}</td>
                                             </tr>) : null
                                     }
                                 </tbody>
                             </table>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Apply configuration</button>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" className="btn btn-primary">Apply configuration</button>
                         </div>
                     </div>
                 </div>
