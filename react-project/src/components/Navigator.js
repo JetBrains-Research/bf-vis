@@ -57,8 +57,8 @@ function Navigator(props) {
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Current Path <i className='bi bi-info-circle-fill'></i>
-                    <a class="" data-bs-toggle="collapse" href="#pathNavCollapsible" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        <i class="bi bi-arrows-collapse"></i>
+                    <a className="" data-bs-toggle="collapse" href="#pathNavCollapsible" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <i className="bi bi-arrows-collapse"></i>
                     </a>
                 </h4>
 
@@ -89,7 +89,7 @@ function Navigator(props) {
                             backgroundColor: "#FE2857",
                             color: "white"
 
-                        }} id="reset" onClick={() => dispatch(returnTreemapHome())}>Reset</button>
+                        }} id="reset" onClick={() => setPathFunc(".")}>Reset</button>
                     </div>
                 </div>
 
@@ -97,8 +97,8 @@ function Navigator(props) {
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Filters <i className='bi bi-info-circle-fill'></i>
-                    <a class="" data-bs-toggle="collapse" href="#filtersCollapsible" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        <i class="bi bi-arrows-collapse">
+                    <a className="" data-bs-toggle="collapse" href="#filtersCollapsible" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <i className="bi bi-arrows-collapse">
                         </i>
                     </a></h4>
                 <div id="#filtersCollapsible">
