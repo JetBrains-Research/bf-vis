@@ -48,7 +48,7 @@ function SimulationModeModal(props) {
                     </i>
                 </a>
             </h4>
-            <div id="simulationModeCollapsible">
+            <div id="simulationModeCollapsible" class="collapse show">
                 <p className="small">Using this mode, we can highlight if the bus factor changes if a certain author leaves</p>
                 <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Configure Simulation

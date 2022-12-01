@@ -36,12 +36,12 @@ function LegendColor(props) {
         <>
             <div id="legend-size-container" className='row panel-right mt-2 pt-2 pb-2' >
                 <h4>Bus Factor <i className='bi bi-info-circle-fill' data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions"></i>
-                    <a className="" data-bs-toggle="collapse" href="#legendColorCollapsible" role="button" aria-expanded="true" aria-controls="legendColorCollapsible">
+                    <a className="" data-bs-toggle="collapse" data-bs-target="#legendColorCollapsible" role="button" aria-expanded="true" aria-controls="legendColorCollapsible">
                         <i className="bi bi-chevron-bar-expand">
                         </i>
                     </a>
                 </h4>
-                <div id="legendColorCollapsible">
+                <div id="legendColorCollapsible" class="collapse show">
                     <p className='small'>Red is lower, green is higher</p>
                     {scale.map(element => {
                         return (

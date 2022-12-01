@@ -56,12 +56,12 @@ function Navigator(props) {
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Current Path <i className='bi bi-info-circle-fill'></i>
-                    <a className="" data-bs-toggle="collapse" href="#pathNavCollapsible" role="button" aria-expanded="true" aria-controls="collapseExample">
+                    <a className="" data-bs-toggle="collapse" data-bs-target="#pathNavCollapsible" role="button" aria-expanded="true" aria-controls="collapseExample">
                         <i className="bi bi-chevron-bar-expand"></i>
                     </a>
                 </h4>
 
-                <div id="pathNavCollapsible">
+                <div id="pathNavCollapsible" className="collapse show">
                     <nav aria-label="breadcrumb">
                         <ol className="breadcrumb">
                             {currentPath.split('/').map(
@@ -112,20 +112,20 @@ function Navigator(props) {
                         <i className="bi bi-chevron-bar-expand">
                         </i>
                     </a></h4>
-                <div className="filtersCollapsible">
-                    <div className="col ps-5 form-check form-switch filtersCollapsible">
+                <div className="filtersCollapsible collapse show">
+                    <div className="col ps-5 form-check form-switch">
                         <input className="form-check-input" type="checkbox" role="switch" id="recalculationSwitch" checked={checked} onChange={() => {
                             console.log("recalculationSwitch flipped")
                         }}></input>
                         <label className="form-check-label" htmlFor="flexSwitchCheckDefault">Enable Bus Factor Recalculation</label>
                     </div>
 
-                    <div className="dropdown open filtersCollapsible">
+                    <div className="dropdown open filtersCollapsible collapse show">
                         <button className="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true"
                             aria-expanded="false">
                             Filter Templates
                         </button>
-                        <div className="dropdown-menu filtersCollapsible" aria-labelledby="triggerId">
+                        <div className="dropdown-menu" aria-labelledby="triggerId">
                             {Object.keys(filterTemplates).map((template) => {
                                 return <button className={template === currentTemplate ? "dropdown-item active" : "dropdown-item"} key={template} template={template} onClick={handleFilterDropdown} >{template}</button>
                             })}
@@ -139,7 +139,7 @@ function Navigator(props) {
 
                     <FilterWithInput key="File name prefix" filterPropertyType="File name prefix" addFunction={addExclusionFilenamePrefixesFilter} removeFunction={removeExclusionFilenamePrefixesFilter} selector={selectExclusionFileNamePrefixFilters} dispatch={dispatch}> </FilterWithInput>
 
-                    <div className="col ps-5 form-check form-switch filtersCollapsible">
+                    <div className="col ps-5 form-check form-switch">
                         <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked={checked} onChange={handleDotFilterSwitch}></input>
                         <label className="form-check-label" htmlFor="flexSwitchCheckDefault">Filter nodes starting with '.'</label>
                     </div>

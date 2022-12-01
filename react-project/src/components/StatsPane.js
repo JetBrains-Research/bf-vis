@@ -65,12 +65,11 @@ function StatsPane(props) {
                     </i>
                 </a>
             </h4>
-            <div className="col-12 statsPaneCollapsible" >
-                <p className="small">Here are some details about the selected node</p>
+            <div className="col-12 statsPaneCollapsible collapse show" >
+                <p className="small">Here are some details about <span className="fw-bold">{nodeData.name}</span></p>
 
                 <h5>Bus Factor</h5>
-                <p className="small">The bus factor of <span className="fw-italic">{nodeData.name}</span> is: <span
-                    className="fw-bold">{nodeBusFactor}</span></p>
+                <span>{nodeBusFactor}</span>
 
                 <h5>Author Contribution</h5>
                 {
@@ -85,14 +84,14 @@ function StatsPane(props) {
                         </>
                 }
 
-                <div className="list-group list-group-flush statsPaneCollapsible" style={{
+                <div className="list-group list-group-flush" style={{
                     "maxHeight": "25vh",
                     "maxWidth": "15vw",
                     "overflowY": "scroll",
                 }}>
                     {(authorsList && topAuthors) ? topAuthors.map(
                         (authorScorePair) =>
-                            <div className="list-group-item statsPaneCollapsible" key={authorScorePair["email"]}>
+                            <div className="list-group-item" key={authorScorePair["email"]}>
                                 <p className="small text-break text-wrap">
                                     {authorScorePair["email"]}
                                 </p>
