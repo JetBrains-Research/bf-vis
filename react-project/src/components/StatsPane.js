@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import * as d3 from 'd3';
 import { dispatch } from "d3";
-import { disableSimulationMode, enableSimulationMode, isSimulationMode, removedAuthors, simulateAuthorRemoval, undoAuthorRemoval } from "../reducers/simulationModeSlice";
+import { disableSimulationMode, enableSimulationMode, removedAuthors, simulateAuthorRemoval, undoAuthorRemoval } from "../reducers/treemapSlice";
 import { useSelector } from "react-redux";
 
 function StatsPane(props) {
@@ -59,22 +59,17 @@ function StatsPane(props) {
 
     return (
         <div id="details-container" className='row panel-right mt-2 pt-2 pb-2'>
-            <h4>Stats <i className='bi bi-info-circle-fill'></i></h4>
-            <div className="col-12" >
-            <p className="small">Here are some details about the selected node</p>
-                <div id="simulation-mode-container">
-                    <h5>Simulation Mode</h5>
-                    <p className="small">Using this mode, we can highlight if the bus factor changes if a certain author leaves</p>
-                    <div className="col ps-5 form-check form-switch">
-                        <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" defaultChecked={inSimulationMode} onChange={handleSimulationModeSwitch}></input>
-                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">Toggle Simulation Mode</label>
-                    </div>
-
-                </div>
+            <h4>Stats <i className='bi bi-info-circle-fill'></i>
+                <a className="" data-bs-toggle="collapse" href=".statsPaneCollapsible" role="button" aria-expanded="true" aria-controls="statsPaneCollapsible">
+                    <i className="bi bi-chevron-bar-expand">
+                    </i>
+                </a>
+            </h4>
+            <div className="col-12 statsPaneCollapsible collapse show" >
+                <p className="small">Here are some details about <span className="fw-bold">{nodeData.name}</span></p>
 
                 <h5>Bus Factor</h5>
-                <p className="small">The bus factor of <span className="fw-italic">{nodeData.name}</span> is: <span
-                    className="fw-bold">{nodeBusFactor}</span></p>
+                <span>{nodeBusFactor}</span>
 
                 <h5>Author Contribution</h5>
                 {
@@ -102,10 +97,10 @@ function StatsPane(props) {
                                 </p>
                                 <h6 className="small">{formatSI(authorScorePair["authorship"])}</h6>
                                 <span className="small">({formatPercentage(authorScorePair["relativeScore"])})</span>
-                                <div className="col ps-5 form-check form-switch">
+                                {/* <div className="col ps-5 form-check form-switch">
                                     <input className="form-check-input" type="checkbox" email={authorScorePair["email"]} role="switch" id="flexSwitchCheckDefault" defaultChecked={removedAuthorsList.includes(authorScorePair["email"])} onChange={handleAuthorRemovalSwitch}></input>
                                     <label className="form-check-label small" htmlFor="flexSwitchCheckDefault">Remove Author</label>
-                                </div>
+                                </div> */}
                             </div>
                     )
                         : <p className="small fw-bold">N/A</p>}
