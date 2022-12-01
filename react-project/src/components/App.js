@@ -1,13 +1,13 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector, batch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 
-import { scopeStatsIn, scopeTreemapIn, selectCurrentStatsData, selectCurrentStatsPath, selectCurrentVisualizationData, selectCurrentVisualizationPath } from '../reducers/treemapSlice';
+import { returnTreemapHome, scopeStatsIn, scopeTreemapIn, selectCurrentStatsData, selectCurrentStatsPath, selectCurrentVisualizationData, selectCurrentVisualizationPath } from '../reducers/treemapSlice';
 
 import { selectExclusionFilters } from '../reducers/filterSlice';
 import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 
-import LeftColumn from './Navigator';
+import Navigator from './Navigator';
 import TreeMap from './Treemap';
 import RightColumn from './RightColumn';
 
@@ -22,7 +22,7 @@ function App() {
     const filters = useSelector(selectExclusionFilters);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const setURLPath = (dataPath, statsPath) => {
+    const setURLPath = useCallback((dataPath, statsPath) => {
         if (dataPath) {
             setSearchParams({
                 "dataPath": dataPath || "",
@@ -35,7 +35,7 @@ function App() {
                 "statsPath": statsPath
             })
         }
-    }
+    }, [searchParams, setSearchParams]);
 
     useEffect(() => {
 
@@ -51,6 +51,9 @@ function App() {
                 })
             }
             else {
+                if (urlDataPath === ".") {
+                    dispatch(returnTreemapHome())
+                }
                 dispatch(scopeTreemapIn(payloadGenerator("path", urlDataPath)));
             }
         }
@@ -58,7 +61,7 @@ function App() {
         if (urlStatsPath && urlStatsPath !== currentStatsPath && urlStatsPath !== urlDataPath)
             dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
 
-    }, [searchParams, setSearchParams, currentStatsPath, currentVisualizationPath, dispatch])
+    }, [setURLPath, searchParams, setSearchParams, currentStatsPath, currentVisualizationPath, dispatch])
 
     return (
         <div className="App container-fluid text-center">
@@ -66,7 +69,7 @@ function App() {
             <div className='row justify-content-evenly'>
                 <div className='col'>
                     <h1>BFViz</h1>
-                    <LeftColumn path={currentVisualizationPath} filters={filters} dispatch={dispatch} setPathFunc={setURLPath}></LeftColumn>
+                    <Navigator path={currentVisualizationPath} filters={filters} dispatch={dispatch} setPathFunc={setURLPath}></Navigator>
                 </div>
                 <div className='col-md-auto'>
                     <TreeMap data={currentVisualizationData} dataPath={currentVisualizationPath} setPathFunc={setURLPath} filters={filters}></TreeMap>
