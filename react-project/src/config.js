@@ -1,7 +1,3 @@
-export const treemapSvgId = "d3_treemap_svg";
-export const treemapContainerId = "treemap-container"
-export const legendSvgId = "d3_legend_svg";
-export const legendSizeSvgId = "d3_legend_size_svg";
 export const CONSTANTS = {
     general: {
         colors: {
@@ -26,6 +22,10 @@ export const CONSTANTS = {
         }
     },
     treemap: {
+        ids: {
+            treemapSvgId: "d3_treemap_svg",
+            treemapContainerId: "treemap-container"
+        },
         layout: {
             height: window.innerHeight,
             overallPadding: window.innerHeight * 0.01,
@@ -40,7 +40,6 @@ export const CONSTANTS = {
             rectWrapperChild: "row p-0 m-0 align-items-center fw-semibold h-100",
             rectWrapperParent: "row px-1 fw-semibold",
             folderIcon: "bi bi-folder2"
-
         },
         children: {
             rect: {
@@ -61,6 +60,10 @@ export const CONSTANTS = {
         }
     },
     legend: {
+        ids: {
+            legendSvgId: "d3_legend_svg",
+            legendSizeSvgId: "d3_legend_size_svg"
+        },
         layout: {
             height: "100%",
             width: "100%",

@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector, batch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
+import { CONSTANTS } from '../config';
 
 import {
     returnTreemapHome,
@@ -81,7 +82,18 @@ function App() {
                     <Navigator path={currentVisualizationPath} filters={exclusionFilters} dispatch={dispatch} setPathFunc={setURLPath}></Navigator>
                 </div>
                 <div className='col-md-auto'>
-                    <TreeMap data={currentVisualizationData} dataPath={currentVisualizationPath} setPathFunc={setURLPath} filters={exclusionFilters}></TreeMap>
+                    <TreeMap
+                        initialHeight={CONSTANTS.treemap.layout.height}
+                        initialWidth={CONSTANTS.treemap.layout.width}
+                        containerId={CONSTANTS.treemap.ids.treemapContainerId}
+                        svgId={CONSTANTS.treemap.ids.treemapSvgId}
+                        data={currentVisualizationData}
+                        dataPath={currentVisualizationPath}
+                        colorDefinitions={CONSTANTS.general.colors.jetbrains}
+                        prefix="main"
+                        setPathFunc={setURLPath}
+                        filters={exclusionFilters}>
+                    </TreeMap>
                 </div>
                 <div className='col'>
                     <RightColumn data={currentStatsData}></RightColumn>

@@ -21,8 +21,8 @@ export const colorSequence = [
 ];
 
 export const color = d3.scaleQuantize().domain([0, MAX_BUS_FACTOR_COLOR_VALUE]).range(colorSequence);
-// export const color = d3.scaleSequential([0, 10], d3.interpolateRdYlGn);
 export const formatSI = d3.format(".2s")
+
 
 export function normalizeD3DataValues(node) {
 
@@ -124,6 +124,13 @@ function chooseRectangleFillColor(d) {
 }
 
 
+function chooseRectangleFillColorMiniTreemap(d) {
+    if ("busFactor" in d.data.busFactorStatus) {
+        
+    }
+}
+
+
 function rectangleOnClickHandler(d, setPathFunction) {
 
     if ("children" in d.data) {
@@ -153,7 +160,7 @@ function rectangleOnMouseOverHandler(d) {
 
 
 function rectangleOnMouseOutHandler(d) {
-    
+
     const pElement = d3.select(`p${`#p-${d.nodeUid.id}`}`);
     pElement.classed("text-truncate", true);
 
@@ -197,6 +204,37 @@ export function generateTreemapLayoutFromData(data, height, width, filters) {
     addColorsToTreemap(root)
 
     return root;
+}
+
+
+export function drawMiniTreemapFromGeneratedLayout(svg, root) {
+    const node = svg.selectAll("g")
+        .data(d3.group(root.descendants().filter(function (d) {
+            return (d.depth < CONSTANTS.treemap.logic.maxDepth)
+        }), d => d.data.path))
+        .join("g")
+        .selectAll("g")
+        .data(d => d[1])
+        .join("g")
+        .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+    node.append("title")
+        .text(d => `${d.ancestors().reverse().map(d => d.data.name).join("/")}
+bytes: ${formatSI(d.size)}
+bus factor: ${("busFactor" in d.data.busFactorStatus) ? d.data.busFactorStatus.busFactor : "?"}
+d3-value: ${d.value}`);
+    
+    // Tiles
+    node.filter((d) => d.depth > 0).append("rect")
+        .style("rx", CONSTANTS.treemap.children.rect.rx)
+        .style("ry", CONSTANTS.treemap.children.rect.ry)
+        .attr("width", d => d.tileWidth)
+        .transition("firstRender").duration(CONSTANTS.treemap.children.rect.transitionDuration)
+        .ease(d3.easeSin)
+        .style("fill", (d) => chooseRectangleFillColor(d))
+        .style("stroke", JETBRAINS_COLORS.black)
+        .attr("id", d => (d.nodeUid = uid("node")).id)
+        .attr("height", d => d.tileHeight);
 }
 
 
@@ -255,7 +293,7 @@ d3-value: ${d.value}`);
     textBox
         .filter((d) => d.data.children && d.depth > 0)
         .append("xhtml:i")
-        .attr("class", CONSTANTS.treemap.classes.folderIcon )
+        .attr("class", CONSTANTS.treemap.classes.folderIcon)
         .style("color", (d) => d.textColor)
         .style("font-size", CONSTANTS.treemap.children.icon.fontSize);
 

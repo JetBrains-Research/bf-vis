@@ -14,9 +14,11 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 const container = document.getElementById('appRoot');
 const root = createRoot(container);
 root.render(
-    <BrowserRouter>
-        <Provider store={store}>
-            <App />
-        </Provider>
-    </BrowserRouter>
+    <React.StrictMode>
+        <BrowserRouter>
+            <Provider store={store}>
+                <App />
+            </Provider>
+        </BrowserRouter>
+    </React.StrictMode>
 );

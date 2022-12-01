@@ -8,13 +8,19 @@ const fullData = gitRepoDirData;
 
 // Initial State for this slice
 const defaultState = {
-    currentVisualizationData: fullData,
-    currentVisualizationPath: fullData.path,
-    currentStatsData: fullData,
-    currentStatsPath: fullData.path,
-    previousPathStack: [],
-    ignored: [],
+    mainTreemap: {
+        currentVisualizationData: fullData,
+        currentVisualizationPath: fullData.path,
+        currentStatsData: fullData,
+        currentStatsPath: fullData.path,
+        previousPathStack: [],
+        ignored: [],
+    },
     simulation: {
+        miniTreemap: {
+            visualizationData: null,
+            visualizationPath: null,
+        },
         isSimulationMode: false,
         removedAuthors: []
     },
@@ -32,6 +38,7 @@ const defaultState = {
     }
 }
 
+
 function getData(fullData, pathQuery) {
     let newData = jp.query(fullData, pathQuery);
     let result = calculateBusFactor(newData[0]);
@@ -47,21 +54,21 @@ const treemapSlice = createSlice({
         // not as useful anymore, URL takes precedence, or at least, it should
         returnTreemapHome: (state) => {
             let newData = getData(fullData, '$')
-            state.currentVisualizationData = newData;
-            state.currentVisualizationPath = newData.path;
-            state.currentStatsData = newData;
-            state.currentStatsPath = newData.path;
+            state.mainTreemap.currentVisualizationData = newData;
+            state.mainTreemap.currentVisualizationPath = newData.path;
+            state.mainTreemap.currentStatsData = newData;
+            state.mainTreemap.currentStatsPath = newData.path;
         },
         // click on a file node
         scopeStatsIn: (state, action) => {
-            if (action.payload && action.payload.path && action.payload.path !== state.currentStatsPath) {
+            if (action.payload && action.payload.path && action.payload.path !== state.mainTreemap.currentStatsPath) {
                 const newPath = `${action.payload.path}`;
                 const pathQuery = `$..[?(@.path=='${newPath}')]`;
                 let newData = getData(fullData, pathQuery);
                 console.log("scopeStatsIn", newData, pathQuery);
                 if (newData) {
-                    state.currentStatsPath = newPath;
-                    state.currentStatsData = newData;
+                    state.mainTreemap.currentStatsPath = newPath;
+                    state.mainTreemap.currentStatsData = newData;
                 } else {
                     console.log("scopeStatsIn", "not changed")
                 }
@@ -69,40 +76,40 @@ const treemapSlice = createSlice({
         },
         // click on a folder node
         scopeTreemapIn: (state, action) => {
-            if (action.payload.path && action.payload.path !== state.currentVisualizationPath) {
+            if (action.payload.path && action.payload.path !== state.mainTreemap.currentVisualizationPath) {
                 const nextPath = `${action.payload.path}`;
                 const pathQuery = `$..[?(@.path=='${nextPath}')]`;
                 let newData = getData(fullData, pathQuery);
                 console.log("scopeTreemapIn", newData, pathQuery);
 
                 if (newData && newData.children) {
-                    state.previousPathStack.push(state.currentVisualizationPath);
-                    state.currentVisualizationPath = nextPath;
-                    state.currentVisualizationData = newData;
-                    state.currentStatsPath = nextPath;
-                    state.currentStatsData = newData;
+                    state.mainTreemap.previousPathStack.push(state.mainTreemap.currentVisualizationPath);
+                    state.mainTreemap.currentVisualizationPath = nextPath;
+                    state.mainTreemap.currentVisualizationData = newData;
+                    state.mainTreemap.currentStatsPath = nextPath;
+                    state.mainTreemap.currentStatsData = newData;
                 }
             }
         },
         // click the back button
         scopeTreemapOut: (state) => {
-            const nextPath = state.previousPathStack.pop();
+            const nextPath = state.mainTreemap.previousPathStack.pop();
 
             if (nextPath) {
                 if (nextPath === ".") {
-                    state.currentVisualizationData = fullData;
-                    state.currentVisualizationPath = fullData.path;
-                    state.currentStatsData = fullData;
-                    state.currentStatsPath = fullData.path;
+                    state.mainTreemap.currentVisualizationData = fullData;
+                    state.mainTreemap.currentVisualizationPath = fullData.path;
+                    state.mainTreemap.currentStatsData = fullData;
+                    state.mainTreemap.currentStatsPath = fullData.path;
                 } else {
                     const pathQuery = `$..[?(@.path==="${nextPath}")]`;
                     let newData = getData(fullData, pathQuery);
                     console.log("scopeTreemapOut", newData, pathQuery);
                     if (newData && newData.children) {
-                        state.currentVisualizationPath = nextPath;
-                        state.currentVisualizationData = newData;
-                        state.currentStatsPath = nextPath;
-                        state.currentStatsData = newData;
+                        state.mainTreemap.currentVisualizationPath = nextPath;
+                        state.mainTreemap.currentVisualizationData = newData;
+                        state.mainTreemap.currentStatsPath = nextPath;
+                        state.mainTreemap.currentStatsData = newData;
                     }
                 }
             }
@@ -236,11 +243,11 @@ export const {
     undoAuthorRemoval
 } = treemapSlice.actions;
 //treemap data selectors
-export const selectFullData = (state) => state.treemap.fullData;
-export const selectCurrentVisualizationData = (state) => state.treemap.currentVisualizationData;
-export const selectCurrentVisualizationPath = (state) => state.treemap.currentVisualizationPath;
-export const selectCurrentStatsData = (state) => state.treemap.currentStatsData;
-export const selectCurrentStatsPath = (state) => state.treemap.currentStatsPath;
+export const selectFullData = (state) => state.treemap.mainTreemap.fullData;
+export const selectCurrentVisualizationData = (state) => state.treemap.mainTreemap.currentVisualizationData;
+export const selectCurrentVisualizationPath = (state) => state.treemap.mainTreemap.currentVisualizationPath;
+export const selectCurrentStatsData = (state) => state.treemap.mainTreemap.currentStatsData;
+export const selectCurrentStatsPath = (state) => state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
 export const selectAllFilters = (state) => state.treemap.filters;
 export const selectInclusionFilters = (state) => state.treemap.filters.inclusion;
