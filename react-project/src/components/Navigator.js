@@ -13,7 +13,6 @@ import {
     selectExclusionFileNamePrefixFilters,
 }
     from "../reducers/filterSlice";
-import { returnTreemapHome } from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 
 function Navigator(props) {
@@ -57,8 +56,8 @@ function Navigator(props) {
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Current Path <i className='bi bi-info-circle-fill'></i>
-                    <a className="" data-bs-toggle="collapse" href="#pathNavCollapsible" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        <i className="bi bi-arrows-collapse"></i>
+                    <a className="" data-bs-toggle="collapse" href="#pathNavCollapsible" role="button" aria-expanded="true" aria-controls="collapseExample">
+                        <i className="bi bi-chevron-bar-expand"></i>
                     </a>
                 </h4>
 
@@ -69,7 +68,10 @@ function Navigator(props) {
                                 (pathElement, i) =>
                                     <li className={i < currentPath.split('/').length - 1 ? "btn btn-link breadcrumb-item p-1" : "btn btn-link breadcrumb-item active p-1"}
                                         key={pathElement}
-                                        onClick={() => setPathFunc(generateBreadcrumb(i, currentPath))}>
+                                        onClick={
+                                            () =>
+                                                setPathFunc(generateBreadcrumb(i, currentPath))
+                                        }>
                                         {pathElement}
                                     </li>
                             )}
@@ -84,35 +86,52 @@ function Navigator(props) {
                                 color: "white"
 
                             }}
-                            id="back" onClick={() => currentPath.split('/').length > 0 ? setPathFunc(currentPath.split('/').slice(0, -1).join('/')) : setPathFunc(".")}>Back</button>
+                            id="back" onClick={
+                                () =>
+                                    currentPath.split('/').filter(r => r !== "").length > 1
+                                        ?
+                                        setPathFunc(currentPath.split('/').slice(0, -1).join('/'))
+                                        :
+                                        setPathFunc(".")}>
+                            Back</button>
                         <button type="button" className="btn" style={{
                             backgroundColor: "#FE2857",
                             color: "white"
 
-                        }} id="reset" onClick={() => setPathFunc(".")}>Reset</button>
+                        }} id="reset" onClick={
+                            () =>
+                                setPathFunc(".")
+                        }>Reset</button>
                     </div>
                 </div>
-
             </div>
 
             <div className="row pt-2 pb-2 mb-3 panel-left">
                 <h4>Filters <i className='bi bi-info-circle-fill'></i>
-                    <a className="" data-bs-toggle="collapse" href="#filtersCollapsible" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        <i className="bi bi-arrows-collapse">
+                    <a className="" data-bs-toggle="collapse" href=".filtersCollapsible" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <i className="bi bi-chevron-bar-expand">
                         </i>
                     </a></h4>
-                <div id="#filtersCollapsible">
-                    <div className="dropdown open">
-                        <a className="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true"
+                <div className="filtersCollapsible">
+                    <div className="col ps-5 form-check form-switch filtersCollapsible">
+                        <input className="form-check-input" type="checkbox" role="switch" id="recalculationSwitch" checked={checked} onChange={() => {
+                            console.log("recalculationSwitch flipped")
+                        }}></input>
+                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">Enable Bus Factor Recalculation</label>
+                    </div>
+
+                    <div className="dropdown open filtersCollapsible">
+                        <button className="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true"
                             aria-expanded="false">
                             Filter Templates
-                        </a>
-                        <div className="dropdown-menu" aria-labelledby="triggerId">
+                        </button>
+                        <div className="dropdown-menu filtersCollapsible" aria-labelledby="triggerId">
                             {Object.keys(filterTemplates).map((template) => {
                                 return <button className={template === currentTemplate ? "dropdown-item active" : "dropdown-item"} key={template} template={template} onClick={handleFilterDropdown} >{template}</button>
                             })}
                         </div>
                     </div>
+
                     <FilterWithInput key="File extension" filterPropertyType="File extension" addFunction={addExclusionExtensionsFilter} removeFunction={removeExclusionExtensionsFilter} selector={selectExclusionExtensionFilters} dispatch={dispatch} addDefaultPrefix="." >
                     </FilterWithInput>
 
@@ -120,13 +139,13 @@ function Navigator(props) {
 
                     <FilterWithInput key="File name prefix" filterPropertyType="File name prefix" addFunction={addExclusionFilenamePrefixesFilter} removeFunction={removeExclusionFilenamePrefixesFilter} selector={selectExclusionFileNamePrefixFilters} dispatch={dispatch}> </FilterWithInput>
 
-                    <div className="col ps-5 form-check form-switch">
+                    <div className="col ps-5 form-check form-switch filtersCollapsible">
                         <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked={checked} onChange={handleDotFilterSwitch}></input>
                         <label className="form-check-label" htmlFor="flexSwitchCheckDefault">Filter nodes starting with '.'</label>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
 
     )
 }
