@@ -12,7 +12,7 @@ import {
     selectExclusionFileNamesFilters,
     selectExclusionFileNamePrefixFilters,
 }
-    from "../reducers/filterSlice";
+    from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 
 function Navigator(props) {

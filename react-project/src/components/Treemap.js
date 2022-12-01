@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { CONSTANTS, treemapSvgId, treemapContainerId } from '../config';
 
-import { selectAllFilters } from '../reducers/filterSlice';
+import { selectAllFilters } from '../reducers/treemapSlice';
 
 import { createSVGInContainer, clearCanvas } from '../d3/svgCanvas';
 import { generateTreemapLayoutFromData, drawTreemapFromGeneratedLayout } from '../d3/treemap';

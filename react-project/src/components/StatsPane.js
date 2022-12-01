@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import * as d3 from 'd3';
 import { dispatch } from "d3";
-import { disableSimulationMode, enableSimulationMode, isSimulationMode, removedAuthors, simulateAuthorRemoval, undoAuthorRemoval } from "../reducers/simulationModeSlice";
+import { disableSimulationMode, enableSimulationMode, removedAuthors, simulateAuthorRemoval, undoAuthorRemoval } from "../reducers/treemapSlice";
 import { useSelector } from "react-redux";
 
 function StatsPane(props) {
