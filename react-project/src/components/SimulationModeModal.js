@@ -19,7 +19,8 @@ function SimulationModeModal(props) {
             return {
                 "email": authorContributionPair.email,
                 "authorship": authorContributionPair.authorship,
-                "relativeScore": authorContributionPair.authorship / cumulativeAuthorship
+                "relativeScore": authorContributionPair.authorship / cumulativeAuthorship,
+                "included": true
             }
         });
     }
@@ -41,8 +42,13 @@ function SimulationModeModal(props) {
 
     return (
         <div id="simulation-mode-container" className='row panel-right mt-2 pt-2 pb-2'>
-            <h4>Simulation Mode <i className='bi bi-info-circle-fill'></i></h4>
-            <div>
+            <h4>Simulation Mode <i className='bi bi-info-circle-fill'></i>
+                <a className="" data-bs-toggle="collapse" href="#simulationModeCollapsible" role="button" aria-expanded="true" aria-controls="simulationModeCollapsible">
+                    <i className="bi bi-chevron-bar-expand">
+                    </i>
+                </a>
+            </h4>
+            <div id="simulationModeCollapsible">
                 <p className="small">Using this mode, we can highlight if the bus factor changes if a certain author leaves</p>
                 <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Configure Simulation
@@ -95,7 +101,10 @@ function SimulationModeModal(props) {
                                                     {index + 1}
                                                 </td>
                                                 <td>
-                                                    <i className="bi bi-check2-circle"></i>
+                                                    <div className="form-check form-check-inline">
+                                                        <input className="form-check-input" type="checkbox" id="" value="option1" checked={authorScorePair.included}
+                                                            onChange={() => console.log("authorChecked")}></input>
+                                                    </div>
                                                 </td>
                                                 <td>{authorScorePair["email"]}</td>
                                                 <td> {formatSI(authorScorePair["authorship"])}</td>

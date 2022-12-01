@@ -59,9 +59,14 @@ function StatsPane(props) {
 
     return (
         <div id="details-container" className='row panel-right mt-2 pt-2 pb-2'>
-            <h4>Stats <i className='bi bi-info-circle-fill'></i></h4>
-            <div className="col-12" >
-            <p className="small">Here are some details about the selected node</p>
+            <h4>Stats <i className='bi bi-info-circle-fill'></i>
+                <a className="" data-bs-toggle="collapse" href=".statsPaneCollapsible" role="button" aria-expanded="true" aria-controls="statsPaneCollapsible">
+                    <i className="bi bi-chevron-bar-expand">
+                    </i>
+                </a>
+            </h4>
+            <div className="col-12 statsPaneCollapsible" >
+                <p className="small">Here are some details about the selected node</p>
 
                 <h5>Bus Factor</h5>
                 <p className="small">The bus factor of <span className="fw-italic">{nodeData.name}</span> is: <span
@@ -80,14 +85,14 @@ function StatsPane(props) {
                         </>
                 }
 
-                <div className="list-group list-group-flush" style={{
+                <div className="list-group list-group-flush statsPaneCollapsible" style={{
                     "maxHeight": "25vh",
                     "maxWidth": "15vw",
                     "overflowY": "scroll",
                 }}>
                     {(authorsList && topAuthors) ? topAuthors.map(
                         (authorScorePair) =>
-                            <div className="list-group-item" key={authorScorePair["email"]}>
+                            <div className="list-group-item statsPaneCollapsible" key={authorScorePair["email"]}>
                                 <p className="small text-break text-wrap">
                                     {authorScorePair["email"]}
                                 </p>
