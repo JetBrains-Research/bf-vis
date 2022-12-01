@@ -6,6 +6,10 @@ function LegendColor(props) {
     const jetbrainsColors = CONSTANTS.general.colors.jetbrains;
     const scale = [
         {
+            color: jetbrainsColors.gray,
+            label: "Not Available"
+        },
+        {
             color: jetbrainsColors.darkRed,
             label: "Very Low [0-2]"
         },
@@ -32,8 +36,8 @@ function LegendColor(props) {
         <>
             <div id="legend-size-container" className='row panel-right mt-2 pt-2 pb-2' >
                 <h4>Bus Factor <i className='bi bi-info-circle-fill' data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions"></i>
-                    <a className="" data-bs-toggle="collapse" href="#legendColorCollapsible" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        <i className="bi bi-arrows-collapse">
+                    <a className="" data-bs-toggle="collapse" href="#legendColorCollapsible" role="button" aria-expanded="true" aria-controls="legendColorCollapsible">
+                        <i className="bi bi-chevron-bar-expand">
                         </i>
                     </a>
                 </h4>
