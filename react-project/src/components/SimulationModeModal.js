@@ -1,12 +1,17 @@
-import * as d3 from 'd3';
+import { format } from '../d3/format';
+import * as tiling from '../d3/tiling';
 import { useState } from 'react';
+import { CONFIG } from '../config';
+import TreeMap from './TreeMap';
 
 function SimulationModeModal(props) {
-    const formatPercentage = d3.format(",.1%");
-    const formatSI = d3.format(".3s");
+    const formatPercentage = format(",.1%");
+    const formatSI = format(".3s");
 
-    const nodeData = props.data;
-    const authorsList = ("users" in nodeData) ? [...nodeData.users] : undefined;
+    const statsData = props.statsData;
+    const authorsList = ("users" in statsData) ? [...statsData.users] : undefined;
+    const simulationVisualizationData = props.simulationVisualizationData;
+    const simulationVisualizationPath = props.simulationVisualizationPath;
 
     let authorsListContributionPercentage = undefined;
     const [nameFilterValue, setNameFilterValue] = useState('');
@@ -65,6 +70,21 @@ function SimulationModeModal(props) {
                         </div>
                         <div className="modal-body">
                             <div className="col-auto">
+                                <TreeMap
+                                    colorDefinitions={CONFIG.general.colors.jetbrains}
+                                    containerId={CONFIG.simulation.ids.treemapContainerId}
+                                    data={simulationVisualizationData}
+                                    dataNormalizationFunction = {Math.log2}
+                                    dataPath={simulationVisualizationPath}
+                                    initialHeight={CONFIG.simulation.layout.height}
+                                    initialWidth={CONFIG.simulation.layout.width}
+                                    padding = {CONFIG.simulation.layout.overallPadding}
+                                    svgId={CONFIG.simulation.ids.treemapSvgId}
+                                    tilingFunction={tiling.squarify}
+                                    topPadding = {CONFIG.simulation.layout.topPadding}
+                                    type="mini"
+                                >
+                                </TreeMap>
                                 <div className="input-group">
                                     <input type="text"
                                         className="form-control"

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { CONSTANTS } from "../config";
+import { CONFIG } from "../config";
 
 
 function FilterWithInput(props) {
@@ -17,7 +17,7 @@ function FilterWithInput(props) {
     }
 
     const pillStyle = {
-        backgroundColor: CONSTANTS.general.colors.jetbrains.darkRed
+        backgroundColor: CONFIG.general.colors.jetbrains.darkRed
     }
 
     const handleTextChange = (event) => {

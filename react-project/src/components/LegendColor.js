@@ -1,9 +1,9 @@
 import React from 'react';
-import { CONSTANTS } from '../config';
+import { CONFIG } from '../config';
 import { generateSvgSquare } from './LegendSize';
 
 function LegendColor(props) {
-    const jetbrainsColors = CONSTANTS.general.colors.jetbrains;
+    const jetbrainsColors = CONFIG.general.colors.jetbrains;
     const scale = [
         {
             color: jetbrainsColors.gray,

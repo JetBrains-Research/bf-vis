@@ -1,4 +1,4 @@
-export const CONSTANTS = {
+export const CONFIG = {
     general: {
         colors: {
             jetbrains: {
@@ -27,19 +27,19 @@ export const CONSTANTS = {
             treemapContainerId: "treemap-container"
         },
         layout: {
-            height: window.innerHeight,
+            height: 1000,
             overallPadding: window.innerHeight * 0.01,
             topPadding: window.innerHeight * 0.05,
-            width: window.innerWidth * 0.65,
+            width: 1100,
         },
         logic: {
             maxDepth: 2,
             maxBusFactorValue: 10,
         },
         classes: {
+            folderIcon: "bi bi-folder2",
             rectWrapperChild: "row p-0 m-0 align-items-center fw-semibold h-100",
             rectWrapperParent: "row px-1 fw-semibold",
-            folderIcon: "bi bi-folder2"
         },
         children: {
             rect: {
@@ -58,6 +58,18 @@ export const CONSTANTS = {
                 fontSize: "0.8em"
             }
         }
+    },
+    simulation: {
+        layout: {
+            height: 600,
+            width: 1000,
+            overallPadding: window.innerHeight * 0.01,
+            topPadding: window.innerHeight * 0.05,
+        },
+        ids: {
+            treemapSvgId: "d3_mini_treemap_svg",
+            treemapContainerId: "mini-treemap-container"
+        },
     },
     legend: {
         ids: {

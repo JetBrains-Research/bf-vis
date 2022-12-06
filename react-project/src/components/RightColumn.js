@@ -5,13 +5,14 @@ import StatsPane from "./StatsPane";
 
 function RightColumn(props) {
 
-    const data = props.data;
+    const statsData = props.statsData;
+    const simulationData = props.simulationData;
 
     return (
         <div className='col p-1'>
             <LegendColor></LegendColor>
-            <SimulationModeModal data={data}></SimulationModeModal>
-            <StatsPane data={data}></StatsPane>
+            <SimulationModeModal statsData={statsData} simulationVisualizationData={simulationData}></SimulationModeModal>
+            <StatsPane data={statsData}></StatsPane>
         </div>)
 
 }

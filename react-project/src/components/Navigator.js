@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { batch } from "react-redux";
-import { CONSTANTS } from "../config";
+import { CONFIG } from "../config";
 import {
     addExclusionExtensionsFilter,
     removeExclusionExtensionsFilter,
@@ -19,7 +19,7 @@ function Navigator(props) {
     const dispatch = props.dispatch;
     const currentPath = props.path;
     const setPathFunc = props.setPathFunc;
-    const filterTemplates = CONSTANTS.filters;
+    const filterTemplates = CONFIG.filters;
     const [checked, setChecked] = React.useState(false);
     const [currentTemplate, setCurrentTemplate] = useState()
 

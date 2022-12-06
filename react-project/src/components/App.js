@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector, batch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { CONSTANTS } from '../config';
+import { CONFIG } from '../config';
 
 import {
     returnTreemapHome,
@@ -11,16 +11,19 @@ import {
     selectCurrentStatsPath,
     selectCurrentVisualizationData,
     selectCurrentVisualizationPath,
-    selectExclusionFilters
+    selectExclusionFilters,
+    simulationVisualizationData,
+    simulationVisualizationPath
 }
     from '../reducers/treemapSlice';
 
 import { payloadGenerator } from '../utils/reduxActionPayloadCreator';
 
-import Navigator from './Navigator';
-import TreeMap from './Treemap';
-import RightColumn from './RightColumn';
+import * as tiling from '../d3/tiling';
 
+import Navigator from './Navigator';
+import TreeMap from './TreeMap';
+import RightColumn from './RightColumn';
 
 function App() {
     const dispatch = useDispatch();
@@ -30,6 +33,10 @@ function App() {
     const currentStatsData = useSelector(selectCurrentStatsData);
     const currentStatsPath = useSelector(selectCurrentStatsPath);
     const exclusionFilters = useSelector(selectExclusionFilters);
+
+    const currentSimulationModeData = useSelector(simulationVisualizationData);
+    const currentSimulationModePath = useSelector(simulationVisualizationPath);
+
     const [searchParams, setSearchParams] = useSearchParams();
 
     const setURLPath = useCallback((dataPath, statsPath) => {
@@ -77,26 +84,36 @@ function App() {
         <div className="App container-fluid text-center">
 
             <div className='row justify-content-evenly'>
-                <div className='col'>
+                <div className='col-2'>
                     <h1>BFViz</h1>
                     <Navigator path={currentVisualizationPath} filters={exclusionFilters} dispatch={dispatch} setPathFunc={setURLPath}></Navigator>
                 </div>
-                <div className='col-md-auto'>
+                <div className='col-8'>
                     <TreeMap
-                        initialHeight={CONSTANTS.treemap.layout.height}
-                        initialWidth={CONSTANTS.treemap.layout.width}
-                        containerId={CONSTANTS.treemap.ids.treemapContainerId}
-                        svgId={CONSTANTS.treemap.ids.treemapSvgId}
+                        colorDefinitions={CONFIG.general.colors.jetbrains}
+                        containerId={CONFIG.treemap.ids.treemapContainerId}
                         data={currentVisualizationData}
+                        dataNormalizationFunction={Math.log2}
                         dataPath={currentVisualizationPath}
-                        colorDefinitions={CONSTANTS.general.colors.jetbrains}
-                        prefix="main"
+                        filters={exclusionFilters}
+                        initialHeight={window.innerHeight}
+                        initialWidth={window.innerWidth * 0.65}
+                        padding={CONFIG.treemap.layout.overallPadding}
                         setPathFunc={setURLPath}
-                        filters={exclusionFilters}>
+                        svgId={CONFIG.treemap.ids.treemapSvgId}
+                        tilingFunction={tiling.squarify}
+                        topPadding={CONFIG.treemap.layout.topPadding}
+                        type="main"
+                    >
                     </TreeMap>
                 </div>
-                <div className='col'>
-                    <RightColumn data={currentStatsData}></RightColumn>
+                <div className='col-2'>
+                    <RightColumn
+                        statsData={currentStatsData}
+                        simulationPath={currentSimulationModePath}
+                        simulationData={currentSimulationModeData}
+                    >
+                    </RightColumn>
                 </div>
             </div>
         </div>

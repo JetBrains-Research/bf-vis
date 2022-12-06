@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import 'd3-transition';
 import { pickTextColorBasedOnBgColor } from '../utils/color';
-import { CONSTANTS } from '../config';
+import { CONFIG } from '../config';
 import uid from './uid';
 
 
@@ -10,8 +10,8 @@ import uid from './uid';
 */
 
 // get max val from data and use it to set the upper limit in color selection
-const JETBRAINS_COLORS = CONSTANTS.general.colors.jetbrains;
-const MAX_BUS_FACTOR_COLOR_VALUE = CONSTANTS.treemap.logic.maxBusFactorValue;
+const JETBRAINS_COLORS = CONFIG.general.colors.jetbrains;
+const MAX_BUS_FACTOR_COLOR_VALUE = CONFIG.treemap.logic.maxBusFactorValue;
 export const colorSequence = [
     JETBRAINS_COLORS.darkRed,
     JETBRAINS_COLORS.orange,
@@ -23,6 +23,7 @@ export const colorSequence = [
 export const color = d3.scaleQuantize().domain([0, MAX_BUS_FACTOR_COLOR_VALUE]).range(colorSequence);
 export const formatSI = d3.format(".2s")
 
+export const treemap = d3.treemap;
 
 export function normalizeD3DataValues(node) {
 
@@ -41,7 +42,7 @@ export function normalizeD3DataValues(node) {
 }
 
 
-function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
+export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
     if (hierarchy) {
         hierarchy.eachAfter(d => {
             if (d.depth <= 1) {
@@ -62,7 +63,7 @@ function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
 }
 
 
-function applyFilters(hierarchy, filters) {
+export function applyFilters(hierarchy, filters) {
     if (hierarchy) {
         hierarchy.eachAfter(d => {
             if (filters) {
@@ -114,6 +115,14 @@ function addColorsToTreemap(treemap) {
 }
 
 
+function addColorsToMiniTreemap(treemap) {
+    treemap.eachAfter((d) => {
+        const color = chooseRectangleFillColorMiniTreemap(d)
+        d.bgColor = color;
+        d.textColor = pickTextColorBasedOnBgColor(color, JETBRAINS_COLORS.gray, JETBRAINS_COLORS.black);
+    })
+}
+
 function chooseRectangleFillColor(d) {
 
     if ("busFactor" in d.data.busFactorStatus) {
@@ -125,9 +134,23 @@ function chooseRectangleFillColor(d) {
 
 
 function chooseRectangleFillColorMiniTreemap(d) {
-    if ("busFactor" in d.data.busFactorStatus) {
-        
+    if ("nodeStatus" in d.data.busFactorStatus) {
+        if (d.data.busFactorStatus.nodeStatus === "removed") {
+            return JETBRAINS_COLORS.brightRed;
+        }
+        else if (d.data.busFactorStatus.nodeStatus === "added") {
+            return JETBRAINS_COLORS.brightGreen;
+        }
     }
+
+    if ("busFactorDelta" in d.data.busFactorStatus) {
+        if (d.data.busFactorStatus.busFactorDelta < 0) {
+            return JETBRAINS_COLORS.golden;
+        }
+    }
+
+
+    else return JETBRAINS_COLORS.gray
 }
 
 
@@ -165,52 +188,60 @@ function rectangleOnMouseOutHandler(d) {
     pElement.classed("text-truncate", true);
 
     const rects = d3.select(d.nodeUid.href)
-    rects.transition().duration(CONSTANTS.treemap.children.rect.transitionDuration)
+    rects.transition().duration(CONFIG.treemap.children.rect.transitionDuration)
         .ease(d3.easeElastic)
         .style("stroke-width", "0.1rem");
 }
 
 
-export function generateTreemapLayoutFromData(data, height, width, filters) {
+export function generateInitialD3Hierarchy(data) {
 
     // Construct nodes and calculate drawing coordinates from filtered data
     let hierarchicalData = d3.hierarchy(data)
         .sum(d => (d.bytes));
 
-    const treemap = (data) => d3.treemap()
-        .size([width, height])
-        .padding(CONSTANTS.treemap.layout.overallPadding)
-        .paddingTop(CONSTANTS.treemap.layout.topPadding)
-        .round(false)
-        .tile(d3.treemapSquarify)
-        (data);
+    // const treemap = (data) => d3.treemap()
+    //     .size([width, height])
+    //     .padding(CONFIG.treemap.layout.overallPadding)
+    //     .paddingTop(CONFIG.treemap.layout.topPadding)
+    //     .round(false)
+    //     .tile(d3.treemapSquarify)
+    //     (data);
 
-    // Applying filters
-    let hierarchyFiltered = applyFilters(hierarchicalData, filters);
+    // // Applying filters
+    // let hierarchyFiltered = applyFilters(hierarchicalData, filters);
 
-    // Applying the log base 2 function to the size
-    let hierarchyNormalized = applyNormalizationToD3Hierarchy(hierarchyFiltered, Math.log2);
+    // // Applying the log base 2 function to the size
+    // let hierarchyNormalized = applyNormalizationToD3Hierarchy(hierarchyFiltered, Math.log2);
 
-    // Sort the nodes
-    hierarchyNormalized.sort((a, b) => b.size - a.size);
+    // // Sort the nodes
+    // hierarchyNormalized.sort((a, b) => b.size - a.size);
 
-    // Form treemap
-    const root = treemap(hierarchyNormalized);
+    // // Form treemap
+    // const root = treemap(hierarchyNormalized);
 
+    return hierarchicalData;
+}
+
+
+// export function generateD3TreemapFromD3Hierarchy(hierarchyRootNode) {
+//     if (hierarchyRootNode) {
+//         return treemap(hierarchyRootNode);
+//     }
+//     throw Error("expected d3.hierarchy, got null");
+// }
+
+
+export function drawMiniTreemapFromGeneratedLayout(svg, root) {
     // Populate dimensions to prevent repeated calculation of the same values
     addDimensionsToTreemap(root)
 
     // Calculate color of background and text
-    addColorsToTreemap(root)
+    addColorsToMiniTreemap(root)
 
-    return root;
-}
-
-
-export function drawMiniTreemapFromGeneratedLayout(svg, root) {
     const node = svg.selectAll("g")
         .data(d3.group(root.descendants().filter(function (d) {
-            return (d.depth < CONSTANTS.treemap.logic.maxDepth)
+            return (d.depth < CONFIG.treemap.logic.maxDepth)
         }), d => d.data.path))
         .join("g")
         .selectAll("g")
@@ -223,26 +254,57 @@ export function drawMiniTreemapFromGeneratedLayout(svg, root) {
 bytes: ${formatSI(d.size)}
 bus factor: ${("busFactor" in d.data.busFactorStatus) ? d.data.busFactorStatus.busFactor : "?"}
 d3-value: ${d.value}`);
-    
+
     // Tiles
     node.filter((d) => d.depth > 0).append("rect")
-        .style("rx", CONSTANTS.treemap.children.rect.rx)
-        .style("ry", CONSTANTS.treemap.children.rect.ry)
+        .style("rx", CONFIG.treemap.children.rect.rx)
+        .style("ry", CONFIG.treemap.children.rect.ry)
         .attr("width", d => d.tileWidth)
-        .transition("firstRender").duration(CONSTANTS.treemap.children.rect.transitionDuration)
+        .transition("firstRender").duration(CONFIG.treemap.children.rect.transitionDuration)
         .ease(d3.easeSin)
-        .style("fill", (d) => chooseRectangleFillColor(d))
+        .style("fill", (d) => d.bgColor)
         .style("stroke", JETBRAINS_COLORS.black)
-        .attr("id", d => (d.nodeUid = uid("node")).id)
+        .attr("id", d => (d.nodeUid = uid("mini-node")).id)
         .attr("height", d => d.tileHeight);
+
+    const textBox = node
+        .append("foreignObject")
+        .attr("width", d => d.tileWidth)
+        .attr("height", d => d.tileHeight)
+        .append("xhtml:div")
+        .attr("class", (d) => d.depth > 0 ? CONFIG.treemap.classes.rectWrapperChild : CONFIG.treemap.classes.rectWrapperParent)
+        .append("div")
+
+    textBox
+        .filter((d) => d.data.children && d.depth > 0)
+        .append("xhtml:i")
+        .attr("class", CONFIG.treemap.classes.folderIcon)
+        .style("color", (d) => d.textColor)
+        .style("font-size", CONFIG.treemap.children.icon.fontSize);
+
+    textBox.append("xhtml:p")
+        .text(d => {
+            return d.data.name
+        })
+        .attr("class", "text-truncate")
+        .attr("id", (d) => `p-${d.nodeUid}`)
+        .style("overflow-wrap", "break-word")
+        .style("color", (d) => d.textColor)
+        .style("font-size", CONFIG.treemap.children.p.fontSize)
 }
 
 
 export function drawTreemapFromGeneratedLayout(svg, root, setPathFunction) {
+    // Populate dimensions to prevent repeated calculation of the same values
+    addDimensionsToTreemap(root)
+
+    // Calculate color of background and text
+    addColorsToTreemap(root)
+
     // Start 'painting'
     const node = svg.selectAll("g")
         .data(d3.group(root.descendants().filter(function (d) {
-            return (d.depth < CONSTANTS.treemap.logic.maxDepth)
+            return (d.depth < CONFIG.treemap.logic.maxDepth)
         }), d => d.data.path))
         .join("g")
         .selectAll("g")
@@ -259,12 +321,12 @@ d3-value: ${d.value}`);
 
     // Tiles
     node.filter((d) => d.depth > 0).append("rect")
-        .style("rx", CONSTANTS.treemap.children.rect.rx)
-        .style("ry", CONSTANTS.treemap.children.rect.ry)
+        .style("rx", CONFIG.treemap.children.rect.rx)
+        .style("ry", CONFIG.treemap.children.rect.ry)
         .attr("width", d => d.tileWidth)
-        .transition("firstRender").duration(CONSTANTS.treemap.children.rect.transitionDuration)
+        .transition("firstRender").duration(CONFIG.treemap.children.rect.transitionDuration)
         .ease(d3.easeSin)
-        .style("fill", (d) => chooseRectangleFillColor(d))
+        .style("fill", (d) => d.bgColor)
         .style("stroke", JETBRAINS_COLORS.black)
         .attr("id", d => (d.nodeUid = uid("node")).id)
         .attr("height", d => d.tileHeight);
@@ -272,9 +334,9 @@ d3-value: ${d.value}`);
     node.filter((d) => d.depth === 0).append("rect")
         .style("fill", d => chooseRectangleFillColor(d))
         .style("stroke", JETBRAINS_COLORS.black)
-        .style("opacity", CONSTANTS.treemap.children.rect.parentOpacity)
-        .style("rx", CONSTANTS.treemap.children.rect.rx)
-        .style("ry", CONSTANTS.treemap.children.rect.ry)
+        .style("opacity", CONFIG.treemap.children.rect.parentOpacity)
+        .style("rx", CONFIG.treemap.children.rect.rx)
+        .style("ry", CONFIG.treemap.children.rect.ry)
         .attr("width", d => d.tileWidth)
         .attr("id", d => (d.nodeUid = uid("node")).id)
         .attr("height", d => d.tileHeight);
@@ -285,7 +347,7 @@ d3-value: ${d.value}`);
         .attr("height", d => d.tileHeight)
         .on('click', (_e, d) => rectangleOnClickHandler(d, setPathFunction))
         .append("xhtml:div")
-        .attr("class", (d) => d.depth > 0 ? CONSTANTS.treemap.classes.rectWrapperChild : CONSTANTS.treemap.classes.rectWrapperParent)
+        .attr("class", (d) => d.depth > 0 ? CONFIG.treemap.classes.rectWrapperChild : CONFIG.treemap.classes.rectWrapperParent)
         .on("mouseover", (_e, d) => rectangleOnMouseOverHandler(d))
         .on("mouseout", (_e, d) => rectangleOnMouseOutHandler(d))
         .append("div")
@@ -293,9 +355,9 @@ d3-value: ${d.value}`);
     textBox
         .filter((d) => d.data.children && d.depth > 0)
         .append("xhtml:i")
-        .attr("class", CONSTANTS.treemap.classes.folderIcon)
+        .attr("class", CONFIG.treemap.classes.folderIcon)
         .style("color", (d) => d.textColor)
-        .style("font-size", CONSTANTS.treemap.children.icon.fontSize);
+        .style("font-size", CONFIG.treemap.children.icon.fontSize);
 
     textBox.append("xhtml:p")
         .text(d => {
@@ -305,5 +367,5 @@ d3-value: ${d.value}`);
         .attr("id", (d) => `p-${d.nodeUid.id}`)
         .style("overflow-wrap", "break-word")
         .style("color", (d) => d.textColor)
-        .style("font-size", CONSTANTS.treemap.children.p.fontSize)
+        .style("font-size", CONFIG.treemap.children.p.fontSize)
 }

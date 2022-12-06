@@ -5,8 +5,8 @@ export function createSVGInContainer(containerId, svgId, height, width) {
         .append("svg")
         .attr("xmlns:xhtml", "http://www.w3.org/1999/xhtml")
         .attr("id", svgId)
-        .attr("height", height)
-        .attr("width", width);
+        .attr("class", "h-100 w-100")
+        .attr("viewBox", `0 0 ${width} ${height}`)
 }
 
 export function clearCanvas(svgId) {
