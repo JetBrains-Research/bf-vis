@@ -1,9 +1,11 @@
-import { configureStore } from '@reduxjs/toolkit'
-import treemapSlice from './reducers/treemapSlice'
+/** @format */
+
+import { configureStore } from "@reduxjs/toolkit";
+import treemapSlice from "./reducers/treemapSlice";
 
 export const store = configureStore({
-    reducer: {
-        treemap: treemapSlice,
-    },
-    middleware: []
-})
+  reducer: {
+    treemap: treemapSlice,
+  },
+  middleware: [],
+});
