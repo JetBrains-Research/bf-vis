@@ -90,7 +90,7 @@ function Navigator(props) {
             role="button"
             aria-expanded="true"
             aria-controls="collapseExample">
-            <i className="bi bi-chevron-bar-expand"></i>
+            <i className="bi bi-plus-circle-fill"></i>
           </a>
         </h4>
 
@@ -123,7 +123,7 @@ function Navigator(props) {
               type="button"
               className="btn"
               style={{
-                backgroundColor: "#087CFA",
+                backgroundColor: CONFIG.general.colors.jetbrains.blue,
                 color: "white",
               }}
               id="back"
@@ -138,7 +138,7 @@ function Navigator(props) {
               type="button"
               className="btn"
               style={{
-                backgroundColor: "#FE2857",
+                backgroundColor: CONFIG.general.colors.jetbrains.brightRed,
                 color: "white",
               }}
               id="reset"
@@ -159,56 +159,51 @@ function Navigator(props) {
             role="button"
             aria-expanded="false"
             aria-controls="collapseExample">
-            <i className="bi bi-chevron-bar-expand"></i>
+            <i className="bi bi-plus-circle-fill"
+            ></i>
           </a>
         </h4>
         <div className="filtersCollapsible collapse show">
-          <h5>Bus Factor Recalculation</h5>
-          <div className="col ps-5 form-check form-switch">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="recalculationSwitch"
-              checked={isDotFilterApplied}
-              onChange={handleBusFactorRecalculationSwitch}></input>
-            <label
-              className="form-check-label"
-              htmlFor="flexSwitchCheckDefault">
-              {isDotFilterApplied ? "Enabled" : "Disabled"}
-            </label>
-          </div>
+          <h6>Bus Factor Recalculation</h6>
 
-          <div className="dropdown open filtersCollapsible collapse show">
-            <button
-              className="btn btn-secondary dropdown-toggle"
-              type="button"
-              id="triggerId"
-              data-bs-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false">
-              Filter Templates
-            </button>
-            <div
-              className="dropdown-menu"
-              aria-labelledby="triggerId">
-              {Object.keys(filterTemplates).map((template) => {
-                return (
-                  <button
-                    className={
-                      template === currentTemplate
-                        ? "dropdown-item active"
-                        : "dropdown-item"
-                    }
-                    key={template}
-                    template={template}
-                    onClick={handleFilterDropdown}>
-                    {template}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <input
+            className="btn-check"
+            type="checkbox"
+            role="switch"
+            id="recalculationSwitch"
+            checked={isBusFactorRecalcActive}
+            onChange={handleBusFactorRecalculationSwitch}></input>
+          <label
+            className="btn btn-sm"
+            style={{
+              backgroundColor: isBusFactorRecalcActive
+                ? CONFIG.general.colors.jetbrains.blue
+                : CONFIG.general.colors.jetbrains.brightRed,
+              color: "white",
+            }}
+            htmlFor="recalculationSwitch">
+            {isBusFactorRecalcActive ? "On" : "Off"}
+          </label>
+
+          <h6>Filter names starting with '.'</h6>
+          <input
+            className="btn-check"
+            type="checkbox"
+            role="switch"
+            id="dotFilterSwitch"
+            checked={isDotFilterApplied}
+            onChange={handleDotFilterSwitch}></input>
+          <label
+            className="btn btn-sm"
+            style={{
+              backgroundColor: isDotFilterApplied
+                ? CONFIG.general.colors.jetbrains.blue
+                : CONFIG.general.colors.jetbrains.brightRed,
+              color: "white",
+            }}
+            htmlFor="dotFilterSwitch">
+            {isDotFilterApplied ? "On" : "Off"}
+          </label>
 
           <FilterWithInput
             key="File extension"
@@ -239,19 +234,36 @@ function Navigator(props) {
             {" "}
           </FilterWithInput>
 
-          <div className="col ps-5 form-check form-switch">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="flexSwitchCheckDefault"
-              checked={isDotFilterApplied}
-              onChange={handleDotFilterSwitch}></input>
-            <label
-              className="form-check-label"
-              htmlFor="flexSwitchCheckDefault">
-              Filter nodes starting with '.'
-            </label>
+          <h5>Filtering Templates</h5>
+          <div className="dropdown open filtersCollapsible collapse show">
+            <button
+              className="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="triggerId"
+              data-bs-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false">
+              Filter Templates
+            </button>
+            <div
+              className="dropdown-menu"
+              aria-labelledby="triggerId">
+              {Object.keys(filterTemplates).map((template) => {
+                return (
+                  <button
+                    className={
+                      template === currentTemplate
+                        ? "dropdown-item active"
+                        : "dropdown-item"
+                    }
+                    key={template}
+                    template={template}
+                    onClick={handleFilterDropdown}>
+                    {template}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

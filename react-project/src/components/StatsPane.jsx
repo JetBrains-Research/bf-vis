@@ -82,7 +82,7 @@ function StatsPane(props) {
           role="button"
           aria-expanded="true"
           aria-controls="statsPaneCollapsible">
-          <i className="bi bi-chevron-bar-expand"></i>
+          <i className="bi bi-plus-circle-fill"></i>
         </a>
       </h4>
       <div className="col-12 statsPaneCollapsible collapse show">

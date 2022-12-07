@@ -51,7 +51,7 @@ function LegendColor(props) {
             role="button"
             aria-expanded="true"
             aria-controls="legendColorCollapsible">
-            <i className="bi bi-chevron-bar-expand"></i>
+            <i className="bi bi-plus-circle-fill"></i>
           </a>
         </h4>
         <div
