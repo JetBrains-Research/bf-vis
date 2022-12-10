@@ -132,7 +132,7 @@ function Navigator(props) {
                   ? setPathFunc(currentPath.split("/").slice(0, -1).join("/"))
                   : setPathFunc(".")
               }>
-              Back
+              &larr; Back
             </button>
             <button
               type="button"
@@ -143,7 +143,7 @@ function Navigator(props) {
               }}
               id="reset"
               onClick={() => setPathFunc(".")}>
-              Reset
+              Reset &#x27F3;
             </button>
           </div>
         </div>
