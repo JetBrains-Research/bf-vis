@@ -6,14 +6,19 @@ import { useState } from "react";
 import { CONFIG } from "../config";
 import TreeMap from "./TreeMap";
 
+import { generateBreadcrumb } from "../utils/url";
+
 function SimulationModeModal(props) {
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
   const statsData = props.statsData;
   const authorsList = "users" in statsData ? [...statsData.users] : undefined;
-  const simulationVisualizationData = props.simulationVisualizationData;
-  const simulationVisualizationPath = props.simulationVisualizationPath;
+  const simulationVisualizationData = props.simulationData;
+  const simulationVisualizationPath = props.simulationPath;
+  console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
+  const setTreemapPathFunc = props.setTreemapPathFunc;
+  const returnTreeMapHome = props.setTreeMapHome;
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
@@ -117,7 +122,75 @@ function SimulationModeModal(props) {
                   svgId={CONFIG.simulation.ids.treemapSvgId}
                   tilingFunction={tiling.squarify}
                   topPadding={CONFIG.simulation.layout.topPadding}
-                  type="mini"></TreeMap>
+                  type="mini"
+                  reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
+
+                <h6>Path</h6>
+                <nav aria-label="breadcrumb">
+                  <ol className="breadcrumb">
+                    {simulationVisualizationPath
+                      .split("/")
+                      .map((pathElement, i) => (
+                        <li
+                          className={
+                            i <
+                            simulationVisualizationPath.split("/").length - 1
+                              ? "btn btn-link breadcrumb-item p-1"
+                              : "btn btn-link breadcrumb-item active p-1"
+                          }
+                          key={pathElement}
+                          onClick={() =>
+                            setTreemapPathFunc(
+                              generateBreadcrumb(i, simulationVisualizationPath)
+                            )
+                          }>
+                          {pathElement}
+                        </li>
+                      ))}
+                  </ol>
+                </nav>
+
+                <div
+                  className="btn-group"
+                  role="group">
+                  <button
+                    type="button"
+                    className="btn"
+                    style={{
+                      backgroundColor: CONFIG.general.colors.jetbrains.blue,
+                      color: "white",
+                    }}
+                    id="back"
+                    onClick={() =>
+                      simulationVisualizationPath
+                        .split("/")
+                        .filter((r) => r !== "").length > 1
+                        ? setTreemapPathFunc(
+                            simulationVisualizationPath
+                              .split("/")
+                              .slice(0, -1)
+                              .join("/")
+                          )
+                        : setTreemapPathFunc(".")
+                    }>
+                    &larr; Back
+                  </button>
+                  <button
+                    type="button"
+                    className="btn"
+                    style={{
+                      backgroundColor:
+                        CONFIG.general.colors.jetbrains.brightRed,
+                      color: "white",
+                    }}
+                    id="reset"
+                    onClick={() => setTreemapPathFunc(".")}>
+                    Reset &#x27F3;
+                  </button>
+                </div>
+              </div>
+
+              <div className="col-auto">
                 <div className="input-group">
                   <input
                     type="text"
@@ -133,50 +206,60 @@ function SimulationModeModal(props) {
                   </button>
                 </div>
               </div>
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Included?</th>
-                    <th>Email</th>
-                    <th>Authorship</th>
-                    <th>Relative Contribution (to current location)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {authorsList && authorsListContributionPercentage
-                    ? authorsListContributionPercentage
-                        .filter((element) =>
-                          element["email"].includes(nameFilterValue)
-                        )
-                        .map((authorScorePair, index) => (
-                          <tr key={authorScorePair["email"]}>
-                            <td>{index + 1}</td>
-                            <td>
-                              <div className="form-check form-check-inline">
-                                <input
-                                  className="form-check-input"
-                                  type="checkbox"
-                                  id=""
-                                  value="option1"
-                                  checked={authorScorePair.included}
-                                  onChange={() =>
-                                    console.log("authorChecked")
-                                  }></input>
-                              </div>
-                            </td>
-                            <td>{authorScorePair["email"]}</td>
-                            <td> {formatSI(authorScorePair["authorship"])}</td>
-                            <td>
-                              {formatPercentage(
-                                authorScorePair["relativeScore"]
-                              )}
-                            </td>
-                          </tr>
-                        ))
-                    : null}
-                </tbody>
-              </table>
+
+              <div
+                style={{
+                  maxHeight: "30vh",
+                  overflowY: "scroll",
+                }}>
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Included?</th>
+                      <th>Email</th>
+                      <th>Authorship</th>
+                      <th>Relative Contribution (to current location)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {authorsList && authorsListContributionPercentage
+                      ? authorsListContributionPercentage
+                          .filter((element) =>
+                            element["email"].includes(nameFilterValue)
+                          )
+                          .map((authorScorePair, index) => (
+                            <tr key={authorScorePair["email"]}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <div className="form-check form-check-inline">
+                                  <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id=""
+                                    value="option1"
+                                    checked={authorScorePair.included}
+                                    onChange={() =>
+                                      console.log("authorChecked")
+                                    }></input>
+                                </div>
+                              </td>
+                              <td>{authorScorePair["email"]}</td>
+                              <td>
+                                {" "}
+                                {formatSI(authorScorePair["authorship"])}
+                              </td>
+                              <td>
+                                {formatPercentage(
+                                  authorScorePair["relativeScore"]
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                      : null}
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div className="modal-footer">
               <button

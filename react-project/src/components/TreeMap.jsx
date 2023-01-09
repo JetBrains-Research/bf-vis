@@ -1,9 +1,9 @@
 /** @format */
 
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
-import { selectAllFilters } from "../reducers/treemapSlice";
+import { selectAllFilters, selectExclusionFilters } from "../reducers/treemapSlice";
 
 import { createSVGInContainer, clearCanvas } from "../d3/svgCanvas";
 import {
@@ -12,11 +12,13 @@ import {
   drawMiniTreemapFromGeneratedLayout,
   applyFilters,
   applyNormalizationToD3Hierarchy,
+  applyRegExFilters,
 } from "../d3/treemap";
 
 import { sizeAscending } from "../d3/sort";
 import { squarify } from "../d3/tiling";
 import * as d3 from "d3";
+import { select } from "d3";
 
 function TreeMap(props) {
   // assign these consts fallback values if prop is empty or throw errors;
@@ -33,7 +35,9 @@ function TreeMap(props) {
     ? props.dataNormalizationFunction
     : Math.sqrt;
   const tilingFunction = props.tilingFunction ? props.tilingFunction : squarify;
-
+  const reduxNavFunctions = props.reduxNavFunctions;
+  
+  // redux related vars
   const filters = useSelector(selectAllFilters);
 
   useEffect(() => {
@@ -66,7 +70,7 @@ function TreeMap(props) {
 
     // Apply filters if present
     if (filters) {
-      applyFilters(rootHierarchyNode, filters);
+      applyRegExFilters(rootHierarchyNode, filters);
     }
 
     // Apply data normalization if applicable
@@ -87,7 +91,7 @@ function TreeMap(props) {
     if (type === "main")
       drawTreemapFromGeneratedLayout(svg, treemapLayout, setPathFunc);
     else if (type === "mini")
-      drawMiniTreemapFromGeneratedLayout(svg, treemapLayout);
+      drawMiniTreemapFromGeneratedLayout(svg, treemapLayout, reduxNavFunctions);
   }, [
     props.data,
     currentDataPath,

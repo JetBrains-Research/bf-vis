@@ -12,34 +12,24 @@ const initialDummyMiniTreeMapData =
 // Initial State for this slice
 const defaultState = {
   mainTreemap: {
-    currentVisualizationData: fullData,
-    currentVisualizationPath: fullData.path,
     currentStatsData: fullData,
     currentStatsPath: fullData.path,
-    previousPathStack: [],
+    currentVisualizationData: fullData,
+    currentVisualizationPath: fullData.path,
     ignored: [],
+    isRecalculationEnabled: false,
+    previousPathStack: [],
   },
   simulation: {
     miniTreemap: {
       visualizationData: initialDummyMiniTreeMapData,
       visualizationPath: fullData.path,
+      previousPathStack: [],
     },
     isSimulationMode: false,
     removedAuthors: [],
   },
-  filters: {
-    mode: "exclusion",
-    inclusion: {
-      extensions: [],
-      fileNames: [],
-      fileNamePrefixes: [],
-    },
-    exclusion: {
-      extensions: [],
-      fileNames: [],
-      fileNamePrefixes: [],
-    },
-  },
+  filters: [],
 };
 
 function getDataWithPathQuery(fullData, pathQuery) {
@@ -54,18 +44,20 @@ function getDummySimulationModeComparisonData(currentData) {
     for (let count = 0; count < currentData.children.length; count++) {
       if (count % 2 === 0) {
         if ("busFactorStatus" in currentData.children[count])
-          currentData.children[count].busFactorStatus["busFactorDelta"] =
-            -count;
+          currentData.children[count].busFactorStatus["busFactorDelta"] = -2;
       }
 
       if (count % 5 === 0) {
         if ("busFactorStatus" in currentData.children[count])
           currentData.children[count].busFactorStatus["nodeStatus"] = "removed";
+
+        currentData.children[count].busFactorStatus["busFactorDelta"] = -count;
       }
 
       if (count % 3 === 0) {
         if ("busFactorStatus" in currentData.children[count])
           currentData.children[count].busFactorStatus["nodeStatus"] = "added";
+        currentData.children[count].busFactorStatus["busFactorDelta"] = 3;
       }
     }
   }
@@ -84,7 +76,7 @@ const treemapSlice = createSlice({
   initialState: defaultState,
   reducers: {
     // not as useful anymore, URL takes precedence, or at least, it should
-    returnTreemapHome: (state) => {
+    returnMainTreemapHome: (state) => {
       let newData = getDataWithPathQuery(fullData, "$");
       state.mainTreemap.currentVisualizationData = newData;
       state.mainTreemap.currentVisualizationPath = newData.path;
@@ -111,7 +103,7 @@ const treemapSlice = createSlice({
       }
     },
     // click on a folder node
-    scopeTreemapIn: (state, action) => {
+    scopeMainTreemapIn: (state, action) => {
       if (
         action.payload.path &&
         action.payload.path !== state.mainTreemap.currentVisualizationPath
@@ -133,7 +125,7 @@ const treemapSlice = createSlice({
       }
     },
     // click the back button
-    scopeTreemapOut: (state) => {
+    scopeMainTreemapOut: (state) => {
       const nextPath = state.mainTreemap.previousPathStack.pop();
 
       if (nextPath) {
@@ -155,7 +147,51 @@ const treemapSlice = createSlice({
         }
       }
     },
-    addExclusionExtensionsFilter: (state, action) => {
+    scopeMiniTreemapIn: (state, action) => {
+      if (
+        action.payload &&
+        action.payload.path &&
+        action.payload.path !== state.simulation.miniTreemap.visualizationPath
+      ) {
+        const nextPath = `${action.payload.path}`;
+        const pathQuery = `$..[?(@.path=='${nextPath}')]`;
+        let newData = jp.query(initialDummyMiniTreeMapData, pathQuery);
+        console.log("scopeTreemapIn", newData, pathQuery);
+
+        if (newData && newData.children) {
+          state.simulation.miniTreemap.previousPathStack.push(
+            state.simulation.miniTreemap.visualizationPath
+          );
+          state.simulation.miniTreemap.visualizationData = newData;
+          state.simulation.miniTreemap.visualizationPath = nextPath;
+        }
+      }
+    },
+    scopeMiniTreemapOut: (state, action) => {
+      const nextPath = state.simulation.miniTreemap.previousPathStack.pop();
+
+      if (nextPath) {
+        if (nextPath === ".") {
+          state.simulation.miniTreemap.visualizationData =
+            initialDummyMiniTreeMapData;
+          state.simulation.miniTreemap.visualizationPath =
+            initialDummyMiniTreeMapData.path;
+        } else {
+          const pathQuery = `$..[?(@.path==="${nextPath}")]`;
+          let newData = getDataWithPathQuery(
+            initialDummyMiniTreeMapData,
+            pathQuery
+          );
+          console.log("scopeTreemapOut", newData, pathQuery);
+          if (newData && newData.children) {
+            state.simulation.miniTreemap.visualizationData = newData;
+            state.simulation.miniTreemap.visualizationPath = nextPath;
+          }
+        }
+      }
+    },
+    returnMiniTreemapHome: (state, action) => {},
+    addExclusionFilter: (state, action) => {
       const newExtensions = action.payload;
 
       if (Array.isArray(newExtensions) && newExtensions.length > 0) {
@@ -164,7 +200,7 @@ const treemapSlice = createSlice({
         ];
       }
     },
-    removeExclusionExtensionsFilter: (state, action) => {
+    removeExclusionFilter: (state, action) => {
       const extensionsToRemove = action.payload;
 
       if (Array.isArray(extensionsToRemove) && extensionsToRemove.length > 0) {
@@ -319,26 +355,18 @@ const treemapSlice = createSlice({
 export const {
   // Treemap Navigation actions
   scopeStatsIn,
-  scopeTreemapIn,
-  scopeTreemapOut,
-  returnTreemapHome,
+  scopeMainTreemapIn,
+  scopeMainTreemapOut,
+  returnMainTreemapHome,
   // exclusion filter actions
-  addExclusionExtensionsFilter,
-  removeExclusionExtensionsFilter,
-  addExclusionFilenamePrefixesFilter,
-  removeExclusionFilenamePrefixesFilter,
-  addExclusionFilenameFilter,
-  removeExclusionFilenameFilter,
+  addExclusionFilter,
+  removeExclusionFilter,
   // inclusion filter methods
-  addInclusionExtensionsFilter,
-  removeInclusionExtensionsFilter,
-  addInclusionFilenameFilter,
-  removeInclusionFilenameFilter,
-  addInclusionFilenamePrefixesFilter,
-  removeInclusionFilenamePrefixesFilter,
   // Simulation Mode Actions
   enableSimulationMode,
   disableSimulationMode,
+  scopeMiniTreemapIn,
+  scopeMiniTreemapOut,
   simulateAuthorRemoval,
   undoAuthorRemoval,
 } = treemapSlice.actions;
@@ -354,22 +382,11 @@ export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
 export const selectAllFilters = (state) => state.treemap.filters;
-export const selectInclusionFilters = (state) =>
-  state.treemap.filters.inclusion;
-export const selectExclusionFilters = (state) =>
-  state.treemap.filters.exclusion;
-export const selectExclusionExtensionFilters = (state) =>
-  state.treemap.filters.exclusion.extensions;
-export const selectExclusionFileNamePrefixFilters = (state) =>
-  state.treemap.filters.exclusion.fileNamePrefixes;
-export const selectExclusionFileNamesFilters = (state) =>
-  state.treemap.filters.exclusion.fileNames;
-export const selectInclusionExtensionFilters = (state) =>
-  state.treemap.filters.inclusion.extensions;
-export const selectInclusionFileNamePrefixFilters = (state) =>
-  state.treemap.filters.inclusion.fileNamePrefixes;
-export const selectInclusionFileNamesFilters = (state) =>
-  state.treemap.filters.inclusion.fileNames;
+// export const selectFilterMode = (state) => state.treemap.filters.mode;
+// export const selectInclusionFilters = (state) =>
+//   state.treemap.filters.inclusion;
+// export const selectExclusionFilters = (state) =>
+//   state.treemap.filters.exclusion;
 //simulation mode selectors
 export const isSimulationMode = (state) =>
   state.treemap.simulation.isSimulationMode;

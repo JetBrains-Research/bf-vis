@@ -3,8 +3,10 @@
 import * as d3 from "d3";
 import "d3-transition";
 import { pickTextColorBasedOnBgColor } from "../utils/color";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
 import { CONFIG } from "../config";
 import uid from "./uid";
+import { filter } from "d3";
 
 /*
     This file has all the methods related to the d3 treemap including calculation and rendering
@@ -64,6 +66,24 @@ export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
     });
   }
   return hierarchy;
+}
+
+export function applyRegExFilters(hierarchy, filters) {
+  if (hierarchy) {
+    if (filters) {
+      filters.forEach((filterExpression) => {
+        const filterRe = new RegExp(filterExpression);
+        hierarchy.eachAfter((d) => {
+          const filePathSplit = d.data.name.split('/')
+          const fileName = filePathSplit[filePathSplit.length - 1];
+
+          if (filterRe.search(fileName) > -1) {
+            d.value = 0;
+          }
+        });
+      })
+    }
+  }
 }
 
 export function applyFilters(hierarchy, filters) {
@@ -152,7 +172,13 @@ function chooseRectangleFillColorMiniTreemap(d) {
   } else return JETBRAINS_COLORS.gray;
 }
 
-function rectangleOnClickHandler(d, setPathFunction) {
+function rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions) {
+  reduxNavFunctions.dispatch(
+    reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator("path", d.data.path))
+  );
+}
+
+function rectangleOnClickHandlerMainTreemap(d, setPathFunction) {
   if ("children" in d.data) {
     setPathFunction(d.data.path);
     // dispatch(scopeTreemapIn(payloadGenerator("path", d.data.path)));
@@ -192,37 +218,14 @@ export function generateInitialD3Hierarchy(data) {
   // Construct nodes and calculate drawing coordinates from filtered data
   let hierarchicalData = d3.hierarchy(data).sum((d) => d.bytes);
 
-  // const treemap = (data) => d3.treemap()
-  //     .size([width, height])
-  //     .padding(CONFIG.treemap.layout.overallPadding)
-  //     .paddingTop(CONFIG.treemap.layout.topPadding)
-  //     .round(false)
-  //     .tile(d3.treemapSquarify)
-  //     (data);
-
-  // // Applying filters
-  // let hierarchyFiltered = applyFilters(hierarchicalData, filters);
-
-  // // Applying the log base 2 function to the size
-  // let hierarchyNormalized = applyNormalizationToD3Hierarchy(hierarchyFiltered, Math.log2);
-
-  // // Sort the nodes
-  // hierarchyNormalized.sort((a, b) => b.size - a.size);
-
-  // // Form treemap
-  // const root = treemap(hierarchyNormalized);
-
   return hierarchicalData;
 }
 
-// export function generateD3TreemapFromD3Hierarchy(hierarchyRootNode) {
-//     if (hierarchyRootNode) {
-//         return treemap(hierarchyRootNode);
-//     }
-//     throw Error("expected d3.hierarchy, got null");
-// }
-
-export function drawMiniTreemapFromGeneratedLayout(svg, root) {
+export function drawMiniTreemapFromGeneratedLayout(
+  svg,
+  root,
+  reduxNavFunctions
+) {
   // Populate dimensions to prevent repeated calculation of the same values
   addDimensionsToTreemap(root);
 
@@ -289,6 +292,9 @@ d3-value: ${d.value}`
 
   textBox
     .filter((d) => d.data.children && d.depth > 0)
+    .on("click", (_e, d) =>
+      rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions)
+    )
     .append("xhtml:i")
     .attr("class", CONFIG.treemap.classes.folderIcon)
     .style("color", (d) => d.textColor)
@@ -297,7 +303,11 @@ d3-value: ${d.value}`
   textBox
     .append("xhtml:p")
     .text((d) => {
-      return d.data.name;
+      return `${d.data.name} ${
+        "busFactorDelta" in d.data.busFactorStatus
+          ? "[" + d.data.busFactorStatus.busFactorDelta + "]"
+          : ""
+      }`;
     })
     .attr("class", "text-truncate")
     .attr("id", (d) => `p-${d.nodeUid}`)
@@ -377,7 +387,9 @@ d3-value: ${d.value}`
     .append("foreignObject")
     .attr("width", (d) => d.tileWidth)
     .attr("height", (d) => d.tileHeight)
-    .on("click", (_e, d) => rectangleOnClickHandler(d, setPathFunction))
+    .on("click", (_e, d) =>
+      rectangleOnClickHandlerMainTreemap(d, setPathFunction)
+    )
     .append("xhtml:div")
     .attr("class", (d) =>
       d.depth > 0

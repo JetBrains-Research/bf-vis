@@ -4,17 +4,12 @@ import React, { useState } from "react";
 import { batch } from "react-redux";
 import { CONFIG } from "../config";
 import {
-  addExclusionExtensionsFilter,
-  removeExclusionExtensionsFilter,
-  addExclusionFilenamePrefixesFilter,
-  removeExclusionFilenamePrefixesFilter,
-  addExclusionFilenameFilter,
-  removeExclusionFilenameFilter,
-  selectExclusionExtensionFilters,
-  selectExclusionFileNamesFilters,
-  selectExclusionFileNamePrefixFilters,
+  addExclusionFilter,
+  removeExclusionFilter,
+  selectAllFilters,
 } from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
+import { generateBreadcrumb } from "../utils/url";
 
 function Navigator(props) {
   const dispatch = props.dispatch;
@@ -28,11 +23,11 @@ function Navigator(props) {
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
 
-    if (event.target.checked) {
-      dispatch(addExclusionFilenamePrefixesFilter(["."]));
-    } else if (!event.target.checked) {
-      dispatch(removeExclusionFilenamePrefixesFilter(["."]));
-    }
+    // if (event.target.checked) {
+    //   dispatch(addExclusionFilenamePrefixesFilter(["."]));
+    // } else if (!event.target.checked) {
+    //   dispatch(removeExclusionFilenamePrefixesFilter(["."]));
+    // }
   };
 
   const handleBusFactorRecalculationSwitch = (event) => {
@@ -52,28 +47,19 @@ function Navigator(props) {
     setCurrentTemplate(dropdownSelection);
     batch(() => {
       dispatch(
-        addExclusionExtensionsFilter(
+        addExclusionFilter(
           filterTemplates[dropdownSelection].extensions
         )
       );
-      dispatch(
-        addExclusionFilenameFilter(filterTemplates[dropdownSelection].fileNames)
-      );
-      dispatch(
-        addExclusionFilenamePrefixesFilter(
-          filterTemplates[dropdownSelection].fileNamePrefixes
-        )
-      );
+      // dispatch(
+      //   addExclusionFilenameFilter(filterTemplates[dropdownSelection].fileNames)
+      // );
+      // dispatch(
+      //   addExclusionFilenamePrefixesFilter(
+      //     filterTemplates[dropdownSelection].fileNamePrefixes
+      //   )
+      // );
     });
-  };
-
-  const generateBreadcrumb = (i, currentPath) => {
-    return i < currentPath.split("/").length
-      ? currentPath
-          .split("/")
-          .slice(0, i + 1)
-          .join("/")
-      : currentPath.split("/")[0];
   };
 
   return (
@@ -206,15 +192,15 @@ function Navigator(props) {
           </label>
 
           <FilterWithInput
-            key="File extension"
-            filterPropertyType="File extension"
-            addFunction={addExclusionExtensionsFilter}
-            removeFunction={removeExclusionExtensionsFilter}
-            selector={selectExclusionExtensionFilters}
+            key="Regex"
+            filterPropertyType="RegEx"
+            addFunction={addExclusionFilter}
+            removeFunction={removeExclusionFilter}
+            selector={selectAllFilters}
             dispatch={dispatch}
             addDefaultPrefix="."></FilterWithInput>
 
-          <FilterWithInput
+          {/* <FilterWithInput
             key="File name"
             filterPropertyType="File name"
             addFunction={addExclusionFilenameFilter}
@@ -232,7 +218,7 @@ function Navigator(props) {
             selector={selectExclusionFileNamePrefixFilters}
             dispatch={dispatch}>
             {" "}
-          </FilterWithInput>
+          </FilterWithInput> */}
 
           <h5>Filtering Templates</h5>
           <div className="dropdown open filtersCollapsible collapse show">

@@ -2,22 +2,22 @@
 
 import React from "react";
 import { CONFIG } from "../config";
-import { generateSvgSquare } from "./LegendSize";
+import { generateSvgSquare } from "../d3/legend";
 
 function LegendColor(props) {
   const jetbrainsColors = CONFIG.general.colors.jetbrains;
   const scale = [
     {
       color: jetbrainsColors.gray,
-      label: "Not Available",
+      label: "Not Applicable",
     },
     {
       color: jetbrainsColors.darkRed,
-      label: "Very Low [0-2]",
+      label: "Very Low [0 - 2]",
     },
     {
       color: jetbrainsColors.orange,
-      label: "Low [3-5]",
+      label: "Low [3 - 5]",
     },
     {
       color: jetbrainsColors.yellow,

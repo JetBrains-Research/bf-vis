@@ -6,16 +6,18 @@ import { useSearchParams } from "react-router-dom";
 import { CONFIG } from "../config";
 
 import {
-  returnTreemapHome,
+  returnMainTreemapHome,
   scopeStatsIn,
-  scopeTreemapIn,
+  scopeMainTreemapIn,
   selectCurrentStatsData,
   selectCurrentStatsPath,
   selectCurrentVisualizationData,
   selectCurrentVisualizationPath,
-  selectExclusionFilters,
+  scopeMiniTreemapIn,
+  scopeMiniTreemapOut,
   simulationVisualizationData,
   simulationVisualizationPath,
+  selectAllFilters,
 } from "../reducers/treemapSlice";
 
 import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
@@ -33,10 +35,16 @@ function App() {
   const currentVisualizationPath = useSelector(selectCurrentVisualizationPath);
   const currentStatsData = useSelector(selectCurrentStatsData);
   const currentStatsPath = useSelector(selectCurrentStatsPath);
-  const exclusionFilters = useSelector(selectExclusionFilters);
+  const filters = useSelector(selectAllFilters);
 
   const currentSimulationModeData = useSelector(simulationVisualizationData);
   const currentSimulationModePath = useSelector(simulationVisualizationPath);
+
+  const reduxNavFunctions = {
+    dispatch,
+    scopeMiniTreemapIn,
+    scopeMiniTreemapOut
+  };
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -64,14 +72,14 @@ function App() {
     if (urlDataPath && urlDataPath !== currentVisualizationPath) {
       if (urlStatsPath && urlStatsPath !== urlDataPath) {
         batch(() => {
-          dispatch(scopeTreemapIn(payloadGenerator("path", urlDataPath)));
+          dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
           dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
         });
       } else {
         if (urlDataPath === ".") {
-          dispatch(returnTreemapHome());
+          dispatch(returnMainTreemapHome());
         }
-        dispatch(scopeTreemapIn(payloadGenerator("path", urlDataPath)));
+        dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
       }
     }
 
@@ -97,7 +105,7 @@ function App() {
           <h1>BFViz</h1>
           <Navigator
             path={currentVisualizationPath}
-            filters={exclusionFilters}
+            filters={filters}
             dispatch={dispatch}
             setPathFunc={setURLPath}></Navigator>
         </div>
@@ -108,7 +116,7 @@ function App() {
             data={currentVisualizationData}
             dataNormalizationFunction={Math.log2}
             dataPath={currentVisualizationPath}
-            filters={exclusionFilters}
+            filters={filters}
             initialHeight={window.innerHeight}
             initialWidth={window.innerWidth * 0.65}
             padding={CONFIG.treemap.layout.overallPadding}
@@ -122,7 +130,11 @@ function App() {
           <RightColumn
             statsData={currentStatsData}
             simulationPath={currentSimulationModePath}
-            simulationData={currentSimulationModeData}></RightColumn>
+            simulationData={currentSimulationModeData}
+            reduxNavFunctions = {reduxNavFunctions}
+          >
+            
+            </RightColumn>
         </div>
       </div>
     </div>
