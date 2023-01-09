@@ -1,20 +1,22 @@
+/** @format */
+
 .header {
-    text-align: center;
-  }
+  text-align: center;
+}
 
 .App {
   background: #ffffff;
 }
 
 .panel-left {
-  box-shadow: 5px 5px 5px lightgray ;
+  box-shadow: 5px 5px 5px lightgray;
   background: #efefef;
   border: 2px solid gray;
   border-radius: 0.5em;
 }
 
 .panel-right {
-  box-shadow: -5px 5px 5px lightgray ;
+  box-shadow: -5px 5px 5px lightgray;
   background: #efefef;
   border: 2px solid gray;
   border-radius: 0.5em;
@@ -27,17 +29,17 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px #CDCDCD; 
+  box-shadow: inset 0 0 5px #cdcdcd;
   border-radius: 10px;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #7D7D7D; 
+  background: #7d7d7d;
   border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #FE2857; 
+  background: #fe2857;
 }
