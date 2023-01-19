@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { batch } from "react-redux";
 import { CONFIG } from "../config";
 import {
-  addExclusionFilter,
-  removeExclusionFilter,
+  addFilter,
+  removeFilter,
   selectAllFilters,
 } from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
@@ -47,7 +47,7 @@ function Navigator(props) {
     setCurrentTemplate(dropdownSelection);
     batch(() => {
       dispatch(
-        addExclusionFilter(
+        addFilter(
           filterTemplates[dropdownSelection].extensions
         )
       );
@@ -194,8 +194,8 @@ function Navigator(props) {
           <FilterWithInput
             key="Regex"
             filterPropertyType="RegEx"
-            addFunction={addExclusionFilter}
-            removeFunction={removeExclusionFilter}
+            addFunction={addFilter}
+            removeFunction={removeFilter}
             selector={selectAllFilters}
             dispatch={dispatch}
             addDefaultPrefix="."></FilterWithInput>

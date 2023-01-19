@@ -71,14 +71,14 @@ export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
 export function applyRegExFilters(hierarchy, filters) {
   if (hierarchy) {
     if (filters) {
-      filters.forEach((filterExpression) => {
+      filters.forEach((filterExpression, filterExpressionIndex) => {
         const filterRe = new RegExp(filterExpression);
         hierarchy.eachAfter((d) => {
           const filePathSplit = d.data.name.split('/')
           const fileName = filePathSplit[filePathSplit.length - 1];
 
-          if (filterRe.search(fileName) > -1) {
-            d.value = 0;
+          if (!filterRe.test(fileName)) {
+            d.value = 0
           }
         });
       })

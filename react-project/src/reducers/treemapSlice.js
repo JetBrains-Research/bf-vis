@@ -191,137 +191,22 @@ const treemapSlice = createSlice({
       }
     },
     returnMiniTreemapHome: (state, action) => {},
-    addExclusionFilter: (state, action) => {
-      const newExtensions = action.payload;
+    addFilter: (state, action) => {
+      const newFilterExps = action.payload;
 
-      if (Array.isArray(newExtensions) && newExtensions.length > 0) {
-        state.filters.exclusion.extensions = [
-          ...new Set(state.filters.exclusion.extensions.concat(newExtensions)),
+      if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
+        state.filters = [
+          ...new Set(state.filters.concat(newFilterExps)),
         ];
       }
     },
-    removeExclusionFilter: (state, action) => {
-      const extensionsToRemove = action.payload;
+    removeFilter: (state, action) => {
+      const newFilterExps = action.payload;
 
-      if (Array.isArray(extensionsToRemove) && extensionsToRemove.length > 0) {
-        state.filters.exclusion.extensions =
-          state.filters.exclusion.extensions.filter(
-            (element) => !extensionsToRemove.includes(element)
-          );
-      }
-    },
-    addExclusionFilenamePrefixesFilter: (state, action) => {
-      const fileNamePrefixesToAdd = action.payload;
-
-      if (
-        Array.isArray(fileNamePrefixesToAdd) &&
-        fileNamePrefixesToAdd.length > 0
-      ) {
-        state.filters.exclusion.fileNamePrefixes = [
-          ...new Set(
-            state.filters.exclusion.fileNamePrefixes.concat(
-              fileNamePrefixesToAdd
-            )
-          ),
-        ];
-      }
-    },
-    removeExclusionFilenamePrefixesFilter: (state, action) => {
-      const fileNamePrefixesToRemove = action.payload;
-
-      if (
-        Array.isArray(fileNamePrefixesToRemove) &&
-        fileNamePrefixesToRemove.length > 0
-      ) {
-        state.filters.exclusion.fileNamePrefixes =
-          state.filters.exclusion.fileNamePrefixes.filter(
-            (element) => !fileNamePrefixesToRemove.includes(element)
-          );
-      }
-    },
-    addExclusionFilenameFilter: (state, action) => {
-      const fileNamesToAdd = action.payload;
-
-      if (Array.isArray(fileNamesToAdd) && fileNamesToAdd.length > 0) {
-        state.filters.exclusion.fileNames = [
-          ...new Set(state.filters.exclusion.fileNames.concat(fileNamesToAdd)),
-        ];
-      }
-    },
-    removeExclusionFilenameFilter: (state, action) => {
-      const fileNamesToRemove = action.payload;
-
-      if (Array.isArray(fileNamesToRemove) && fileNamesToRemove.length > 0) {
-        state.filters.exclusion.fileNames =
-          state.filters.exclusion.fileNames.filter(
-            (element) => !fileNamesToRemove.includes(element)
-          );
-      }
-    },
-    addInclusionExtensionsFilter: (state, action) => {
-      const newExtensions = action.payload;
-
-      if (Array.isArray(newExtensions) && newExtensions.length > 0) {
-        state.filters.inclusion.extensions = [
-          ...new Set(state.filters.inclusion.extensions.concat(newExtensions)),
-        ];
-      }
-    },
-    removeInclusionExtensionsFilter: (state, action) => {
-      const extensionsToRemove = action.payload;
-
-      if (Array.isArray(extensionsToRemove) && extensionsToRemove.length > 0) {
-        state.filters.inclusion.extensions =
-          state.filters.inclusion.extensions.filter(
-            (element) => !extensionsToRemove.includes(element)
-          );
-      }
-    },
-    addInclusionFilenamePrefixesFilter: (state, action) => {
-      const fileNamePrefixesToAdd = action.payload;
-
-      if (
-        Array.isArray(fileNamePrefixesToAdd) &&
-        fileNamePrefixesToAdd.length > 0
-      ) {
-        state.filters.inclusion.fileNamePrefixes = [
-          ...new Set(
-            state.filters.inclusion.fileNamePrefixes.concat(
-              fileNamePrefixesToAdd
-            )
-          ),
-        ];
-      }
-    },
-    removeInclusionFilenamePrefixesFilter: (state, action) => {
-      const fileNamePrefixesToRemove = action.payload;
-
-      if (
-        Array.isArray(fileNamePrefixesToRemove) &&
-        fileNamePrefixesToRemove.length > 0
-      ) {
-        state.filters.inclusion.fileNamePrefixes =
-          state.filters.inclusion.fileNamePrefixes.filter(
-            (element) => !fileNamePrefixesToRemove.includes(element)
-          );
-      }
-    },
-    addInclusionFilenameFilter: (state, action) => {
-      const fileNamesToAdd = action.payload;
-
-      if (Array.isArray(fileNamesToAdd) && fileNamesToAdd.length > 0) {
-        state.filters.inclusion.fileNames = [
-          ...new Set(state.filters.inclusion.fileNames.concat(fileNamesToAdd)),
-        ];
-      }
-    },
-    removeInclusionFilenameFilter: (state, action) => {
-      const fileNamesToRemove = action.payload;
-
-      if (Array.isArray(fileNamesToRemove) && fileNamesToRemove.length > 0) {
-        state.filters.inclusion.fileNames =
-          state.filters.inclusion.fileNames.filter(
-            (element) => !fileNamesToRemove.includes(element)
+      if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
+        state.filters =
+          state.filters.filter(
+            (element) => !newFilterExps.includes(element)
           );
       }
     },
@@ -358,9 +243,9 @@ export const {
   scopeMainTreemapIn,
   scopeMainTreemapOut,
   returnMainTreemapHome,
-  // exclusion filter actions
-  addExclusionFilter,
-  removeExclusionFilter,
+  // regex filter actions
+  addFilter,
+  removeFilter,
   // inclusion filter methods
   // Simulation Mode Actions
   enableSimulationMode,
@@ -382,11 +267,6 @@ export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
 export const selectAllFilters = (state) => state.treemap.filters;
-// export const selectFilterMode = (state) => state.treemap.filters.mode;
-// export const selectInclusionFilters = (state) =>
-//   state.treemap.filters.inclusion;
-// export const selectExclusionFilters = (state) =>
-//   state.treemap.filters.exclusion;
 //simulation mode selectors
 export const isSimulationMode = (state) =>
   state.treemap.simulation.isSimulationMode;
