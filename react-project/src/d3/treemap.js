@@ -74,14 +74,16 @@ export function applyRegExFilters(hierarchy, filters) {
       filters.forEach((filterExpression, filterExpressionIndex) => {
         const filterRe = new RegExp(filterExpression);
         hierarchy.eachAfter((d) => {
-          const filePathSplit = d.data.name.split('/')
-          const fileName = filePathSplit[filePathSplit.length - 1];
+          if (d.value > 0) {
+            const filePathSplit = d.data.name.split("/");
+            const fileName = filePathSplit[filePathSplit.length - 1];
 
-          if (!filterRe.test(fileName)) {
-            d.value = 0
+            if (!filterRe.test(fileName)) {
+              d.value = 0;
+            }
           }
         });
-      })
+      });
     }
   }
 }
