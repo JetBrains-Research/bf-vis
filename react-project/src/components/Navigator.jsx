@@ -46,11 +46,7 @@ function Navigator(props) {
     const dropdownSelection = event.target.innerText;
     setCurrentTemplate(dropdownSelection);
     batch(() => {
-      dispatch(
-        addFilter(
-          filterTemplates[dropdownSelection].extensions
-        )
-      );
+      dispatch(addFilter(filterTemplates[dropdownSelection].extensions));
       // dispatch(
       //   addExclusionFilenameFilter(filterTemplates[dropdownSelection].fileNames)
       // );
@@ -145,8 +141,7 @@ function Navigator(props) {
             role="button"
             aria-expanded="false"
             aria-controls="collapseExample">
-            <i className="bi bi-plus-circle-fill"
-            ></i>
+            <i className="bi bi-plus-circle-fill"></i>
           </a>
         </h4>
         <div className="filtersCollapsible collapse show">
@@ -197,8 +192,7 @@ function Navigator(props) {
             addFunction={addFilter}
             removeFunction={removeFilter}
             selector={selectAllFilters}
-            dispatch={dispatch}
-            addDefaultPrefix="."></FilterWithInput>
+            dispatch={dispatch}></FilterWithInput>
 
           {/* <FilterWithInput
             key="File name"
