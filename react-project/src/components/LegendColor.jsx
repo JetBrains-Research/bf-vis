@@ -4,8 +4,10 @@ import React from "react";
 import { CONFIG } from "../config";
 import { generateSvgSquare } from "../d3/legend";
 import { InfoPanel } from "./InfoPanel";
+import { useTranslation } from "react-i18next";
 
 function LegendColor(props) {
+  const { t } = useTranslation()
   const jetbrainsColors = CONFIG.general.colors.jetbrains;
   const scale = [
     {
@@ -45,7 +47,7 @@ function LegendColor(props) {
             className="bi bi-info-circle-fill"
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasWithBothOptions"></i> */}
-          <InfoPanel divName="legendColorInfoPanel" header="How are colors determined for the treemap panels" body="We assign the color based on the bus factor value of the node"></InfoPanel>
+          <InfoPanel divName="legendColorInfoPanel" header="How are colors determined for the treemap panels" body={t('busFactor.color')}></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"
