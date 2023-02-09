@@ -3,6 +3,7 @@
 import React from "react";
 import { CONFIG } from "../config";
 import { generateSvgSquare } from "../d3/legend";
+import { InfoPanel } from "./InfoPanel";
 
 function LegendColor(props) {
   const jetbrainsColors = CONFIG.general.colors.jetbrains;
@@ -40,10 +41,11 @@ function LegendColor(props) {
         className="row panel-right mt-2 pt-2 pb-2">
         <h4>
           Bus Factor{" "}
-          <i
+          {/* <i
             className="bi bi-info-circle-fill"
             data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasWithBothOptions"></i>
+            data-bs-target="#offcanvasWithBothOptions"></i> */}
+          <InfoPanel divName="legendColorInfoPanel" header="How are colors determined for the treemap panels" body="We assign the color based on the bus factor value of the node"></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"
