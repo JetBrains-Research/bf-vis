@@ -1,7 +1,7 @@
 /** @format */
 
 import { createSlice } from "@reduxjs/toolkit";
-import { gitRepoDirData } from "../data/nikolaiData_recalculating";
+import { gitRepoDirData } from "../data/project_data_recalculating";
 import * as jp from "jsonpath";
 import { calculateBusFactor } from "../utils/BusFactorUtil";
 
