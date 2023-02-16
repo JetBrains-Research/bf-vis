@@ -13,10 +13,10 @@ const resources = {
         general: ["The size and color of the tiles in the treemap are dependent on the calculated bus factor and the size of the file or folder it represents"],
         color: ["The tiles are assigned specific colors to indicate the bus factor of the file or folder it represents", "The color palette and the correpsonding bus factor ranges are shown in the panel itself. If authorship data is insufficient for a file or folder of if the file or folder is trivial, the tile will be grayed out."],
         size: ["The size of the tiles are proportional to the square root of the size of the file or folder itself", "The size is measured in bytes. A file that is 100KB will haev a tile twice as big as a file that is 10KB. Folder sizes are assigned as the recursively aggregated sizes of their children elements"],
-        recalculation: ["Turning this feature on will ensure that the bus factor values for the files and folders are updated everytime filters are added or removed. This option is enabled by default for the simulation mode and takes into accounbt currently applied filters as well as authors being added or removed."],
+        recalculation: ["Turning this feature on will ensure that the bus factor values for the files and folders are updated everytime filters are added or removed. This option is enabled by default for the simulation mode and takes into account currently applied filters as well as authors being added or removed."],
       },
       currentPath: {
-        general: ["This panel shows the path to the folder whose contents are currently being visualized as a treemap"],
+        general: ["This panel shows the path to the folder whose contents are currently being visualized as a treemap."],
         details: ["All of the folder names in the path are clickable. Clicking on any of them will route the visualization to the contents that specific folder. The existing filters will still apply"]
       },
       filters: {
@@ -26,9 +26,9 @@ const resources = {
       },
       simMode: {
         general: ["The simulation mode of the BFViz app allows users to remove specific code authors and visualize how their removal would affect the contribution scores and the bus factor for the given project and its folders and files"],
-        detail: ["The authorship scores, and the bus factors are recalculated for all of the files and folders in the project every time a filter is added or removed as well as whenever an author is added or removed. The"],
+        detail: ["The authorship scores, and the bus factors are recalculated for all of the files and folders in the project every time a filter is added or removed as well as whenever an author is added or removed. The calculations are based on the paper by Jabrayilzade, Evtikhiev, Tüzün, and Kovalenko accessible at https://arxiv.org/abs/2202.01523"],
       },
-      stats: ["This panel shows authors that have contributed to the currently visualized folder or currently selected file  along with their contribution scores adn the bus factor for it"],
+      stats: ["This panel shows authors that have contributed to the currently visualized folder or currently selected file  along with their contribution scores and the bus factor for it"],
     },
   },
   ru: {

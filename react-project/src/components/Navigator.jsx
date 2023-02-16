@@ -2,6 +2,10 @@
 
 import React, { useState } from "react";
 import { batch } from "react-redux";
+
+import { InfoPanel } from "./InfoPanel";
+import { useTranslation } from "react-i18next";
+
 import { CONFIG } from "../config";
 import {
   addFilter,
@@ -19,6 +23,7 @@ function Navigator(props) {
   const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
   const [isBusFactorRecalcActive, setisBusFactorRecalcActive] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState();
+  const { t, i18n } = useTranslation();
 
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
@@ -79,6 +84,14 @@ function Navigator(props) {
         <div
           id="pathNavCollapsible"
           className="collapse show">
+          <InfoPanel
+            divName="currentPathInfoPanel"
+            header="What is the current path"
+            body={[t('currentPath.general'), t('currentPath.details')]}
+
+          >
+
+          </InfoPanel>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               {currentPath.split("/").map((pathElement, i) => (
@@ -133,7 +146,7 @@ function Navigator(props) {
 
       <div className="row pt-2 pb-2 mb-3 panel-left">
         <h4>
-          Filters <i className="bi bi-info-circle-fill"></i>
+          Filters <InfoPanel divName="filtersInfoPanel" header="What are filters" body={[t("filters.general")]}></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"
