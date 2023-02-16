@@ -3,6 +3,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { CONFIG } from "../config";
+import { InfoPanel } from "./InfoPanel";
 
 function FilterWithInput(props) {
   const dispatch = props.dispatch;
@@ -49,7 +50,15 @@ function FilterWithInput(props) {
 
   return (
     <>
-      <h5>{filterPropertyType}</h5>
+      <h5>
+        {filterPropertyType}{" "}
+        {props.infoPanelDetails !== null ? (
+          <InfoPanel
+            divName={filterPropertyType + "InfoPanel"}
+            header={"How does " + filterPropertyType + " work?"}
+            body={props.infoPanelDetails}></InfoPanel>
+        ) : null}
+      </h5>
       <div className="input-group">
         <input
           type="text"

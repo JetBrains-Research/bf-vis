@@ -7,8 +7,12 @@ import { CONFIG } from "../config";
 import TreeMap from "./TreeMap";
 
 import { generateBreadcrumb } from "../utils/url";
+import { useTranslation } from "react-i18next";
+import { InfoPanel } from "./InfoPanel";
 
 function SimulationModeModal(props) {
+
+  const { t, i18n } = useTranslation();
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
@@ -60,7 +64,13 @@ function SimulationModeModal(props) {
       id="simulation-mode-container"
       className="row panel-right mt-2 pt-2 pb-2">
       <h4>
-        Simulation Mode <i className="bi bi-info-circle-fill"></i>
+        Simulation Mode
+        <InfoPanel
+          divName="simInfoPanel"
+          header="How does the simulation mode work?"
+          body= {[t("simMode.general"), t("simMode.detail")]}
+        >
+          </InfoPanel>
         <a
           className=""
           data-bs-toggle="collapse"

@@ -47,7 +47,7 @@ function LegendColor(props) {
             className="bi bi-info-circle-fill"
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasWithBothOptions"></i> */}
-          <InfoPanel divName="legendColorInfoPanel" header="How are colors determined for the treemap panels" body={t('busFactor.color')}></InfoPanel>
+          <InfoPanel divName="legendColorInfoPanel" header="How are colors determined for the treemap panels" body={[t('busFactor.color')]}></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"

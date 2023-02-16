@@ -11,8 +11,11 @@ import {
   undoAuthorRemoval,
 } from "../reducers/treemapSlice";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import { InfoPanel } from "./InfoPanel";
 
 function StatsPane(props) {
+  const { t, i18n } = useTranslation();
   const formatPercentage = d3.format(",.1%");
   const formatSI = d3.format(".3s");
 
@@ -74,7 +77,11 @@ function StatsPane(props) {
       id="details-container"
       className="row panel-right mt-2 pt-2 pb-2">
       <h4>
-        Stats <i className="bi bi-info-circle-fill"></i>
+        Stats{" "}
+        <InfoPanel
+          divName="statsInfoPanel"
+          header="What are these stats and how are the calculated?"
+          body={[t("stats")]}></InfoPanel>
         <a
           className=""
           data-bs-toggle="collapse"

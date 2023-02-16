@@ -69,7 +69,14 @@ function Navigator(props) {
       id="controls">
       <div className="row pt-2 pb-2 mb-3 panel-left">
         <h4>
-          Current Path <i className="bi bi-info-circle-fill"></i>
+          Current Path{" "}
+          <InfoPanel
+            divName="currentPathInfoPanel"
+            header="What is the current path"
+            body={[
+              t("currentPath.general"),
+              t("currentPath.details"),
+            ]}></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"
@@ -84,14 +91,6 @@ function Navigator(props) {
         <div
           id="pathNavCollapsible"
           className="collapse show">
-          <InfoPanel
-            divName="currentPathInfoPanel"
-            header="What is the current path"
-            body={[t('currentPath.general'), t('currentPath.details')]}
-
-          >
-
-          </InfoPanel>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               {currentPath.split("/").map((pathElement, i) => (
@@ -146,7 +145,11 @@ function Navigator(props) {
 
       <div className="row pt-2 pb-2 mb-3 panel-left">
         <h4>
-          Filters <InfoPanel divName="filtersInfoPanel" header="What are filters" body={[t("filters.general")]}></InfoPanel>
+          Filters{" "}
+          <InfoPanel
+            divName="filtersInfoPanel"
+            header="What are filters"
+            body={[t("filters.general")]}></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"
@@ -158,7 +161,13 @@ function Navigator(props) {
           </a>
         </h4>
         <div className="filtersCollapsible collapse show">
-          <h6>Bus Factor Recalculation</h6>
+          <h6>
+            Bus Factor Recalculation{" "}
+            <InfoPanel
+              divName="recalculationInfoPanel"
+              header="How and when is bus factor recalculated?"
+              body={[t("busFactor.recalculation")]}></InfoPanel>
+          </h6>
 
           <input
             className="btn-check"
@@ -205,27 +214,8 @@ function Navigator(props) {
             addFunction={addFilter}
             removeFunction={removeFilter}
             selector={selectAllFilters}
-            dispatch={dispatch}></FilterWithInput>
-
-          {/* <FilterWithInput
-            key="File name"
-            filterPropertyType="File name"
-            addFunction={addExclusionFilenameFilter}
-            removeFunction={removeExclusionFilenameFilter}
-            selector={selectExclusionFileNamesFilters}
-            dispatch={dispatch}>
-            {" "}
-          </FilterWithInput>
-
-          <FilterWithInput
-            key="File name prefix"
-            filterPropertyType="File name prefix"
-            addFunction={addExclusionFilenamePrefixesFilter}
-            removeFunction={removeExclusionFilenamePrefixesFilter}
-            selector={selectExclusionFileNamePrefixFilters}
-            dispatch={dispatch}>
-            {" "}
-          </FilterWithInput> */}
+            dispatch={dispatch}
+            infoPanelDetails={[t("filters.regex")]}></FilterWithInput>
 
           <h5>Filtering Templates</h5>
           <div className="dropdown open filtersCollapsible collapse show">
