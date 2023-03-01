@@ -82,7 +82,7 @@ export const CONFIG = {
     },
   },
   commonFilterExpressions: {
-    startingWithDot: ["^\\..*"],
+    startingWithDot: ["^[^\\.].*"],
   },
   filters: {
     general: {
