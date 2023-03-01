@@ -28,11 +28,11 @@ function Navigator(props) {
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
 
-    // if (event.target.checked) {
-    //   dispatch(addExclusionFilenamePrefixesFilter(["."]));
-    // } else if (!event.target.checked) {
-    //   dispatch(removeExclusionFilenamePrefixesFilter(["."]));
-    // }
+    if (event.target.checked) {
+      dispatch(addFilter(CONFIG.commonFilterExpressions.startingWithDot));
+    } else if (!event.target.checked) {
+      dispatch(removeFilter(CONFIG.commonFilterExpressions.startingWithDot));
+    }
   };
 
   const handleBusFactorRecalculationSwitch = (event) => {

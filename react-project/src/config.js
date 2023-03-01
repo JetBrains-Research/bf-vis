@@ -81,6 +81,9 @@ export const CONFIG = {
       width: "100%",
     },
   },
+  commonFilterExpressions: {
+    startingWithDot: ["^\\..*"],
+  },
   filters: {
     general: {
       extensions: [".md", ".1"],
