@@ -2,7 +2,7 @@
 
 import * as d3 from "d3";
 import "d3-transition";
-import { pickTextColorBasedOnBgColor } from "../utils/color";
+import { pickTextColorBasedOnBgColor } from "../utils/color.tsx";
 import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
 import { CONFIG } from "../config";
 import uid from "./uid";
