@@ -1,0 +1,18 @@
+FROM node:16
+
+LABEL environment="dev" \
+  version="0.1"
+
+WORKDIR /app
+
+COPY package*.json ./
+
+COPY ./public ./public
+
+COPY ./src ./src
+
+RUN npm install -y
+
+EXPOSE 3000
+
+CMD [ "npm", "run", "start" ]
