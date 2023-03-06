@@ -20,7 +20,7 @@ import {
   selectAllFilters,
 } from "../reducers/treemapSlice";
 
-import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 
 import * as tiling from "../d3/tiling";
 
