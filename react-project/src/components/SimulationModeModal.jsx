@@ -6,7 +6,7 @@ import { useState } from "react";
 import { CONFIG } from "../config";
 import TreeMap from "./TreeMap";
 
-import { generateBreadcrumb } from "../utils/url";
+import { generateBreadcrumb } from "../utils/url.tsx";
 import { useTranslation } from "react-i18next";
 import { InfoPanel } from "./InfoPanel";
 
