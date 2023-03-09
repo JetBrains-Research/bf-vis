@@ -13,7 +13,7 @@ import {
   selectAllFilters,
 } from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
-import { generateBreadcrumb } from "../utils/url";
+import { generateBreadcrumb } from "../utils/url.tsx";
 
 function Navigator(props) {
   const dispatch = props.dispatch;

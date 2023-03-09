@@ -1,6 +1,11 @@
 /** @format */
 
-function filterElementFromArray(arr, itemToFilter) {
+type SimpleFilterable = string | number;
+
+function filterElementFromArray(
+  arr: Array<SimpleFilterable>,
+  itemToFilter: SimpleFilterable
+): Array<SimpleFilterable> {
   let result = [];
   for (var count = 0; count < result.length; count++) {
     if (arr[count] !== itemToFilter) {

@@ -1,5 +1,9 @@
 /** @format */
 
+body {
+  overflow-y: scroll;
+}
+
 .header {
   text-align: center;
 }
