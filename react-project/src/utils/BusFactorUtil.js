@@ -14,20 +14,29 @@ export function calculateBusFactor(data) {
   return result;
 }
 
+// return true if all is fine
+function checkStatus(node) {
+  const status = node.busFactorStatus
+  return !(status.ignored || status.old);
+}
+
 function getMajorFileData(folderData) {
   let stack = [folderData];
   let result = [];
   while (stack.length > 0) {
     let file = stack.pop();
+
+    if (!checkStatus(file)) continue
+
     if (file.children && file.children.length > 0) {
       stack.push(...file.children);
       continue;
     }
+
     let fileMajorUsers = [];
     if (file.users) {
       file.users.forEach((user) => {
         if (isMajor(user.authorship, user.normalizedAuthorship)) {
-          // if (isMajor(user.authorship)) {
           fileMajorUsers.push(user.email);
         }
       });
@@ -39,18 +48,17 @@ function getMajorFileData(folderData) {
 }
 
 function busFactorForFolder(folderData) {
-  var majorFileData = getMajorFileData(folderData);
-  let developers = sortContributors(majorFileData);
-  var orphanFiles = countOrphan(majorFileData);
-  let filesCount = majorFileData.length;
-  var busFactor = 0;
+  let majorFileData = getMajorFileData(folderData);
+  const developers = sortContributors(majorFileData);
+  let orphanFiles = countOrphan(majorFileData);
+  const filesCount = majorFileData.length;
+  let busFactor = 0;
   developers.forEach((mainAuthor) => {
     if (filesCount >= 2 * orphanFiles) busFactor++;
 
     orphanFiles = 0;
     // Each time we delete 1 main author from major contributors and count files without authors
     majorFileData = majorFileData.map((it) => {
-      it.filter((item) => item !== mainAuthor);
       let dataWithoutCurrentAuthor = it.filter((item) => item !== mainAuthor);
       if (dataWithoutCurrentAuthor.length === 0) orphanFiles++;
       return dataWithoutCurrentAuthor;
@@ -83,9 +91,9 @@ function sortContributors(majorFileData) {
 }
 
 function countOrphan(majorFileData) {
-  var result = 0;
-  for (const [key, value] of Object.entries(majorFileData)) {
-    if (value.length === 0) result++;
+  let result = 0;
+  for (let users in majorFileData) {
+    if (users.length === 0) result++
   }
   return result;
 }
@@ -94,7 +102,6 @@ const authorshipThresholdNew = 0.001;
 const normalizedAuthorshipThreshold = 0.75;
 
 function isMajor(authorship, normalizedAuthorship) {
-  // function isMajor(authorship) {
   return (
     authorship >= authorshipThresholdNew &&
     normalizedAuthorship > normalizedAuthorshipThreshold
