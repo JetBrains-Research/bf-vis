@@ -85,6 +85,7 @@ function Navigator(props) {
             aria-expanded="true"
             aria-controls="collapseExample">
             <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
           </a>
         </h4>
 
@@ -155,9 +156,10 @@ function Navigator(props) {
             data-bs-toggle="collapse"
             href=".filtersCollapsible"
             role="button"
-            aria-expanded="false"
+            aria-expanded="true"
             aria-controls="collapseExample">
             <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
           </a>
         </h4>
         <div className="filtersCollapsible collapse show">

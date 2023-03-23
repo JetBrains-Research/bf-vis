@@ -36,6 +36,7 @@ function LegendColor(props) {
     },
   ];
 
+
   return (
     <>
       <div
@@ -56,6 +57,7 @@ function LegendColor(props) {
             aria-expanded="true"
             aria-controls="legendColorCollapsible">
             <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
           </a>
         </h4>
         <div

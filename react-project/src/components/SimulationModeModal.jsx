@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import { InfoPanel } from "./InfoPanel";
 
 function SimulationModeModal(props) {
-
   const { t, i18n } = useTranslation();
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
@@ -68,9 +67,7 @@ function SimulationModeModal(props) {
         <InfoPanel
           divName="simInfoPanel"
           header="How does the simulation mode work?"
-          body= {[t("simMode.general"), t("simMode.detail")]}
-        >
-          </InfoPanel>
+          body={[t("simMode.general"), t("simMode.detail")]}></InfoPanel>
         <a
           className=""
           data-bs-toggle="collapse"
@@ -79,6 +76,7 @@ function SimulationModeModal(props) {
           aria-expanded="true"
           aria-controls="simulationModeCollapsible">
           <i className="bi bi-plus-circle-fill"></i>
+          <i className="bi bi-dash-circle-fill"></i>
         </a>
       </h4>
       <div

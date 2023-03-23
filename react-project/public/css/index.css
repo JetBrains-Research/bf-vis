@@ -12,6 +12,22 @@ body {
   background: #ffffff;
 }
 
+a[aria-expanded=true] .bi-plus-circle-fill {
+  display: none
+}
+
+a[aria-expanded=true] .bi-dash-circle-fill {
+  display:inline
+}
+
+a[aria-expanded=false] .bi-dash-circle-fill {
+  display: none
+}
+
+a[aria-expanded=false] .bi-plus-circle-fill {
+  display: inline
+}
+
 .panel-left {
   box-shadow: 5px 5px 5px lightgray;
   background: #efefef;
