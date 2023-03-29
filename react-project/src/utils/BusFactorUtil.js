@@ -3,12 +3,13 @@
 const debug = false
 
 export function calculateBusFactor(data) {
-  let result = busFactorForFolder(data);
+  const developersToRemove = []
+  const result = busFactorForFolder(data, developersToRemove);
 
   if (data.children) {
-    let children = [];
+    const children = [];
     data.children.forEach((child) => {
-      const node = busFactorForFolder(child);
+      const node = busFactorForFolder(child, developersToRemove);
       node.children = child.children
       children.push(node);
     });
@@ -60,6 +61,151 @@ function getMajorFileData(node) {
   return result;
 }
 
+function countOrphanAndRemove(majorFileData, mainAuthor) {
+  let newMajorFileData = []
+  let orphanFiles = 0
+  majorFileData.forEach((it) => {
+    const fileMajorUsers = getFileMajorUsers(it)
+    let dataWithoutCurrentAuthor = fileMajorUsers.filter((item) => item !== mainAuthor);
+    if (dataWithoutCurrentAuthor.length === 0) orphanFiles++;
+
+    let obj
+    if (debug) {
+      obj = {
+        ...it,
+        fileMajorUsers: dataWithoutCurrentAuthor
+      };
+    } else {
+      obj = dataWithoutCurrentAuthor
+    }
+
+    newMajorFileData.push(obj)
+  })
+  return [orphanFiles, newMajorFileData]
+}
+
+function busFactorForFolder(folderData, developersToRemove) {
+  if (debug) console.log(folderData.path)
+
+  let majorFileData = getMajorFileData(folderData);
+  const developers = sortContributors(majorFileData, developersToRemove);
+  let orphanFiles = countOrphan(majorFileData);
+  const filesCount = majorFileData.length;
+  let busFactor = 0;
+  // console.log(`${folderData.name} Files count ${filesCount}`)
+  let steps
+  if (debug) {
+    steps = [{
+      orphanFiles: orphanFiles,
+      filesCount: filesCount
+    }]
+  } else {
+    steps = []
+  }
+
+  // compareDevelopers(folderData, developers)
+
+  for (const mainAuthor of developers) {
+    if (filesCount >= 2 * orphanFiles) {
+      busFactor++
+    } else {
+      break
+    }
+
+    orphanFiles = 0;
+    // Each time we delete 1 main author from major contributors and count files without authors
+    const authorRemovedFrom = [];
+    [orphanFiles, majorFileData] = countOrphanAndRemove(majorFileData, mainAuthor)
+
+    if (debug) {
+      steps.push({
+        mainAuthor: mainAuthor,
+        orphanFiles: orphanFiles,
+        filesCount: filesCount,
+        busFactor: busFactor,
+        authorRemovedFrom: authorRemovedFrom
+      })
+    }
+  }
+
+  compareSteps(folderData, steps)
+  compareBF(folderData, busFactor)
+  return sliceNoChildren(folderData, busFactor);
+}
+
+function sortContributors(majorFileData, developersToRemove) {
+  let counter = new Map();
+  majorFileData.forEach((it) => {
+    const fileContributors = getFileMajorUsers(it)
+    fileContributors.forEach((user) => {
+      let value = counter.get(user);
+      if (value) {
+        counter.set(user, value + 1);
+      } else {
+        counter.set(user, 1);
+      }
+    });
+  });
+
+  counter[Symbol.iterator] = function* () {
+    yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
+  };
+  let developers = [];
+  for (let [key, value] of counter) {
+    developers.push(key);
+  }
+
+  return developers.filter( function( el ) {
+    return !developersToRemove.includes( el );
+  } );
+}
+
+function getFileMajorUsers(item) {
+  if (debug) {
+    return item.fileMajorUsers
+  } else {
+    return item
+  }
+}
+
+function countOrphan(majorFileData) {
+  let result = 0;
+  majorFileData.forEach((it) => {
+    const fileMajorUsers = getFileMajorUsers(it)
+    if (fileMajorUsers.length === 0) result++
+  })
+  return result;
+}
+
+const authorshipThresholdNew = 0.001;
+const normalizedAuthorshipThreshold = 0.75;
+
+function isMajor(authorship, normalizedAuthorship) {
+  return (
+    authorship >= authorshipThresholdNew &&
+    normalizedAuthorship > normalizedAuthorshipThreshold
+  );
+}
+
+function sliceNoChildren(data, newBusFactor) {
+  let result = {};
+  for (let i in data) {
+    if (i === "children") continue;
+    if (i === "busFactorStatus") {
+      let bfs = data[i];
+      let value = bfs.busFactor;
+      if (value) {
+        result[i] = {
+          busFactor: newBusFactor,
+        };
+        continue;
+      }
+    }
+    result[i] = data[i];
+  }
+  return result;
+}
+
 function compareMajor(node, major) {
   if (!debug) return
 
@@ -108,9 +254,14 @@ function compareSteps(node, steps) {
   steps.forEach((v, i) => {
     const step = nodeSteps[i]
     if (i !== 0) {
-      // console.log(`step: ${v}`)
-      // if (step.mainAuthor !== v.mainAuthor || step.orphanFiles !== v.orphanFiles) {
-      if (step.busFactor !== v.busFactor || step.orphanFiles !== v.orphanFiles) {
+      const bfIsNotEq = step.busFactor !== v.busFactor
+      const orphanIsNotEq = step.orphanFiles !== v.orphanFiles
+      if (orphanIsNotEq) {
+        console.log(`Orphan files is not equal: ${step.orphanFiles} != ${v.orphanFiles}`)
+      }
+
+      if (bfIsNotEq) {
+        console.log(`!!! BF values different`)
         console.log(`file ${node.path} , step: ${i}, `)
         console.log(step)
         console.log(v)
@@ -118,78 +269,6 @@ function compareSteps(node, steps) {
       }
     }
   })
-}
-
-
-function countOrphanAndRemove(majorFileData, mainAuthor) {
-  let newMajorFileData = []
-  let orphanFiles = 0
-  majorFileData.forEach((it) => {
-    const fileMajorUsers = getFileMajorUsers(it)
-    let dataWithoutCurrentAuthor = fileMajorUsers.filter((item) => item !== mainAuthor);
-    if (dataWithoutCurrentAuthor.length === 0) orphanFiles++;
-    let obj
-    if (debug) {
-      obj = {
-      ...it,
-        fileMajorUsers: dataWithoutCurrentAuthor
-      };
-    } else {
-      obj = dataWithoutCurrentAuthor
-    }
-    newMajorFileData.push(obj)
-  })
-  return [orphanFiles, newMajorFileData]
-}
-
-
-function busFactorForFolder(folderData) {
-  if (debug) console.log(folderData.path)
-
-  let majorFileData = getMajorFileData(folderData);
-  const developers = sortContributors(majorFileData, folderData);
-  let orphanFiles = countOrphan(majorFileData);
-  const filesCount = majorFileData.length;
-  let busFactor = 0;
-  // console.log(`${folderData.name} Files count ${filesCount}`)
-  let steps
-  if (debug) {
-    steps = [{
-      orphanFiles: orphanFiles,
-      filesCount: filesCount
-    }]
-  } else {
-    steps = []
-  }
-
-  // compareDevelopers(folderData, developers)
-
-  for (const mainAuthor of developers) {
-    if (filesCount >= 2 * orphanFiles) {
-      busFactor++
-    } else {
-      break
-    }
-
-    orphanFiles = 0;
-    // Each time we delete 1 main author from major contributors and count files without authors
-    const authorRemovedFrom = [];
-    [orphanFiles, majorFileData] = countOrphanAndRemove(majorFileData, mainAuthor)
-
-    if (debug) {
-      steps.push({
-        mainAuthor: mainAuthor,
-        orphanFiles: orphanFiles,
-        filesCount: filesCount,
-        busFactor: busFactor,
-        authorRemovedFrom: authorRemovedFrom
-      })
-    }
-  }
-
-  compareSteps(folderData, steps)
-  compareBF(folderData, busFactor)
-  return sliceNoChildren(folderData, busFactor);
 }
 
 function compareBF(node, busFactor) {
@@ -202,85 +281,3 @@ function compareBF(node, busFactor) {
   }
 }
 
-function sortContributors(majorFileData, node) {
-  let counter = new Map();
-  majorFileData.forEach((it) => {
-    const fileContributors = getFileMajorUsers(it)
-    fileContributors.forEach((user) => {
-      let value = counter.get(user);
-      if (value) {
-        counter.set(user, value + 1);
-      } else {
-        counter.set(user, 1);
-      }
-    });
-  });
-
-  counter[Symbol.iterator] = function* () {
-    yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
-  };
-  let developers = [];
-  for (let [key, value] of counter) {
-    developers.push(key);
-  }
-
-
-  // TODO: replace with developers
-  const devs = node.busFactorStatus.developersSorted
-  // if (devs !== developers) console.log(`${devs} != ${developers}`)
-
-  if (devs === undefined) {
-    return []
-  } else {
-    if (devs.length !== developers.length) console.log(`Different size of devs`)
-
-    return devs
-  }
-  // return devs;
-}
-
-function getFileMajorUsers(item) {
-  if (debug) {
-    return item.fileMajorUsers
-  } else {
-    return item
-  }
-}
-
-function countOrphan(majorFileData) {
-  let result = 0;
-  majorFileData.forEach((it) => {
-    const fileMajorUsers = getFileMajorUsers(it)
-    if (fileMajorUsers.length === 0) result++
-  })
-  return result;
-}
-
-const authorshipThresholdNew = 0.001;
-const normalizedAuthorshipThreshold = 0.75;
-
-function isMajor(authorship, normalizedAuthorship) {
-  return (
-    authorship >= authorshipThresholdNew &&
-    normalizedAuthorship > normalizedAuthorshipThreshold
-  );
-}
-
-function sliceNoChildren(data, newBusFactor) {
-  let result = {};
-  for (let i in data) {
-    if (i === "children") continue;
-    if (i === "busFactorStatus") {
-      let bfs = data[i];
-      let value = bfs.busFactor;
-      if (value) {
-        result[i] = {
-          busFactor: newBusFactor,
-        };
-        continue;
-      }
-    }
-    result[i] = data[i];
-  }
-  return result;
-}
