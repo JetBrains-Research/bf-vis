@@ -25,7 +25,7 @@ function checkStatus(node) {
   return !(status.ignored || status.old);
 }
 
-function getMajorFileData(node) {
+function getMajorFileData(node, developersToRemove) {
   let stack = [node];
   let result = [];
   while (stack.length > 0) {
@@ -46,6 +46,10 @@ function getMajorFileData(node) {
         }
       });
     }
+
+    fileMajorUsers = fileMajorUsers.filter( function( el ) {
+      return !developersToRemove.includes( el );
+    } );
 
     if (debug) {
       result.push({
@@ -87,8 +91,8 @@ function countOrphanAndRemove(majorFileData, mainAuthor) {
 function busFactorForFolder(folderData, developersToRemove) {
   if (debug) console.log(folderData.path)
 
-  let majorFileData = getMajorFileData(folderData);
-  const developers = sortContributors(majorFileData, developersToRemove);
+  let majorFileData = getMajorFileData(folderData, developersToRemove);
+  const developers = sortContributors(majorFileData);
   let orphanFiles = countOrphan(majorFileData);
   const filesCount = majorFileData.length;
   let busFactor = 0;
@@ -155,9 +159,7 @@ function sortContributors(majorFileData, developersToRemove) {
     developers.push(key);
   }
 
-  return developers.filter( function( el ) {
-    return !developersToRemove.includes( el );
-  } );
+  return developers
 }
 
 function getFileMajorUsers(item) {
