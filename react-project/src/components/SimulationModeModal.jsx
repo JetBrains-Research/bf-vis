@@ -19,7 +19,7 @@ function SimulationModeModal(props) {
   const authorsList = "users" in statsData ? [...statsData.users] : undefined;
   const simulationVisualizationData = props.simulationData;
   const simulationVisualizationPath = props.simulationPath;
-  console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
+  // console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
   const setTreemapPathFunc = props.setTreemapPathFunc;
   const returnTreeMapHome = props.setTreeMapHome;
 

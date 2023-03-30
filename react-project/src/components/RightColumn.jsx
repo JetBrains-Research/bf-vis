@@ -10,7 +10,7 @@ function RightColumn(props) {
   const statsData = props.statsData;
   const simulationData = props.simulationData;
   const simulationPath = props.simulationPath;
-  console.log(`Simulation Viz Path (RightColumn): ${simulationPath}`);
+  // console.log(`Simulation Viz Path (RightColumn): ${simulationPath}`);
 
   return (
     <div className="col p-1">
