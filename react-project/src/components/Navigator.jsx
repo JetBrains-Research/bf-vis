@@ -9,7 +9,7 @@ import {useTranslation} from "react-i18next";
 import {CONFIG} from "../config";
 import {addFilter, removeFilter, selectAllFilters,} from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
-import {generateBreadcrumb} from "../utils/url";
+import { generateBreadcrumb } from "../utils/url.tsx";
 
 function Navigator(props) {
   const dispatch = props.dispatch;
@@ -81,6 +81,7 @@ function Navigator(props) {
             aria-expanded="true"
             aria-controls="collapseExample">
             <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
           </a>
         </h4>
 
@@ -151,9 +152,10 @@ function Navigator(props) {
             data-bs-toggle="collapse"
             href=".filtersCollapsible"
             role="button"
-            aria-expanded="false"
+            aria-expanded="true"
             aria-controls="collapseExample">
             <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
           </a>
         </h4>
         <div className="filtersCollapsible collapse show">

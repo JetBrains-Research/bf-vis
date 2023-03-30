@@ -2,10 +2,10 @@
 
 import * as d3 from "d3";
 import "d3-transition";
-import { pickTextColorBasedOnBgColor } from "../utils/color";
-import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
+import { pickTextColorBasedOnBgColor } from "../utils/color.tsx";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 import { CONFIG } from "../config";
-import uid from "./uid";
+import uid from "./uid.tsx";
 import { filter } from "d3";
 
 /*
@@ -24,8 +24,8 @@ export const colorSequence = [
 ];
 
 export const color = d3
-  .scaleQuantize()
-  .domain([0, MAX_BUS_FACTOR_COLOR_VALUE])
+  .scaleThreshold()
+  .domain([3,6,8,MAX_BUS_FACTOR_COLOR_VALUE])
   .range(colorSequence);
 export const formatSI = d3.format(".2s");
 

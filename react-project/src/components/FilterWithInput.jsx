@@ -36,9 +36,21 @@ function FilterWithInput(props) {
   };
 
   const handleFilterElementSubmit = (event) => {
+    let isValid = true;
     event.preventDefault();
     if (currentFilterInput.length > 1) {
-      dispatch(addFunction([currentFilterInput]));
+      try {
+        RegExp(currentFilterInput);
+      } catch (e) {
+        isValid = false;
+      }
+      if (!isValid) {
+        alert(
+          "Invalid regex pattern specified. Please test it out and fix it using https://regexr.com and try again"
+        );
+      } else {
+        dispatch(addFunction([currentFilterInput]));
+      }
     }
   };
 

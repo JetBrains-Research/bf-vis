@@ -25,6 +25,7 @@ function checkStatus(node) {
   return !(status.ignored || status.old);
 }
 
+
 function getMajorFileData(node, developersToRemove) {
   let stack = [node];
   let result = [];
@@ -35,6 +36,7 @@ function getMajorFileData(node, developersToRemove) {
       stack.push(...file.children);
       continue;
     }
+
 
     if (!checkStatus(file)) continue
 
@@ -64,6 +66,7 @@ function getMajorFileData(node, developersToRemove) {
   compareMajor(node, result)
   return result;
 }
+
 
 function countOrphanAndRemove(majorFileData, mainAuthor) {
   let newMajorFileData = []
@@ -96,7 +99,8 @@ function busFactorForFolder(folderData, developersToRemove) {
   let orphanFiles = countOrphan(majorFileData);
   const filesCount = majorFileData.length;
   let busFactor = 0;
-  // console.log(`${folderData.name} Files count ${filesCount}`)
+
+// console.log(`${folderData.name} Files count ${filesCount}`)
   let steps
   if (debug) {
     steps = [{
@@ -161,6 +165,7 @@ function sortContributors(majorFileData, developersToRemove) {
 
   return developers
 }
+
 
 function getFileMajorUsers(item) {
   if (debug) {

@@ -10,6 +10,6 @@ export const nameAscending = (a, b) => ascending(a.name, b.name);
 export const nameDescending = (a, b) => descending(a.name, b.name);
 
 export const busFactorAscending = (a, b) =>
-  ascending(a.data.busFactor.b.data.BusFactor);
+  ascending(a.data.busFactor, b.data.BusFactor);
 export const busFactorDescending = (a, b) =>
-  descending(a.data.busFactor.b.data.BusFactor);
+  descending(a.data.busFactor, b.data.BusFactor);
