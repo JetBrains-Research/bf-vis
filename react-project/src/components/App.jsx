@@ -1,6 +1,6 @@
 /** @format */
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useTransition } from "react";
 import { useDispatch, useSelector, batch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { CONFIG } from "../config";
@@ -43,10 +43,11 @@ function App() {
   const reduxNavFunctions = {
     dispatch,
     scopeMiniTreemapIn,
-    scopeMiniTreemapOut
+    scopeMiniTreemapOut,
   };
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   const setURLPath = useCallback(
     (dataPath, statsPath) => {
@@ -69,26 +70,28 @@ function App() {
     const urlDataPath = searchParams.get("dataPath") || "";
     const urlStatsPath = searchParams.get("statsPath") || "";
 
-    if (urlDataPath && urlDataPath !== currentVisualizationPath) {
-      if (urlStatsPath && urlStatsPath !== urlDataPath) {
-        batch(() => {
+    startTransition(() => {
+      if (urlDataPath && urlDataPath !== currentVisualizationPath) {
+        if (urlStatsPath && urlStatsPath !== urlDataPath) {
+          batch(() => {
+            dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
+            dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
+          });
+        } else {
+          if (urlDataPath === ".") {
+            dispatch(returnMainTreemapHome());
+          }
           dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
-          dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
-        });
-      } else {
-        if (urlDataPath === ".") {
-          dispatch(returnMainTreemapHome());
         }
-        dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
       }
-    }
 
-    if (
-      urlStatsPath &&
-      urlStatsPath !== currentStatsPath &&
-      urlStatsPath !== urlDataPath
-    )
-      dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
+      if (
+        urlStatsPath &&
+        urlStatsPath !== currentStatsPath &&
+        urlStatsPath !== urlDataPath
+      )
+        dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
+    });
   }, [
     setURLPath,
     searchParams,
@@ -131,10 +134,7 @@ function App() {
             statsData={currentStatsData}
             simulationPath={currentSimulationModePath}
             simulationData={currentSimulationModeData}
-            reduxNavFunctions = {reduxNavFunctions}
-          >
-            
-            </RightColumn>
+            reduxNavFunctions={reduxNavFunctions}></RightColumn>
         </div>
       </div>
     </div>
