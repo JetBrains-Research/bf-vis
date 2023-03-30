@@ -1,6 +1,10 @@
 /** @format */
 
-import { Suspense, useCallback, useEffect, useTransition } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useLayoutEffect,
+} from "react";
 import { useDispatch, useSelector, batch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { CONFIG } from "../config";
@@ -27,19 +31,31 @@ import * as tiling from "../d3/tiling";
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
-import Loading from "./Loading";
+
 
 function App() {
   const dispatch = useDispatch();
 
-  const currentVisualizationData = useSelector(selectCurrentVisualizationData);
-  const currentVisualizationPath = useSelector(selectCurrentVisualizationPath);
-  const currentStatsData = useSelector(selectCurrentStatsData);
-  const currentStatsPath = useSelector(selectCurrentStatsPath);
-  const filters = useSelector(selectAllFilters);
+  const currentVisualizationData = useDeferredValue(
+    useSelector(selectCurrentVisualizationData)
+  );
+  const currentVisualizationPath = useDeferredValue(
+    useSelector(selectCurrentVisualizationPath)
+  );
+  const currentStatsData = useDeferredValue(
+    useSelector(selectCurrentStatsData)
+  );
+  const currentStatsPath = useDeferredValue(
+    useSelector(selectCurrentStatsPath)
+  );
+  const filters = useDeferredValue(useSelector(selectAllFilters));
 
-  const currentSimulationModeData = useSelector(simulationVisualizationData);
-  const currentSimulationModePath = useSelector(simulationVisualizationPath);
+  const currentSimulationModeData = useDeferredValue(
+    useSelector(simulationVisualizationData)
+  );
+  const currentSimulationModePath = useDeferredValue(
+    useSelector(simulationVisualizationPath)
+  );
 
   const reduxNavFunctions = {
     dispatch,
@@ -48,7 +64,6 @@ function App() {
   };
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isPending, startTransition] = useTransition();
 
   const setURLPath = useCallback(
     (dataPath, statsPath) => {
@@ -67,27 +82,21 @@ function App() {
     [searchParams, setSearchParams]
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const urlDataPath = searchParams.get("dataPath") || "";
     const urlStatsPath = searchParams.get("statsPath") || "";
 
     if (urlDataPath && urlDataPath !== currentVisualizationPath) {
       if (urlStatsPath && urlStatsPath !== urlDataPath) {
-        startTransition(() => {
-          batch(() => {
-            dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
-            dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
-          });
+        batch(() => {
+          dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
+          dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
         });
       } else {
         if (urlDataPath === ".") {
-          startTransition(() => {
-            dispatch(returnMainTreemapHome());
-          });
+          dispatch(returnMainTreemapHome());
         }
-        startTransition(() => {
-          dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
-        });
+        dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
       }
     }
 
@@ -118,25 +127,21 @@ function App() {
             setPathFunc={setURLPath}></Navigator>
         </div>
         <div className="col-8">
-          {isPending ? (
-            <Loading></Loading>
-          ) : (
-            <TreeMap
-              colorDefinitions={CONFIG.general.colors.jetbrains}
-              containerId={CONFIG.treemap.ids.treemapContainerId}
-              data={currentVisualizationData}
-              dataNormalizationFunction={Math.log2}
-              dataPath={currentVisualizationPath}
-              filters={filters}
-              initialHeight={window.innerHeight}
-              initialWidth={window.innerWidth * 0.65}
-              padding={CONFIG.treemap.layout.overallPadding}
-              setPathFunc={setURLPath}
-              svgId={CONFIG.treemap.ids.treemapSvgId}
-              tilingFunction={tiling.squarify}
-              topPadding={CONFIG.treemap.layout.topPadding}
-              type="main"></TreeMap>
-          )}
+          <TreeMap
+            colorDefinitions={CONFIG.general.colors.jetbrains}
+            containerId={CONFIG.treemap.ids.treemapContainerId}
+            data={currentVisualizationData}
+            dataNormalizationFunction={Math.log2}
+            dataPath={currentVisualizationPath}
+            filters={filters}
+            initialHeight={window.innerHeight}
+            initialWidth={window.innerWidth * 0.65}
+            padding={CONFIG.treemap.layout.overallPadding}
+            setPathFunc={setURLPath}
+            svgId={CONFIG.treemap.ids.treemapSvgId}
+            tilingFunction={tiling.squarify}
+            topPadding={CONFIG.treemap.layout.topPadding}
+            type="main"></TreeMap>
         </div>
         <div className="col-2">
           <RightColumn
