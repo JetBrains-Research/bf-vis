@@ -1,6 +1,6 @@
 /** @format */
 
-import { useCallback, useEffect, useTransition } from "react";
+import { Suspense, useCallback, useEffect, useTransition } from "react";
 import { useDispatch, useSelector, batch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { CONFIG } from "../config";
@@ -27,6 +27,7 @@ import * as tiling from "../d3/tiling";
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
+import Loading from "./Loading";
 
 function App() {
   const dispatch = useDispatch();
@@ -117,21 +118,25 @@ function App() {
             setPathFunc={setURLPath}></Navigator>
         </div>
         <div className="col-8">
-          <TreeMap
-            colorDefinitions={CONFIG.general.colors.jetbrains}
-            containerId={CONFIG.treemap.ids.treemapContainerId}
-            data={currentVisualizationData}
-            dataNormalizationFunction={Math.log2}
-            dataPath={currentVisualizationPath}
-            filters={filters}
-            initialHeight={window.innerHeight}
-            initialWidth={window.innerWidth * 0.65}
-            padding={CONFIG.treemap.layout.overallPadding}
-            setPathFunc={setURLPath}
-            svgId={CONFIG.treemap.ids.treemapSvgId}
-            tilingFunction={tiling.squarify}
-            topPadding={CONFIG.treemap.layout.topPadding}
-            type="main"></TreeMap>
+          {isPending ? (
+            <Loading></Loading>
+          ) : (
+            <TreeMap
+              colorDefinitions={CONFIG.general.colors.jetbrains}
+              containerId={CONFIG.treemap.ids.treemapContainerId}
+              data={currentVisualizationData}
+              dataNormalizationFunction={Math.log2}
+              dataPath={currentVisualizationPath}
+              filters={filters}
+              initialHeight={window.innerHeight}
+              initialWidth={window.innerWidth * 0.65}
+              padding={CONFIG.treemap.layout.overallPadding}
+              setPathFunc={setURLPath}
+              svgId={CONFIG.treemap.ids.treemapSvgId}
+              tilingFunction={tiling.squarify}
+              topPadding={CONFIG.treemap.layout.topPadding}
+              type="main"></TreeMap>
+          )}
         </div>
         <div className="col-2">
           <RightColumn
