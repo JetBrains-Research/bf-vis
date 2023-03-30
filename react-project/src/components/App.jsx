@@ -70,28 +70,32 @@ function App() {
     const urlDataPath = searchParams.get("dataPath") || "";
     const urlStatsPath = searchParams.get("statsPath") || "";
 
-    startTransition(() => {
-      if (urlDataPath && urlDataPath !== currentVisualizationPath) {
-        if (urlStatsPath && urlStatsPath !== urlDataPath) {
+    if (urlDataPath && urlDataPath !== currentVisualizationPath) {
+      if (urlStatsPath && urlStatsPath !== urlDataPath) {
+        startTransition(() => {
           batch(() => {
             dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
             dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
           });
-        } else {
-          if (urlDataPath === ".") {
+        });
+      } else {
+        if (urlDataPath === ".") {
+          startTransition(() => {
             dispatch(returnMainTreemapHome());
-          }
-          dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
+          });
         }
+        startTransition(() => {
+          dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
+        });
       }
+    }
 
-      if (
-        urlStatsPath &&
-        urlStatsPath !== currentStatsPath &&
-        urlStatsPath !== urlDataPath
-      )
-        dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
-    });
+    if (
+      urlStatsPath &&
+      urlStatsPath !== currentStatsPath &&
+      urlStatsPath !== urlDataPath
+    )
+      dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
   }, [
     setURLPath,
     searchParams,
