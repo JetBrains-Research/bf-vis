@@ -1,6 +1,10 @@
 /** @format */
 
-import { useCallback, useDeferredValue, useLayoutEffect } from "react";
+import {
+  useCallback,
+  useDeferredValue, useEffect,
+  useLayoutEffect,
+} from "react";
 import { useDispatch, useSelector, batch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { CONFIG } from "../config";
@@ -27,9 +31,15 @@ import * as tiling from "../d3/tiling";
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
+import { gitRepoDirData } from "../data/project_data_recalculating";
 
 function App() {
   const dispatch = useDispatch();
+
+  // Similar to componentDidMount and componentDidUpdate:
+  useEffect(() => {
+    dispatch(setNewTree(gitRepoDirData))
+  }, []);
 
   const currentVisualizationData = useDeferredValue(
     useSelector(selectCurrentVisualizationData)
@@ -126,7 +136,7 @@ function App() {
             simulationData={currentSimulationModeData}
             statsData={currentStatsData}
           >
-            
+
             </Navigator>
         </div>
         <div className="col-8">

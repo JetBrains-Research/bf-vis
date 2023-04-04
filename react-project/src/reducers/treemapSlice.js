@@ -1,36 +1,59 @@
 /** @format */
 
-import { createSlice } from "@reduxjs/toolkit";
-import { gitRepoDirData } from "../data/project_data_recalculating";
+import {createSlice} from "@reduxjs/toolkit";
 import * as jp from "jsonpath";
-import { calculateBusFactor } from "../utils/BusFactorUtil";
+import {calculateBusFactor} from "../utils/BusFactorUtil";
 
-const fullData = gitRepoDirData;
-const initialDummyMiniTreeMapData =
-  getDummySimulationModeComparisonData(fullData);
-
-// Initial State for this slice
-const defaultState = {
-  mainTreemap: {
-    currentStatsData: fullData,
-    currentStatsPath: fullData.path,
-    currentVisualizationData: fullData,
-    currentVisualizationPath: fullData.path,
-    ignored: [],
-    isRecalculationEnabled: false,
-    previousPathStack: [],
+const defaultTree = {
+  "name": "PlaceHolder",
+  "path": ".",
+  "bytes": 1,
+  "busFactorStatus": {
+    "busFactor": 1
   },
-  simulation: {
-    miniTreemap: {
-      visualizationData: initialDummyMiniTreeMapData,
-      visualizationPath: fullData.path,
+  "users": [
+    {
+      "email": "place.holder@mail.com",
+      "authorship": 0.5
+    },],
+  "children": [
+    {
+      "name": "place_holder",
+      "path": "/place_holder",
+      "bytes": 1,
+      "busFactorStatus": {
+        "old": true
+      }
+    },]
+}
+
+function convertTreeToState(tree) {
+  const initialDummyMiniTreeMapData =
+    getDummySimulationModeComparisonData(tree);
+  return {
+    tree: tree,
+    initialDummyMiniTreeMapData: initialDummyMiniTreeMapData,
+    mainTreemap: {
+      currentStatsData: tree,
+      currentStatsPath: tree.path,
+      currentVisualizationData: tree,
+      currentVisualizationPath: tree.path,
+      ignored: [],
+      isRecalculationEnabled: false,
       previousPathStack: [],
     },
-    isSimulationMode: false,
-    removedAuthors: [],
-  },
-  filters: [],
-};
+    simulation: {
+      miniTreemap: {
+        visualizationData: initialDummyMiniTreeMapData,
+        visualizationPath: tree.path,
+        previousPathStack: [],
+      },
+      isSimulationMode: false,
+      removedAuthors: [],
+    },
+    filters: [],
+  };
+}
 
 function getDataWithPathQuery(fullData, pathQuery) {
   let newData = jp.query(fullData, pathQuery);
@@ -40,29 +63,65 @@ function getDataWithPathQuery(fullData, pathQuery) {
 }
 
 function getDummySimulationModeComparisonData(currentData) {
-  if (currentData.children) {
+  const children = []
+  if (children) {
     for (let count = 0; count < currentData.children.length; count++) {
+      const childData = currentData.children[count]
+      let busFactorStatus
+
+      if (childData.busFactorStatus) {
+        busFactorStatus = childData.busFactorStatus
+      }
+
       if (count % 2 === 0) {
-        if ("busFactorStatus" in currentData.children[count])
-          currentData.children[count].busFactorStatus["busFactorDelta"] = -2;
+        if ("busFactorStatus" in childData) {
+          busFactorStatus = {
+            ...busFactorStatus,
+            busFactorDelta: -2
+          }
+        }
       }
 
       if (count % 5 === 0) {
-        if ("busFactorStatus" in currentData.children[count])
-          currentData.children[count].busFactorStatus["nodeStatus"] = "removed";
-
-        currentData.children[count].busFactorStatus["busFactorDelta"] = -count;
+        if ("busFactorStatus" in childData) {
+          busFactorStatus = {
+            ...busFactorStatus,
+            nodeStatus: "removed"
+          }
+        }
+        busFactorStatus = {
+          ...busFactorStatus,
+          busFactorDelta: -count
+        }
       }
 
       if (count % 3 === 0) {
-        if ("busFactorStatus" in currentData.children[count])
-          currentData.children[count].busFactorStatus["nodeStatus"] = "added";
-        currentData.children[count].busFactorStatus["busFactorDelta"] = 3;
+        if ("busFactorStatus" in childData) {
+          busFactorStatus = {
+            ...busFactorStatus,
+            nodeStatus: "added"
+          }
+        }
+        busFactorStatus = {
+          ...busFactorStatus,
+          busFactorDelta: 3
+        }
+      }
+      if ("busFactorStatus" in childData) {
+        children.push({
+          ...childData,
+          busFactorStatus: busFactorStatus
+        })
+      } else {
+        children.push(childData)
       }
     }
   }
 
-  return currentData;
+  return {
+    ...currentData,
+    children: children
+  };
 }
 
 function getDataFromCurrentData(currentData, authorsToRemove, filters) {
@@ -73,10 +132,14 @@ function getDataFromCurrentData(currentData, authorsToRemove, filters) {
 // Definition of the slice and its reducer function
 const treemapSlice = createSlice({
   name: "treemap",
-  initialState: defaultState,
+  initialState: convertTreeToState(defaultTree),
   reducers: {
+    setNewTree: (state, action) => {
+      return {...convertTreeToState(action.payload)}
+    },
     // not as useful anymore, URL takes precedence, or at least, it should
     returnMainTreemapHome: (state) => {
+      const fullData = state.tree
       let newData = getDataWithPathQuery(fullData, "$");
       state.mainTreemap.currentVisualizationData = newData;
       state.mainTreemap.currentVisualizationPath = newData.path;
@@ -85,6 +148,7 @@ const treemapSlice = createSlice({
     },
     // click on a file node
     scopeStatsIn: (state, action) => {
+      const fullData = state.tree
       if (
         action.payload &&
         action.payload.path &&
@@ -104,6 +168,7 @@ const treemapSlice = createSlice({
     },
     // click on a folder node
     scopeMainTreemapIn: (state, action) => {
+      const fullData = state.tree
       if (
         action.payload.path &&
         action.payload.path !== state.mainTreemap.currentVisualizationPath
@@ -126,6 +191,7 @@ const treemapSlice = createSlice({
     },
     // click the back button
     scopeMainTreemapOut: (state) => {
+      const fullData = state.tree
       const nextPath = state.mainTreemap.previousPathStack.pop();
 
       if (nextPath) {
@@ -148,10 +214,22 @@ const treemapSlice = createSlice({
       }
     },
     scopeMiniTreemapIn: (state, action) => {
+      // TODO: problem must be here
+      const initialDummyMiniTreeMapData =
+        state.initialDummyMiniTreeMapData
+
+      const newState = {
+        "simulation" : {
+          "miniTreemap" : state.simulation.miniTreemap
+        }
+      }
+
+      const miniTreemap = newState.simulation.miniTreemap
+
       if (
         action.payload &&
         action.payload.path &&
-        action.payload.path !== state.simulation.miniTreemap.visualizationPath
+        action.payload.path !== miniTreemap.visualizationPath
       ) {
         const nextPath = `${action.payload.path}`;
         const pathQuery = `$..[?(@.path=='${nextPath}')]`;
@@ -159,22 +237,38 @@ const treemapSlice = createSlice({
         console.log("scopeTreemapIn", newData, pathQuery);
 
         if (newData && newData.children) {
-          state.simulation.miniTreemap.previousPathStack.push(
-            state.simulation.miniTreemap.visualizationPath
+          miniTreemap.previousPathStack.push(
+            miniTreemap.visualizationPath
           );
-          state.simulation.miniTreemap.visualizationData = newData;
-          state.simulation.miniTreemap.visualizationPath = nextPath;
+          miniTreemap.visualizationData = newData;
+          miniTreemap.visualizationPath = nextPath;
         }
+      }
+
+      return {
+        ...state,
+        ...newState
       }
     },
     scopeMiniTreemapOut: (state, action) => {
+      // TODO: problem must be here
+      const initialDummyMiniTreeMapData =
+        state.initialDummyMiniTreeMapData
       const nextPath = state.simulation.miniTreemap.previousPathStack.pop();
+
+      const newState = {
+        "simulation" : {
+          "miniTreemap" : state.simulation.miniTreemap
+        }
+      }
+
+      const miniTreemap = newState.simulation.miniTreemap
 
       if (nextPath) {
         if (nextPath === ".") {
-          state.simulation.miniTreemap.visualizationData =
+          miniTreemap.visualizationData =
             initialDummyMiniTreeMapData;
-          state.simulation.miniTreemap.visualizationPath =
+          miniTreemap.visualizationPath =
             initialDummyMiniTreeMapData.path;
         } else {
           const pathQuery = `$..[?(@.path==="${nextPath}")]`;
@@ -184,13 +278,19 @@ const treemapSlice = createSlice({
           );
           console.log("scopeTreemapOut", newData, pathQuery);
           if (newData && newData.children) {
-            state.simulation.miniTreemap.visualizationData = newData;
-            state.simulation.miniTreemap.visualizationPath = nextPath;
+            miniTreemap.visualizationData = newData;
+            miniTreemap.visualizationPath = nextPath;
           }
         }
       }
+
+      return {
+        ...state,
+        ...newState
+      }
     },
-    returnMiniTreemapHome: (state, action) => {},
+    returnMiniTreemapHome: (state, action) => {
+    },
     addFilter: (state, action) => {
       const newFilterExps = action.payload;
 
@@ -238,6 +338,7 @@ const treemapSlice = createSlice({
 
 // Exports
 export const {
+  setNewTree,
   // Treemap Navigation actions
   scopeStatsIn,
   scopeMainTreemapIn,

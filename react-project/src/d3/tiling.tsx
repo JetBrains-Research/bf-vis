@@ -1,5 +1,6 @@
 /** @format */
 
+// @ts-ignore
 import { treemapBinary, treemapSquarify } from "d3";
 
 export const squarify = treemapSquarify;
