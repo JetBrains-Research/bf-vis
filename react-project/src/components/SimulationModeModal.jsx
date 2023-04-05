@@ -58,6 +58,15 @@ function SimulationModeModal(props) {
     }
   };
 
+  const handleAuthorCheckmark = (authorScorePair) => {
+    let email = authorScorePair.email;
+    authorsListContributionPercentage.map((authorScorePairOriginal) => {
+      if (authorScorePairOriginal.email === email) {
+        authorScorePairOriginal.included = !authorScorePairOriginal.included
+      }
+    })
+  }
+
   return (
     <div
       id="simulation-mode-container"
@@ -244,12 +253,10 @@ function SimulationModeModal(props) {
                                   <input
                                     className="form-check-input"
                                     type="checkbox"
-                                    id=""
-                                    value="option1"
+                                    id={authorScorePair.email}
                                     checked={authorScorePair.included}
-                                    onChange={() =>
-                                      console.log("authorChecked")
-                                    }></input>
+                                    onChange={() => handleAuthorCheckmark(authorScorePair)}
+                                    ></input>
                                 </div>
                               </td>
                               <td>{authorScorePair["email"]}</td>
