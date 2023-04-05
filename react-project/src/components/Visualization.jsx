@@ -21,7 +21,7 @@ import {
   scopeMiniTreemapOut,
   simulationVisualizationData,
   simulationVisualizationPath,
-  selectAllFilters,
+  selectAllFilters
 } from "../reducers/treemapSlice";
 
 import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
@@ -31,15 +31,9 @@ import * as tiling from "../d3/tiling";
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
-import { gitRepoDirData } from "../data/project_data_recalculating";
 
-function App() {
+function Visualization() {
   const dispatch = useDispatch();
-
-  // Similar to componentDidMount and componentDidUpdate:
-  useEffect(() => {
-    dispatch(setNewTree(gitRepoDirData))
-  }, []);
 
   const currentVisualizationData = useDeferredValue(
     useSelector(selectCurrentVisualizationData)
@@ -100,7 +94,6 @@ function App() {
       } else {
         if (urlDataPath === ".") {
           dispatch(returnMainTreemapHome());
-          dispatch(scopeStatsIn(payloadGenerator("path", ".")));
         }
         dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
       }
@@ -164,4 +157,4 @@ function App() {
   );
 }
 
-export default App;
+export default Visualization;

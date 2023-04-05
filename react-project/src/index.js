@@ -1,12 +1,12 @@
 /** @format */
 
-import React from "react";
+import React, {useEffect} from "react";
 import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
+import {Provider, useDispatch} from "react-redux";
 
 import { BrowserRouter } from "react-router-dom";
 
-import App from "./components/App";
+import Visualization from "./components/Visualization";
 import { store } from "./store";
 import './i18n';
 
@@ -14,11 +14,26 @@ import './i18n';
 import "bootstrap/dist/js/bootstrap.bundle";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import {setNewTree} from "./reducers/treemapSlice";
+import { gitRepoDirData } from "./data/project_data_recalculating";
 
 
 
 const container = document.getElementById("appRoot");
 const root = createRoot(container);
+
+
+function App() {
+  const dispatch = useDispatch();
+
+  // Similar to componentDidMount and componentDidUpdate:
+  useEffect(() => {
+    dispatch(setNewTree(gitRepoDirData))
+  }, []);
+
+  return (<Visualization/>)
+}
+
 root.render(
   <React.StrictMode>
     <BrowserRouter>
