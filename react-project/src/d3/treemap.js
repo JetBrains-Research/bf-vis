@@ -181,12 +181,10 @@ function rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions) {
 }
 
 function rectangleOnClickHandlerMainTreemap(d, setPathFunction) {
-  if ("children" in d.data) {
+  if ("children" in d.data && d.data.children) {
     setPathFunction(d.data.path);
-    // dispatch(scopeTreemapIn(payloadGenerator("path", d.data.path)));
   } else {
     setPathFunction("", d.data.path);
-    // dispatch(scopeStatsIn(payloadGenerator("path", d.data.path)));
   }
 }
 
