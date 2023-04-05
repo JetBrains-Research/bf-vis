@@ -19,7 +19,7 @@ function SimulationModeModal(props) {
   const authorsList = "users" in statsData ? [...statsData.users] : undefined;
   const simulationVisualizationData = props.simulationData;
   const simulationVisualizationPath = props.simulationPath;
-  console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
+  // console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
   const setTreemapPathFunc = props.setTreemapPathFunc;
   const returnTreeMapHome = props.setTreeMapHome;
 
@@ -57,6 +57,15 @@ function SimulationModeModal(props) {
       setNameFilterValue("");
     }
   };
+
+  const handleAuthorCheckmark = (authorScorePair) => {
+    let email = authorScorePair.email;
+    authorsListContributionPercentage.map((authorScorePairOriginal) => {
+      if (authorScorePairOriginal.email === email) {
+        authorScorePairOriginal.included = !authorScorePairOriginal.included
+      }
+    })
+  }
 
   return (
     <div
@@ -244,12 +253,10 @@ function SimulationModeModal(props) {
                                   <input
                                     className="form-check-input"
                                     type="checkbox"
-                                    id=""
-                                    value="option1"
+                                    id={authorScorePair.email}
                                     checked={authorScorePair.included}
-                                    onChange={() =>
-                                      console.log("authorChecked")
-                                    }></input>
+                                    onChange={() => handleAuthorCheckmark(authorScorePair)}
+                                    ></input>
                                 </div>
                               </td>
                               <td>{authorScorePair["email"]}</td>

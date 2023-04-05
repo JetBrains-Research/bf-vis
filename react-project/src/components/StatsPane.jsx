@@ -141,10 +141,10 @@ function StatsPane(props) {
                   {authorScorePair["email"]}
                 </p>
                 <h6 className="small">
-                  {formatSI(authorScorePair["authorship"])}
+                  {(formatPercentage(authorScorePair["relativeScore"]))}
                 </h6>
                 <span className="small">
-                  ({formatPercentage(authorScorePair["relativeScore"])})
+                  ({formatSI(authorScorePair["authorship"])})
                 </span>
               </div>
             ))

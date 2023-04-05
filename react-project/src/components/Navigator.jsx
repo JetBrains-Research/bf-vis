@@ -1,17 +1,13 @@
 /** @format */
 
-import React, { useState } from "react";
-import { batch } from "react-redux";
+import React, {useState} from "react";
+import {batch} from "react-redux";
 
-import { InfoPanel } from "./InfoPanel";
-import { useTranslation } from "react-i18next";
+import {InfoPanel} from "./InfoPanel";
+import {useTranslation} from "react-i18next";
 
-import { CONFIG } from "../config";
-import {
-  addFilter,
-  removeFilter,
-  selectAllFilters,
-} from "../reducers/treemapSlice";
+import {CONFIG} from "../config";
+import {addFilter, removeFilter, selectAllFilters,} from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 import { generateBreadcrumb } from "../utils/url.tsx";
 
@@ -23,7 +19,7 @@ function Navigator(props) {
   const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
   const [isBusFactorRecalcActive, setisBusFactorRecalcActive] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState();
-  const { t, i18n } = useTranslation();
+  const {t, i18n} = useTranslation();
 
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
