@@ -95,6 +95,7 @@ function App() {
       } else {
         if (urlDataPath === ".") {
           dispatch(returnMainTreemapHome());
+          dispatch(scopeStatsIn(payloadGenerator("path", ".")));
         }
         dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
       }
