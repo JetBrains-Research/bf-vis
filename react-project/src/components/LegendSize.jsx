@@ -45,7 +45,7 @@ function LegendSize(props) {
               CONFIG.general.colors.jetbrains.darkGray
             )}
           </div>
-          <div className="col">10 lines</div>
+          <div className="col">10 kB</div>
         </div>
         <div className="row justify-content-start align-items-center g-2 m-2">
           <div className="col">
@@ -54,7 +54,7 @@ function LegendSize(props) {
               CONFIG.general.colors.jetbrains.darkGray
             )}
           </div>
-          <div className="col">100 lines</div>
+          <div className="col">100 kB</div>
         </div>
       </div>
     </div>
