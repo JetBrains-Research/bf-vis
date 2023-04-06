@@ -12,15 +12,15 @@ function LegendColor(props) {
   const scale = [
     {
       color: jetbrainsColors.white,
-      label: "OK",
+      label: "OK [5+]",
     },
     {
       color: jetbrainsColors.golden,
-      label: "Low [3 - 5]",
+      label: "Low [2 - 4]",
     },
     {
       color: jetbrainsColors.brightRed,
-      label: "Dangerous [0 - 2]",
+      label: "Dangerous [0 - 1]",
     },
     {
       color: jetbrainsColors.darkGray,

@@ -24,7 +24,7 @@ export const colorSequence = [
   // JETBRAINS_COLORS.blue,
 ];
 
-export const color = d3.scaleThreshold().domain([3, 6]).range(colorSequence);
+export const color = d3.scaleThreshold().domain([2, 5]).range(colorSequence);
 export const formatSI = d3.format(".2s");
 
 export const treemap = d3.treemap;
