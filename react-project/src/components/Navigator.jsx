@@ -186,26 +186,6 @@ function Navigator(props) {
             {isBusFactorRecalcActive ? "On" : "Off"}
           </label>
 
-          <h6>Filter names starting with '.'</h6>
-          <input
-            className="btn-check"
-            type="checkbox"
-            role="switch"
-            id="dotFilterSwitch"
-            checked={isDotFilterApplied}
-            onChange={handleDotFilterSwitch}></input>
-          <label
-            className="btn btn-sm"
-            style={{
-              backgroundColor: isDotFilterApplied
-                ? CONFIG.general.colors.jetbrains.blue
-                : CONFIG.general.colors.jetbrains.brightRed,
-              color: "white",
-            }}
-            htmlFor="dotFilterSwitch">
-            {isDotFilterApplied ? "On" : "Off"}
-          </label>
-
           <FilterWithInput
             key="Regex"
             filterPropertyType="RegEx"
