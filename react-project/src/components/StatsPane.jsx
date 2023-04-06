@@ -28,7 +28,11 @@ function StatsPane(props) {
     () =>
       "busFactor" in nodeData.busFactorStatus
         ? nodeData.busFactorStatus.busFactor
-        : "N/A",
+        : nodeData.busFactorStatus.old
+        ? "N/A (marked 'old')"
+        : nodeData.busFactorStatus.ignored
+        ? "N/A (file in ignore list)"
+        : "N/A (reason unknown)",
     [nodeData]
   );
 
@@ -75,7 +79,7 @@ function StatsPane(props) {
       authorsList
         ? authorsListContributionPercentage.slice(0, numOfAuthors)
         : null,
-    [authorsListContributionPercentage, numOfAuthors]
+    [authorsList, authorsListContributionPercentage, numOfAuthors]
   );
 
   const handleSimulationModeSwitch = (event) => {
@@ -102,8 +106,12 @@ function StatsPane(props) {
     if (isFirstRender.current) {
       isFirstRender.current = false;
     }
-    if (nodeBusFactor) setNumOfAuthors(nodeBusFactor);
-  }, [nodeBusFactor]);
+    if (nodeBusFactor && nodeBusFactor > 0) {
+      setNumOfAuthors(nodeBusFactor);
+    } else if (totalNumOfAuthors) {
+      setNumOfAuthors(totalNumOfAuthors);
+    }
+  }, [nodeBusFactor, totalNumOfAuthors]);
 
   return (
     <div

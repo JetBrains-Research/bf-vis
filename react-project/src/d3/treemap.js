@@ -14,19 +14,17 @@ import { filter } from "d3";
 
 // get max val from data and use it to set the upper limit in color selection
 const JETBRAINS_COLORS = CONFIG.general.colors.jetbrains;
+const UNAVAILABLE_BF_COLOR = JETBRAINS_COLORS.darkGray;
 const MAX_BUS_FACTOR_COLOR_VALUE = CONFIG.treemap.logic.maxBusFactorValue;
 export const colorSequence = [
-  JETBRAINS_COLORS.darkRed,
-  JETBRAINS_COLORS.orange,
-  JETBRAINS_COLORS.yellow,
-  JETBRAINS_COLORS.green,
-  JETBRAINS_COLORS.blue,
+  JETBRAINS_COLORS.brightRed,
+  JETBRAINS_COLORS.golden,
+  JETBRAINS_COLORS.white,
+  // JETBRAINS_COLORS.green,
+  // JETBRAINS_COLORS.blue,
 ];
 
-export const color = d3
-  .scaleThreshold()
-  .domain([3,6,8,MAX_BUS_FACTOR_COLOR_VALUE])
-  .range(colorSequence);
+export const color = d3.scaleThreshold().domain([3, 6]).range(colorSequence);
 export const formatSI = d3.format(".2s");
 
 export const treemap = d3.treemap;
@@ -134,7 +132,7 @@ function addColorsToTreemap(treemap) {
     d.bgColor = color;
     d.textColor = pickTextColorBasedOnBgColor(
       color,
-      JETBRAINS_COLORS.gray,
+      JETBRAINS_COLORS.white,
       JETBRAINS_COLORS.black
     );
   });
@@ -155,7 +153,7 @@ function addColorsToMiniTreemap(treemap) {
 function chooseRectangleFillColor(d) {
   if ("busFactor" in d.data.busFactorStatus) {
     return color(d.data.busFactorStatus.busFactor);
-  } else return JETBRAINS_COLORS.gray;
+  } else return UNAVAILABLE_BF_COLOR;
 }
 
 function chooseRectangleFillColorMiniTreemap(d) {
@@ -171,7 +169,7 @@ function chooseRectangleFillColorMiniTreemap(d) {
     if (d.data.busFactorStatus.busFactorDelta < 0) {
       return JETBRAINS_COLORS.golden;
     }
-  } else return JETBRAINS_COLORS.gray;
+  } else return UNAVAILABLE_BF_COLOR;
 }
 
 function rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions) {
@@ -351,7 +349,11 @@ bytes: ${formatSI(d.size)}
 bus factor: ${
       "busFactor" in d.data.busFactorStatus
         ? d.data.busFactorStatus.busFactor
-        : "?"
+        : d.data.busFactorStatus.old
+        ? "old"
+        : d.data.busFactorStatus.ignored
+        ? "ignored"
+        : "missing"
     }
 d3-value: ${d.value}`
   );
