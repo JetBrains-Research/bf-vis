@@ -1,10 +1,6 @@
 /** @format */
 
-import {
-  useCallback,
-  useDeferredValue,
-  useLayoutEffect,
-} from "react";
+import { useCallback, useDeferredValue, useLayoutEffect } from "react";
 import { useDispatch, useSelector, batch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { CONFIG } from "../config";
@@ -31,7 +27,6 @@ import * as tiling from "../d3/tiling";
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
-
 
 function App() {
   const dispatch = useDispatch();
@@ -122,10 +117,17 @@ function App() {
         <div className="col-2">
           <h1>BFViz</h1>
           <Navigator
-            path={currentVisualizationPath}
-            filters={filters}
             dispatch={dispatch}
-            setPathFunc={setURLPath}></Navigator>
+            filters={filters}
+            path={currentVisualizationPath}
+            reduxNavFunctions={reduxNavFunctions}
+            setPathFunc={setURLPath}
+            simulationPath={currentSimulationModePath}
+            simulationData={currentSimulationModeData}
+            statsData={currentStatsData}
+          >
+            
+            </Navigator>
         </div>
         <div className="col-8">
           <TreeMap
@@ -145,11 +147,7 @@ function App() {
             type="main"></TreeMap>
         </div>
         <div className="col-2">
-          <RightColumn
-            statsData={currentStatsData}
-            simulationPath={currentSimulationModePath}
-            simulationData={currentSimulationModeData}
-            reduxNavFunctions={reduxNavFunctions}></RightColumn>
+          <RightColumn statsData={currentStatsData}></RightColumn>
         </div>
       </div>
     </div>

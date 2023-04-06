@@ -9,19 +9,13 @@ import LegendSize from "./LegendSize";
 
 function RightColumn(props) {
   const statsData = props.statsData;
-  const simulationData = props.simulationData;
-  const simulationPath = props.simulationPath;
   // console.log(`Simulation Viz Path (RightColumn): ${simulationPath}`);
 
   return (
     <div className="col p-1">
       <LegendColor></LegendColor>
       <LegendSize></LegendSize>
-      <SimulationModeModal
-        statsData={statsData}
-        simulationData={simulationData}
-        simulationPath={simulationPath}
-        reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
+      
       <StatsPane data={statsData}></StatsPane>
     </div>
   );
