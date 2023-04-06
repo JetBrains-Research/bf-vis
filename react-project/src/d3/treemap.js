@@ -252,13 +252,11 @@ export function drawMiniTreemapFromGeneratedLayout(
       .reverse()
       .map((d) => d.data.name)
       .join("/")}
-bytes: ${formatSI(d.size)}
 bus factor: ${
       "busFactor" in d.data.busFactorStatus
         ? d.data.busFactorStatus.busFactor
         : "?"
-    }
-d3-value: ${d.value}`
+    }`
   );
 
   // Tiles
@@ -345,7 +343,6 @@ export function drawTreemapFromGeneratedLayout(svg, root, setPathFunction) {
       .reverse()
       .map((d) => d.data.name)
       .join("/")}
-bytes: ${formatSI(d.size)}
 bus factor: ${
       "busFactor" in d.data.busFactorStatus
         ? d.data.busFactorStatus.busFactor
@@ -354,8 +351,7 @@ bus factor: ${
         : d.data.busFactorStatus.ignored
         ? "ignored"
         : "missing"
-    }
-d3-value: ${d.value}`
+    }`
   );
 
   // Tiles
