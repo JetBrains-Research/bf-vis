@@ -9,12 +9,17 @@ import {useTranslation} from "react-i18next";
 import {CONFIG} from "../config";
 import {addFilter, removeFilter, selectAllFilters,} from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
+import SimulationModeModal from "./SimulationModeModal";
 import { generateBreadcrumb } from "../utils/url.tsx";
 
 function Navigator(props) {
   const dispatch = props.dispatch;
   const currentPath = props.path;
   const setPathFunc = props.setPathFunc;
+  const simulationData = props.simulationData;
+  const simulationPath = props.simulationPath;
+  const statsData = props.statsData;
+
   const filterTemplates = CONFIG.filters;
   const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
   const [isBusFactorRecalcActive, setisBusFactorRecalcActive] = useState(false);
@@ -186,26 +191,6 @@ function Navigator(props) {
             {isBusFactorRecalcActive ? "On" : "Off"}
           </label>
 
-          <h6>Filter names starting with '.'</h6>
-          <input
-            className="btn-check"
-            type="checkbox"
-            role="switch"
-            id="dotFilterSwitch"
-            checked={isDotFilterApplied}
-            onChange={handleDotFilterSwitch}></input>
-          <label
-            className="btn btn-sm"
-            style={{
-              backgroundColor: isDotFilterApplied
-                ? CONFIG.general.colors.jetbrains.blue
-                : CONFIG.general.colors.jetbrains.brightRed,
-              color: "white",
-            }}
-            htmlFor="dotFilterSwitch">
-            {isDotFilterApplied ? "On" : "Off"}
-          </label>
-
           <FilterWithInput
             key="Regex"
             filterPropertyType="RegEx"
@@ -248,6 +233,13 @@ function Navigator(props) {
           </div>
         </div>
       </div>
+      <SimulationModeModal
+        statsData={statsData}
+        simulationData={simulationData}
+        simulationPath={simulationPath}
+        reduxNavFunctions={props.reduxNavFunctions}>
+        
+        </SimulationModeModal>
     </div>
   );
 }

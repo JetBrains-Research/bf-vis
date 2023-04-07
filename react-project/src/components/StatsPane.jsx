@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useState } from "react";
+import React, { useRef, useEffect, useMemo, useState } from "react";
 import * as d3 from "d3";
 import { dispatch } from "d3";
 import {
@@ -19,19 +19,68 @@ function StatsPane(props) {
   const formatPercentage = d3.format(",.1%");
   const formatSI = d3.format(".3s");
 
-  const nodeData = props.data;
-  const nodeBusFactor =
-    "busFactor" in nodeData.busFactorStatus
-      ? nodeData.busFactorStatus.busFactor
-      : "N/A";
-  const authorsList = "users" in nodeData ? [...nodeData.users] : undefined;
-  let topAuthors = undefined;
-  let authorsListContributionPercentage = undefined;
-  const totalNumOfAuthors = authorsList ? authorsList.length : 0;
-
+  const isFirstRender = useRef(true);
   const [numOfAuthors, setNumOfAuthors] = useState(0);
   const [inSimulationMode, setSimulationMode] = useState(false);
-  const removedAuthorsList = useSelector(removedAuthors);
+
+  const nodeData = props.data;
+  const nodeBusFactor = useMemo(
+    () =>
+      "busFactor" in nodeData.busFactorStatus
+        ? nodeData.busFactorStatus.busFactor
+        : nodeData.busFactorStatus.old
+        ? "N/A (marked 'old')"
+        : nodeData.busFactorStatus.ignored
+        ? "N/A (file in ignore list)"
+        : "N/A (reason unknown)",
+    [nodeData]
+  );
+
+  const authorsList = useMemo(
+    () =>
+      "users" in nodeData
+        ? [...nodeData.users].sort((a, b) => b.authorship - a.authorship)
+        : undefined,
+    [nodeData]
+  );
+
+  const totalNumOfAuthors = useMemo(
+    () => (authorsList ? authorsList.length : 0),
+    [authorsList]
+  );
+
+  const cumulativeAuthorship = useMemo(
+    () =>
+      authorsList
+        ? authorsList
+            .map((element) => element.authorship)
+            .reduce((prevValue, currentValue) => prevValue + currentValue, 0)
+        : null,
+    [authorsList]
+  );
+
+  const authorsListContributionPercentage = useMemo(
+    () =>
+      authorsList
+        ? authorsList.map((authorContributionPair) => {
+            return {
+              email: authorContributionPair.email,
+              authorship: authorContributionPair.authorship,
+              relativeScore:
+                authorContributionPair.authorship / cumulativeAuthorship,
+            };
+          })
+        : null,
+    [authorsList, cumulativeAuthorship]
+  );
+
+  const topAuthors = useMemo(
+    () =>
+      authorsList
+        ? authorsListContributionPercentage.slice(0, numOfAuthors)
+        : null,
+    [authorsList, authorsListContributionPercentage, numOfAuthors]
+  );
 
   const handleSimulationModeSwitch = (event) => {
     setSimulationMode(!inSimulationMode);
@@ -53,24 +102,16 @@ function StatsPane(props) {
     }
   };
 
-  if (authorsList) {
-    authorsList.sort((a, b) => b.authorship - a.authorship);
-    let cumulativeAuthorship = authorsList
-      .map((element) => element.authorship)
-      .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
-
-    authorsListContributionPercentage = authorsList.map(
-      (authorContributionPair) => {
-        return {
-          email: authorContributionPair.email,
-          authorship: authorContributionPair.authorship,
-          relativeScore:
-            authorContributionPair.authorship / cumulativeAuthorship,
-        };
-      }
-    );
-    topAuthors = authorsListContributionPercentage.slice(0, numOfAuthors);
-  }
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+    }
+    if (nodeBusFactor && nodeBusFactor > 0) {
+      setNumOfAuthors(nodeBusFactor);
+    } else if (totalNumOfAuthors) {
+      setNumOfAuthors(totalNumOfAuthors);
+    }
+  }, [nodeBusFactor, totalNumOfAuthors]);
 
   return (
     <div
@@ -94,13 +135,14 @@ function StatsPane(props) {
         </a>
       </h4>
       <div className="col-12 statsPaneCollapsible collapse show">
-        <p className="small">
-          Here are some details about{" "}
-          <span className="fw-bold">{nodeData.name}</span>
+        <h5>Name</h5>
+        <p>
+          {}
+          {nodeData.name}
         </p>
 
         <h5>Bus Factor</h5>
-        <span>{nodeBusFactor}</span>
+        <p>{nodeBusFactor}</p>
 
         <h5>Author Contribution</h5>
         {authorsList && topAuthors ? (
@@ -108,14 +150,16 @@ function StatsPane(props) {
             <label
               htmlFor="authorNumberSelecter"
               className="form-label">
-              Number of Authors to show: {numOfAuthors}{" "}
+              Showing top {numOfAuthors}
+              {" of "}
+              {totalNumOfAuthors}
             </label>
             <input
               type="range"
               className="form-range"
-              defaultValue={Math.min(totalNumOfAuthors, 3)}
+              value={numOfAuthors}
               onChange={(e) => setNumOfAuthors(e.target.value)}
-              min="0"
+              min={0}
               max={totalNumOfAuthors}
               id="authorNumberSelecter"></input>
           </>
@@ -141,7 +185,7 @@ function StatsPane(props) {
                   {authorScorePair["email"]}
                 </p>
                 <h6 className="small">
-                  {(formatPercentage(authorScorePair["relativeScore"]))}
+                  {formatPercentage(authorScorePair["relativeScore"])}
                 </h6>
                 <span className="small">
                   ({formatSI(authorScorePair["authorship"])})
