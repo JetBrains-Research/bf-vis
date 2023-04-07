@@ -7,7 +7,7 @@ import {
   selectAllFilters,
 } from "../reducers/treemapSlice";
 
-import { createSVGInContainer, clearCanvas } from "../d3/svgCanvas";
+import { createSVGInContainer, clearCanvas } from "../d3/svgCanvas.tsx";
 import {
   generateInitialD3Hierarchy,
   drawTreemapFromGeneratedLayout,

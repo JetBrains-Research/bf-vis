@@ -1,7 +1,7 @@
 /** @format */
 
-import { format } from "../d3/format";
-import * as tiling from "../d3/tiling";
+import { format } from "../d3/format.tsx";
+import * as tiling from "../d3/tiling.tsx";
 import { useState } from "react";
 import { CONFIG } from "../config";
 import TreeMap from "./TreeMap";

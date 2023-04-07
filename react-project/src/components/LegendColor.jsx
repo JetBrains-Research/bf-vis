@@ -2,7 +2,7 @@
 
 import React from "react";
 import { CONFIG } from "../config";
-import { generateSvgSquare } from "../d3/legend";
+import { generateSvgSquare } from "../d3/legend.tsx";
 import { InfoPanel } from "./InfoPanel";
 import { useTranslation } from "react-i18next";
 
