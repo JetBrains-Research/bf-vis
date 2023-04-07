@@ -1,33 +1,39 @@
 /** @format */
 
-import React, { useState } from "react";
-import { batch } from "react-redux";
-import { CONFIG } from "../config";
-import {
-  addExclusionFilter,
-  removeExclusionFilter,
-  selectAllFilters,
-} from "../reducers/treemapSlice";
+import React, {useState} from "react";
+import {batch} from "react-redux";
+
+import {InfoPanel} from "./InfoPanel";
+import {useTranslation} from "react-i18next";
+
+import {CONFIG} from "../config";
+import {addFilter, removeFilter, selectAllFilters,} from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
-import { generateBreadcrumb } from "../utils/url";
+import SimulationModeModal from "./SimulationModeModal";
+import { generateBreadcrumb } from "../utils/url.tsx";
 
 function Navigator(props) {
   const dispatch = props.dispatch;
   const currentPath = props.path;
   const setPathFunc = props.setPathFunc;
+  const simulationData = props.simulationData;
+  const simulationPath = props.simulationPath;
+  const statsData = props.statsData;
+
   const filterTemplates = CONFIG.filters;
   const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
   const [isBusFactorRecalcActive, setisBusFactorRecalcActive] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState();
+  const {t, i18n} = useTranslation();
 
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
 
-    // if (event.target.checked) {
-    //   dispatch(addExclusionFilenamePrefixesFilter(["."]));
-    // } else if (!event.target.checked) {
-    //   dispatch(removeExclusionFilenamePrefixesFilter(["."]));
-    // }
+    if (event.target.checked) {
+      dispatch(addFilter(CONFIG.commonFilterExpressions.startingWithDot));
+    } else if (!event.target.checked) {
+      dispatch(removeFilter(CONFIG.commonFilterExpressions.startingWithDot));
+    }
   };
 
   const handleBusFactorRecalculationSwitch = (event) => {
@@ -46,11 +52,7 @@ function Navigator(props) {
     const dropdownSelection = event.target.innerText;
     setCurrentTemplate(dropdownSelection);
     batch(() => {
-      dispatch(
-        addExclusionFilter(
-          filterTemplates[dropdownSelection].extensions
-        )
-      );
+      dispatch(addFilter(filterTemplates[dropdownSelection].extensions));
       // dispatch(
       //   addExclusionFilenameFilter(filterTemplates[dropdownSelection].fileNames)
       // );
@@ -68,7 +70,14 @@ function Navigator(props) {
       id="controls">
       <div className="row pt-2 pb-2 mb-3 panel-left">
         <h4>
-          Current Path <i className="bi bi-info-circle-fill"></i>
+          Current Path{" "}
+          <InfoPanel
+            divName="currentPathInfoPanel"
+            header="What is the current path"
+            body={[
+              t("currentPath.general"),
+              t("currentPath.details"),
+            ]}></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"
@@ -77,6 +86,7 @@ function Navigator(props) {
             aria-expanded="true"
             aria-controls="collapseExample">
             <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
           </a>
         </h4>
 
@@ -137,20 +147,30 @@ function Navigator(props) {
 
       <div className="row pt-2 pb-2 mb-3 panel-left">
         <h4>
-          Filters <i className="bi bi-info-circle-fill"></i>
+          Filters{" "}
+          <InfoPanel
+            divName="filtersInfoPanel"
+            header="What are filters"
+            body={[t("filters.general")]}></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"
             href=".filtersCollapsible"
             role="button"
-            aria-expanded="false"
+            aria-expanded="true"
             aria-controls="collapseExample">
-            <i className="bi bi-plus-circle-fill"
-            ></i>
+            <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
           </a>
         </h4>
         <div className="filtersCollapsible collapse show">
-          <h6>Bus Factor Recalculation</h6>
+          <h6>
+            Bus Factor Recalculation{" "}
+            <InfoPanel
+              divName="recalculationInfoPanel"
+              header="How and when is bus factor recalculated?"
+              body={[t("busFactor.recalculation")]}></InfoPanel>
+          </h6>
 
           <input
             className="btn-check"
@@ -171,54 +191,14 @@ function Navigator(props) {
             {isBusFactorRecalcActive ? "On" : "Off"}
           </label>
 
-          <h6>Filter names starting with '.'</h6>
-          <input
-            className="btn-check"
-            type="checkbox"
-            role="switch"
-            id="dotFilterSwitch"
-            checked={isDotFilterApplied}
-            onChange={handleDotFilterSwitch}></input>
-          <label
-            className="btn btn-sm"
-            style={{
-              backgroundColor: isDotFilterApplied
-                ? CONFIG.general.colors.jetbrains.blue
-                : CONFIG.general.colors.jetbrains.brightRed,
-              color: "white",
-            }}
-            htmlFor="dotFilterSwitch">
-            {isDotFilterApplied ? "On" : "Off"}
-          </label>
-
           <FilterWithInput
             key="Regex"
             filterPropertyType="RegEx"
-            addFunction={addExclusionFilter}
-            removeFunction={removeExclusionFilter}
+            addFunction={addFilter}
+            removeFunction={removeFilter}
             selector={selectAllFilters}
             dispatch={dispatch}
-            addDefaultPrefix="."></FilterWithInput>
-
-          {/* <FilterWithInput
-            key="File name"
-            filterPropertyType="File name"
-            addFunction={addExclusionFilenameFilter}
-            removeFunction={removeExclusionFilenameFilter}
-            selector={selectExclusionFileNamesFilters}
-            dispatch={dispatch}>
-            {" "}
-          </FilterWithInput>
-
-          <FilterWithInput
-            key="File name prefix"
-            filterPropertyType="File name prefix"
-            addFunction={addExclusionFilenamePrefixesFilter}
-            removeFunction={removeExclusionFilenamePrefixesFilter}
-            selector={selectExclusionFileNamePrefixFilters}
-            dispatch={dispatch}>
-            {" "}
-          </FilterWithInput> */}
+            infoPanelDetails={[t("filters.regex")]}></FilterWithInput>
 
           <h5>Filtering Templates</h5>
           <div className="dropdown open filtersCollapsible collapse show">
@@ -253,6 +233,13 @@ function Navigator(props) {
           </div>
         </div>
       </div>
+      <SimulationModeModal
+        statsData={statsData}
+        simulationData={simulationData}
+        simulationPath={simulationPath}
+        reduxNavFunctions={props.reduxNavFunctions}>
+        
+        </SimulationModeModal>
     </div>
   );
 }

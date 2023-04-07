@@ -1,11 +1,31 @@
 /** @format */
 
+body {
+  overflow-y: scroll;
+}
+
 .header {
   text-align: center;
 }
 
 .App {
   background: #ffffff;
+}
+
+a[aria-expanded=true] .bi-plus-circle-fill {
+  display: none
+}
+
+a[aria-expanded=true] .bi-dash-circle-fill {
+  display:inline
+}
+
+a[aria-expanded=false] .bi-dash-circle-fill {
+  display: none
+}
+
+a[aria-expanded=false] .bi-plus-circle-fill {
+  display: inline
 }
 
 .panel-left {

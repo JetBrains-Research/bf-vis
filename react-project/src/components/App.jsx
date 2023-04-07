@@ -1,6 +1,6 @@
 /** @format */
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useDeferredValue, useLayoutEffect } from "react";
 import { useDispatch, useSelector, batch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { CONFIG } from "../config";
@@ -20,7 +20,7 @@ import {
   selectAllFilters,
 } from "../reducers/treemapSlice";
 
-import { payloadGenerator } from "../utils/reduxActionPayloadCreator";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 
 import * as tiling from "../d3/tiling";
 
@@ -31,19 +31,31 @@ import RightColumn from "./RightColumn";
 function App() {
   const dispatch = useDispatch();
 
-  const currentVisualizationData = useSelector(selectCurrentVisualizationData);
-  const currentVisualizationPath = useSelector(selectCurrentVisualizationPath);
-  const currentStatsData = useSelector(selectCurrentStatsData);
-  const currentStatsPath = useSelector(selectCurrentStatsPath);
-  const filters = useSelector(selectAllFilters);
+  const currentVisualizationData = useDeferredValue(
+    useSelector(selectCurrentVisualizationData)
+  );
+  const currentVisualizationPath = useDeferredValue(
+    useSelector(selectCurrentVisualizationPath)
+  );
+  const currentStatsData = useDeferredValue(
+    useSelector(selectCurrentStatsData)
+  );
+  const currentStatsPath = useDeferredValue(
+    useSelector(selectCurrentStatsPath)
+  );
+  const filters = useDeferredValue(useSelector(selectAllFilters));
 
-  const currentSimulationModeData = useSelector(simulationVisualizationData);
-  const currentSimulationModePath = useSelector(simulationVisualizationPath);
+  const currentSimulationModeData = useDeferredValue(
+    useSelector(simulationVisualizationData)
+  );
+  const currentSimulationModePath = useDeferredValue(
+    useSelector(simulationVisualizationPath)
+  );
 
   const reduxNavFunctions = {
     dispatch,
     scopeMiniTreemapIn,
-    scopeMiniTreemapOut
+    scopeMiniTreemapOut,
   };
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,7 +77,7 @@ function App() {
     [searchParams, setSearchParams]
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const urlDataPath = searchParams.get("dataPath") || "";
     const urlStatsPath = searchParams.get("statsPath") || "";
 
@@ -78,6 +90,7 @@ function App() {
       } else {
         if (urlDataPath === ".") {
           dispatch(returnMainTreemapHome());
+          dispatch(scopeStatsIn(payloadGenerator("path", ".")));
         }
         dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
       }
@@ -104,10 +117,17 @@ function App() {
         <div className="col-2">
           <h1>BFViz</h1>
           <Navigator
-            path={currentVisualizationPath}
-            filters={filters}
             dispatch={dispatch}
-            setPathFunc={setURLPath}></Navigator>
+            filters={filters}
+            path={currentVisualizationPath}
+            reduxNavFunctions={reduxNavFunctions}
+            setPathFunc={setURLPath}
+            simulationPath={currentSimulationModePath}
+            simulationData={currentSimulationModeData}
+            statsData={currentStatsData}
+          >
+            
+            </Navigator>
         </div>
         <div className="col-8">
           <TreeMap
@@ -127,14 +147,7 @@ function App() {
             type="main"></TreeMap>
         </div>
         <div className="col-2">
-          <RightColumn
-            statsData={currentStatsData}
-            simulationPath={currentSimulationModePath}
-            simulationData={currentSimulationModeData}
-            reduxNavFunctions = {reduxNavFunctions}
-          >
-            
-            </RightColumn>
+          <RightColumn statsData={currentStatsData}></RightColumn>
         </div>
       </div>
     </div>

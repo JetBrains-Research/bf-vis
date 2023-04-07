@@ -1,14 +1,17 @@
 /** @format */
 
-import { format } from "../d3/format";
-import * as tiling from "../d3/tiling";
+import { format } from "../d3/format.tsx";
+import * as tiling from "../d3/tiling.tsx";
 import { useState } from "react";
 import { CONFIG } from "../config";
 import TreeMap from "./TreeMap";
 
-import { generateBreadcrumb } from "../utils/url";
+import { generateBreadcrumb } from "../utils/url.tsx";
+import { useTranslation } from "react-i18next";
+import { InfoPanel } from "./InfoPanel";
 
 function SimulationModeModal(props) {
+  const { t, i18n } = useTranslation();
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
@@ -16,7 +19,7 @@ function SimulationModeModal(props) {
   const authorsList = "users" in statsData ? [...statsData.users] : undefined;
   const simulationVisualizationData = props.simulationData;
   const simulationVisualizationPath = props.simulationPath;
-  console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
+  // console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
   const setTreemapPathFunc = props.setTreemapPathFunc;
   const returnTreeMapHome = props.setTreeMapHome;
 
@@ -55,12 +58,25 @@ function SimulationModeModal(props) {
     }
   };
 
+  const handleAuthorCheckmark = (authorScorePair) => {
+    let email = authorScorePair.email;
+    authorsListContributionPercentage.map((authorScorePairOriginal) => {
+      if (authorScorePairOriginal.email === email) {
+        authorScorePairOriginal.included = !authorScorePairOriginal.included
+      }
+    })
+  }
+
   return (
     <div
       id="simulation-mode-container"
       className="row panel-right mt-2 pt-2 pb-2">
       <h4>
-        Simulation Mode <i className="bi bi-info-circle-fill"></i>
+        Simulation Mode
+        <InfoPanel
+          divName="simInfoPanel"
+          header="How does the simulation mode work?"
+          body={[t("simMode.general"), t("simMode.detail")]}></InfoPanel>
         <a
           className=""
           data-bs-toggle="collapse"
@@ -69,6 +85,7 @@ function SimulationModeModal(props) {
           aria-expanded="true"
           aria-controls="simulationModeCollapsible">
           <i className="bi bi-plus-circle-fill"></i>
+          <i className="bi bi-dash-circle-fill"></i>
         </a>
       </h4>
       <div
@@ -236,12 +253,10 @@ function SimulationModeModal(props) {
                                   <input
                                     className="form-check-input"
                                     type="checkbox"
-                                    id=""
-                                    value="option1"
+                                    id={authorScorePair.email}
                                     checked={authorScorePair.included}
-                                    onChange={() =>
-                                      console.log("authorChecked")
-                                    }></input>
+                                    onChange={() => handleAuthorCheckmark(authorScorePair)}
+                                    ></input>
                                 </div>
                               </td>
                               <td>{authorScorePair["email"]}</td>

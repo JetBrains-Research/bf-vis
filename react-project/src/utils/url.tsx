@@ -1,4 +1,4 @@
-export const generateBreadcrumb = (i, currentPath) => {
+export const generateBreadcrumb = (i: number, currentPath: string): string => {
   return i < currentPath.split("/").length
     ? currentPath
         .split("/")

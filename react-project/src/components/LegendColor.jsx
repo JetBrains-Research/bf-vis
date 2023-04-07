@@ -2,34 +2,29 @@
 
 import React from "react";
 import { CONFIG } from "../config";
-import { generateSvgSquare } from "../d3/legend";
+import { generateSvgSquare } from "../d3/legend.tsx";
+import { InfoPanel } from "./InfoPanel";
+import { useTranslation } from "react-i18next";
 
 function LegendColor(props) {
+  const { t } = useTranslation();
   const jetbrainsColors = CONFIG.general.colors.jetbrains;
   const scale = [
     {
-      color: jetbrainsColors.gray,
+      color: jetbrainsColors.white,
+      label: "OK [5+]",
+    },
+    {
+      color: jetbrainsColors.golden,
+      label: "Low [2 - 4]",
+    },
+    {
+      color: jetbrainsColors.brightRed,
+      label: "Dangerous [0 - 1]",
+    },
+    {
+      color: jetbrainsColors.darkGray,
       label: "Not Applicable",
-    },
-    {
-      color: jetbrainsColors.darkRed,
-      label: "Very Low [0 - 2]",
-    },
-    {
-      color: jetbrainsColors.orange,
-      label: "Low [3 - 5]",
-    },
-    {
-      color: jetbrainsColors.yellow,
-      label: "OK [6 - 7]",
-    },
-    {
-      color: jetbrainsColors.green,
-      label: "Good [8 - 9]",
-    },
-    {
-      color: jetbrainsColors.blue,
-      label: "Very Good [10+]",
     },
   ];
 
@@ -40,10 +35,10 @@ function LegendColor(props) {
         className="row panel-right mt-2 pt-2 pb-2">
         <h4>
           Bus Factor{" "}
-          <i
-            className="bi bi-info-circle-fill"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasWithBothOptions"></i>
+          <InfoPanel
+            divName="legendColorInfoPanel"
+            header="How are colors determined for the treemap panels"
+            body={[t("busFactor.color")]}></InfoPanel>
           <a
             className=""
             data-bs-toggle="collapse"
@@ -52,6 +47,7 @@ function LegendColor(props) {
             aria-expanded="true"
             aria-controls="legendColorCollapsible">
             <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
           </a>
         </h4>
         <div

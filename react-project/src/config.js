@@ -19,6 +19,7 @@ export const CONFIG = {
         indigo: "rgb(107,87,255)",
         orange: "rgb(252,128,29)",
         pink: "rgb(255,49,140)",
+        white: "rgb(255,255,255)",
         yellow: "rgb(252,248,74)",
       },
     },
@@ -81,13 +82,16 @@ export const CONFIG = {
       width: "100%",
     },
   },
+  commonFilterExpressions: {
+    startingWithDot: ["^[^\\.].*"],
+  },
   filters: {
-    general: {
+    "Python project": {
       extensions: [".md", ".1"],
       fileNames: [".git"],
       fileNamePrefixes: ["jdk"],
     },
-    test: {
+    "Java Project": {
       extensions: [".json", ".js"],
       fileNames: ["src"],
       fileNamePrefixes: ["java"],
