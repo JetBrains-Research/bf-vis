@@ -9,6 +9,14 @@ import TreeMap from "./TreeMap";
 import { generateBreadcrumb } from "../utils/url.tsx";
 import { useTranslation } from "react-i18next";
 import { InfoPanel } from "./InfoPanel";
+import {
+  addAuthorToRemovalList,
+  selectRemovedAuthors,
+  scopeMiniTreemapIn,
+  undoAuthorRemoval,
+} from "../reducers/treemapSlice.js";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
+import { useSelector } from "react-redux";
 
 function SimulationModeModal(props) {
   const { t, i18n } = useTranslation();
@@ -32,6 +40,7 @@ function SimulationModeModal(props) {
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
+  const removedAuthorsList = useSelector(selectRemovedAuthors);
 
   if (authorsList) {
     authorsList.sort((a, b) => b.authorship - a.authorship);
@@ -46,7 +55,9 @@ function SimulationModeModal(props) {
           authorship: authorContributionPair.authorship,
           relativeScore:
             authorContributionPair.authorship / cumulativeAuthorship,
-          included: true,
+          included: removedAuthorsList.includes(authorContributionPair.email)
+            ? false
+            : true,
         };
       }
     );
@@ -65,13 +76,25 @@ function SimulationModeModal(props) {
     }
   };
 
-  const handleAuthorCheckmark = (authorScorePair) => {
+  const handleAuthorCheckmark = (e, authorScorePair) => {
     let email = authorScorePair.email;
-    authorsListContributionPercentage.map((authorScorePairOriginal) => {
-      if (authorScorePairOriginal.email === email) {
-        authorScorePairOriginal.included = !authorScorePairOriginal.included;
-      }
-    });
+    console.log(email);
+    if (!e.target.checked) {
+      props.reduxNavFunctions.dispatch(addAuthorToRemovalList([email]));
+      props.reduxNavFunctions.dispatch(
+        scopeMiniTreemapIn(
+          payloadGenerator("path", simulationVisualizationPath)
+        )
+      );
+    }
+    else if (e.target.checked) {
+      props.reduxNavFunctions.dispatch(undoAuthorRemoval([email]));
+      props.reduxNavFunctions.dispatch(
+        scopeMiniTreemapIn(
+          payloadGenerator("path", simulationVisualizationPath)
+        )
+      );
+    }
   };
 
   return (
@@ -262,8 +285,8 @@ function SimulationModeModal(props) {
                                     type="checkbox"
                                     id={authorScorePair.email}
                                     checked={authorScorePair.included}
-                                    onChange={() =>
-                                      handleAuthorCheckmark(authorScorePair)
+                                    onChange={(e) =>
+                                      handleAuthorCheckmark(e, authorScorePair)
                                     }></input>
                                 </div>
                               </td>

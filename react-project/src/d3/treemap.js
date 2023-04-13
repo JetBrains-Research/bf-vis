@@ -56,6 +56,8 @@ export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
           }
 
         if (d.depth === 0) {
+          if (!("children" in d))
+              console.log(d)
           d.value = d.children
             .map((e) => e.value)
             .reduce((prevValue, currentValue) => prevValue + currentValue);
@@ -157,19 +159,20 @@ function chooseRectangleFillColor(d) {
 }
 
 function chooseRectangleFillColorMiniTreemap(d) {
-  if ("nodeStatus" in d.data.busFactorStatus) {
-    if (d.data.busFactorStatus.nodeStatus === "removed") {
+  if ("delta" in d.data.busFactorStatus) {
+    if (d.data.busFactorStatus.delta  < 0) {
       return JETBRAINS_COLORS.brightRed;
-    } else if (d.data.busFactorStatus.nodeStatus === "added") {
+    } else if (d.data.busFactorStatus.delta > 0) {
       return JETBRAINS_COLORS.brightGreen;
     }
   }
 
-  if ("busFactorDelta" in d.data.busFactorStatus) {
-    if (d.data.busFactorStatus.busFactorDelta < 0) {
-      return JETBRAINS_COLORS.golden;
-    }
-  } else return UNAVAILABLE_BF_COLOR;
+  // if ("busFactorDelta" in d.data.busFactorStatus) {
+  //   if (d.data.busFactorStatus.busFactorDelta < 0) {
+  //     return JETBRAINS_COLORS.golden;
+  //   }
+  // } else 
+  return UNAVAILABLE_BF_COLOR;
 }
 
 function rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions) {
@@ -261,7 +264,7 @@ bus factor: ${
 
   // Tiles
   node
-    .filter((d) => d.depth > 0)
+    .filter((d) => d.depth >= 0)
     .append("rect")
     .style("rx", CONFIG.treemap.children.rect.rx)
     .style("ry", CONFIG.treemap.children.rect.ry)
@@ -300,8 +303,8 @@ bus factor: ${
     .append("xhtml:p")
     .text((d) => {
       return `${d.data.name} ${
-        "busFactorDelta" in d.data.busFactorStatus
-          ? "[" + d.data.busFactorStatus.busFactorDelta + "]"
+        "delta" in d.data.busFactorStatus
+          ? "[" + d.data.busFactorStatus.delta + "]"
           : ""
       }`;
     })
