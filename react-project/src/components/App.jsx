@@ -7,6 +7,7 @@ import { CONFIG } from "../config";
 
 import {
   returnMainTreemapHome,
+  returnMiniTreemapHome,
   scopeStatsIn,
   scopeMainTreemapIn,
   selectCurrentStatsData,
@@ -85,14 +86,21 @@ function App() {
       if (urlStatsPath && urlStatsPath !== urlDataPath) {
         batch(() => {
           dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
+          dispatch(scopeMiniTreemapIn(payloadGenerator("path", urlDataPath)));
           dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
         });
       } else {
         if (urlDataPath === ".") {
-          dispatch(returnMainTreemapHome());
+          batch(() => {
+            dispatch(returnMainTreemapHome());
+            dispatch(returnMiniTreemapHome());  
+          })
           dispatch(scopeStatsIn(payloadGenerator("path", ".")));
         }
-        dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
+        batch(() => {
+          dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
+          dispatch(scopeMiniTreemapIn(payloadGenerator("path", urlDataPath)));
+        });
       }
     }
 
@@ -124,10 +132,7 @@ function App() {
             setPathFunc={setURLPath}
             simulationPath={currentSimulationModePath}
             simulationData={currentSimulationModeData}
-            statsData={currentStatsData}
-          >
-            
-            </Navigator>
+            statsData={currentStatsData}></Navigator>
         </div>
         <div className="col-8">
           <TreeMap

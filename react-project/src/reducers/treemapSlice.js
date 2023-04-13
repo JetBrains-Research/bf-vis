@@ -4,10 +4,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import { gitRepoDirData } from "../data/project_data_recalculating";
 import * as jp from "jsonpath";
 import { calculateBusFactor } from "../utils/BusFactorUtil";
+import { initializeBusFactorDeltaProperties } from "../actions/simulationMode.ts";
 
 const fullData = gitRepoDirData;
-const initialDummyMiniTreeMapData =
-  getDummySimulationModeComparisonData(fullData);
+const initialMiniTreeMapData =
+  initializeBusFactorDeltaProperties(fullData);
 
 // Initial State for this slice
 const defaultState = {
@@ -21,23 +22,81 @@ const defaultState = {
     previousPathStack: [],
   },
   simulation: {
-    miniTreemap: {
-      visualizationData: initialDummyMiniTreeMapData,
-      visualizationPath: fullData.path,
-      previousPathStack: [],
-    },
     isSimulationMode: false,
+    lastUsedRemovedAuthorsList: [],
+    miniTreemap: {
+      previousPathStack: [],
+      visualizationData: initialMiniTreeMapData,
+      visualizationPath: fullData.path,
+    },
     removedAuthors: [],
   },
   filters: [],
 };
 
-function getDataWithPathQuery(fullData, pathQuery) {
+function getDataWithPathQuery(fullData, pathQuery, developersToRemove) {
   let newData = jp.query(fullData, pathQuery);
-  let result = calculateBusFactor(newData[0]);
+  let result = calculateBusFactor(newData[0], developersToRemove);
 
   return result;
 }
+
+export function getRecalculatedBusFactorData(baseData, developersToRemove) {
+  let newData = calculateBusFactor(baseData, developersToRemove);
+  return newData;
+}
+
+function getDataFromCurrentData(currentData, developersToRemove, filters) {
+  let newData = currentData;
+  let result = calculateBusFactor(currentData, developersToRemove);
+}
+
+export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
+  if (oldDataRootNode === null) {
+    throw new Error("Old data is null!");
+  }
+
+  if (newDataRootNode === null) {
+    throw new Error("New data is null!");
+  }
+
+  if (oldDataRootNode.name !== newDataRootNode.name) {
+    throw new Error("Names don't match!");
+  }
+
+  if (
+    oldDataRootNode.busFactorStatus.busFactor &&
+    newDataRootNode.busFactorStatus.busFactor
+  ) {
+    let delta =
+      newDataRootNode.busFactorStatus.busFactor -
+      oldDataRootNode.busFactorStatus.busFactor;
+    newDataRootNode.busFactorStatus.delta = delta;
+    newDataRootNode.busFactorStatus.nodeStatus =
+      oldDataRootNode.busFactorStatus.busFactor + delta <= 0
+        ? "lost"
+        : oldDataRootNode.busFactorStatus.busFactor + delta < 2
+        ? "Danger"
+        : "OK";
+
+    if (oldDataRootNode.children && newDataRootNode.children) {
+      for (let count = 0; count < newDataRootNode.lenght; count++) {
+        newDataRootNode.children[count] = getBusFactorDeltas(
+          oldDataRootNode.children[count],
+          newDataRootNode.children[count]
+        );
+      }
+    }
+  }
+  return newDataRootNode;
+}
+
+
+function getDifference(a1, a2) {
+  var a2Set = new Set(a2);
+  return a1.filter(function(x) { return !a2Set.has(x); });
+}
+
 
 function getDummySimulationModeComparisonData(currentData) {
   if (currentData.children) {
@@ -65,11 +124,6 @@ function getDummySimulationModeComparisonData(currentData) {
   return currentData;
 }
 
-function getDataFromCurrentData(currentData, authorsToRemove, filters) {
-  let newData = currentData;
-  let result = calculateBusFactor(currentData);
-}
-
 // Definition of the slice and its reducer function
 const treemapSlice = createSlice({
   name: "treemap",
@@ -77,11 +131,16 @@ const treemapSlice = createSlice({
   reducers: {
     // not as useful anymore, URL takes precedence, or at least, it should
     returnMainTreemapHome: (state) => {
-      let newData = getDataWithPathQuery(fullData, "$");
+      let newData = getDataWithPathQuery(fullData, "$", []);
       state.mainTreemap.currentVisualizationData = newData;
       state.mainTreemap.currentVisualizationPath = newData.path;
       state.mainTreemap.currentStatsData = newData;
       state.mainTreemap.currentStatsPath = newData.path;
+    },
+    returnMiniTreemapHome: (state) => {
+      let newData = getDataWithPathQuery(fullData, "$", state.simulation.removedAuthors);
+      state.simulation.miniTreemap.visualizationData = newData;
+      state.simulation.miniTreemap.visualizationPath = newData.path;
     },
     // click on a file node
     scopeStatsIn: (state, action) => {
@@ -92,7 +151,7 @@ const treemapSlice = createSlice({
       ) {
         const newPath = `${action.payload.path}`;
         const pathQuery = `$..[?(@.path=='${newPath}')]`;
-        let newData = getDataWithPathQuery(fullData, pathQuery);
+        let newData = getDataWithPathQuery(fullData, pathQuery, []);
         console.log("scopeStatsIn", newData, pathQuery);
         if (newData) {
           state.mainTreemap.currentStatsPath = newPath;
@@ -110,7 +169,7 @@ const treemapSlice = createSlice({
       ) {
         const nextPath = `${action.payload.path}`;
         const pathQuery = `$..[?(@.path=='${nextPath}')]`;
-        let newData = getDataWithPathQuery(fullData, pathQuery);
+        let newData = getDataWithPathQuery(fullData, pathQuery, []);
         console.log("scopeTreemapIn", newData, pathQuery);
 
         if (newData && newData.children) {
@@ -136,7 +195,7 @@ const treemapSlice = createSlice({
           state.mainTreemap.currentStatsPath = fullData.path;
         } else {
           const pathQuery = `$..[?(@.path==="${nextPath}")]`;
-          let newData = getDataWithPathQuery(fullData, pathQuery);
+          let newData = getDataWithPathQuery(fullData, pathQuery, []);
           console.log("scopeTreemapOut", newData, pathQuery);
           if (newData && newData.children) {
             state.mainTreemap.currentVisualizationPath = nextPath;
@@ -152,11 +211,13 @@ const treemapSlice = createSlice({
         action.payload &&
         action.payload.path &&
         action.payload.path !== state.simulation.miniTreemap.visualizationPath
+        && getDifference(state.simulation.lastUsedRemovedAuthorsList, state.simulation.removedAuthors)
       ) {
         const nextPath = `${action.payload.path}`;
         const pathQuery = `$..[?(@.path=='${nextPath}')]`;
-        let newData = jp.query(initialDummyMiniTreeMapData, pathQuery);
-        console.log("scopeTreemapIn", newData, pathQuery);
+        let newData = getDataWithPathQuery(initialMiniTreeMapData, pathQuery, state.simulation.removedAuthors);
+        state.simulation.lastUsedRemovedAuthorsList = state.simulation.removedAuthors;
+        console.log("scopeMiniTreemapIn", newData, pathQuery, state.simulation.removedAuthors);
 
         if (newData && newData.children) {
           state.simulation.miniTreemap.previousPathStack.push(
@@ -173,14 +234,15 @@ const treemapSlice = createSlice({
       if (nextPath) {
         if (nextPath === ".") {
           state.simulation.miniTreemap.visualizationData =
-            initialDummyMiniTreeMapData;
+            initialMiniTreeMapData;
           state.simulation.miniTreemap.visualizationPath =
-            initialDummyMiniTreeMapData.path;
+            initialMiniTreeMapData.path;
         } else {
           const pathQuery = `$..[?(@.path==="${nextPath}")]`;
           let newData = getDataWithPathQuery(
-            initialDummyMiniTreeMapData,
-            pathQuery
+            initialMiniTreeMapData,
+            pathQuery,
+            state.simulation.removedAuthors
           );
           console.log("scopeTreemapOut", newData, pathQuery);
           if (newData && newData.children) {
@@ -190,25 +252,24 @@ const treemapSlice = createSlice({
         }
       }
     },
-    returnMiniTreemapHome: (state, action) => {},
     addFilter: (state, action) => {
       const newFilterExps = action.payload;
 
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
-        state.filters = [
-          ...new Set(state.filters.concat(newFilterExps)),
-        ];
+        state.filters = [...new Set(state.filters.concat(newFilterExps))];
       }
     },
     removeFilter: (state, action) => {
       const newFilterExps = action.payload;
 
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
-        state.filters =
-          state.filters.filter(
-            (element) => !newFilterExps.includes(element)
-          );
+        state.filters = state.filters.filter(
+          (element) => !newFilterExps.includes(element)
+        );
       }
+    },
+    removeAllFilters: (state, action) => {
+      state.filters = [];
     },
     enableSimulationMode: (state) => {
       state.isSimulationMode = true;
@@ -250,6 +311,7 @@ export const {
   // Simulation Mode Actions
   enableSimulationMode,
   disableSimulationMode,
+  returnMiniTreemapHome,
   scopeMiniTreemapIn,
   scopeMiniTreemapOut,
   simulateAuthorRemoval,
