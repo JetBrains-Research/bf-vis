@@ -57,6 +57,7 @@ function App() {
     dispatch,
     scopeMiniTreemapIn,
     scopeMiniTreemapOut,
+    returnMiniTreemapHome
   };
 
   const [searchParams, setSearchParams] = useSearchParams();

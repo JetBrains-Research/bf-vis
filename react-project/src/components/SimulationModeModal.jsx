@@ -20,8 +20,15 @@ function SimulationModeModal(props) {
   const simulationVisualizationData = props.simulationData;
   const simulationVisualizationPath = props.simulationPath;
   // console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
-  const setTreemapPathFunc = props.setTreemapPathFunc;
-  const returnTreeMapHome = props.setTreeMapHome;
+  const setTreemapPathOutFunc = () => {
+    props.reduxNavFunctions.dispatch(
+      props.reduxNavFunctions.scopeMiniTreemapOut()
+    );
+  };
+  const returnTreeMapHome = () =>
+    props.reduxNavFunctions.dispatch(
+      props.reduxNavFunctions.returnMiniTreemapHome()
+    );
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
@@ -62,10 +69,10 @@ function SimulationModeModal(props) {
     let email = authorScorePair.email;
     authorsListContributionPercentage.map((authorScorePairOriginal) => {
       if (authorScorePairOriginal.email === email) {
-        authorScorePairOriginal.included = !authorScorePairOriginal.included
+        authorScorePairOriginal.included = !authorScorePairOriginal.included;
       }
-    })
-  }
+    });
+  };
 
   return (
     <div
@@ -157,7 +164,7 @@ function SimulationModeModal(props) {
                           }
                           key={pathElement}
                           onClick={() =>
-                            setTreemapPathFunc(
+                            setTreemapPathOutFunc(
                               generateBreadcrumb(i, simulationVisualizationPath)
                             )
                           }>
@@ -182,13 +189,13 @@ function SimulationModeModal(props) {
                       simulationVisualizationPath
                         .split("/")
                         .filter((r) => r !== "").length > 1
-                        ? setTreemapPathFunc(
+                        ? setTreemapPathOutFunc(
                             simulationVisualizationPath
                               .split("/")
                               .slice(0, -1)
                               .join("/")
                           )
-                        : setTreemapPathFunc(".")
+                        : setTreemapPathOutFunc(".")
                     }>
                     &larr; Back
                   </button>
@@ -201,7 +208,7 @@ function SimulationModeModal(props) {
                       color: "white",
                     }}
                     id="reset"
-                    onClick={() => setTreemapPathFunc(".")}>
+                    onClick={() => returnTreeMapHome()}>
                     Reset &#x27F3;
                   </button>
                 </div>
@@ -255,8 +262,9 @@ function SimulationModeModal(props) {
                                     type="checkbox"
                                     id={authorScorePair.email}
                                     checked={authorScorePair.included}
-                                    onChange={() => handleAuthorCheckmark(authorScorePair)}
-                                    ></input>
+                                    onChange={() =>
+                                      handleAuthorCheckmark(authorScorePair)
+                                    }></input>
                                 </div>
                               </td>
                               <td>{authorScorePair["email"]}</td>
