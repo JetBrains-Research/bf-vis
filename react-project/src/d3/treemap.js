@@ -14,7 +14,7 @@ import { filter } from "d3";
 
 // get max val from data and use it to set the upper limit in color selection
 const JETBRAINS_COLORS = CONFIG.general.colors.jetbrains;
-const UNAVAILABLE_BF_COLOR = JETBRAINS_COLORS.darkGray;
+const UNAVAILABLE_BF_COLOR = JETBRAINS_COLORS.gray;
 const MAX_BUS_FACTOR_COLOR_VALUE = CONFIG.treemap.logic.maxBusFactorValue;
 export const colorSequence = [
   JETBRAINS_COLORS.brightRed,
@@ -56,8 +56,7 @@ export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
           }
 
         if (d.depth === 0) {
-          if (!("children" in d))
-              console.log(d)
+          if (!("children" in d)) console.log(d);
           d.value = d.children
             .map((e) => e.value)
             .reduce((prevValue, currentValue) => prevValue + currentValue);
@@ -159,19 +158,21 @@ function chooseRectangleFillColor(d) {
 }
 
 function chooseRectangleFillColorMiniTreemap(d) {
-  if ("delta" in d.data.busFactorStatus) {
-    if (d.data.busFactorStatus.delta  < 0) {
+  if (d.data.busFactorStatus.busFactor === 0) {
+    if (d.data.busFactorStatus.old || d.data.busFactorStatus.ignored) {
+      return JETBRAINS_COLORS.gray;
+    } else {
       return JETBRAINS_COLORS.brightRed;
+    }
+  }
+  if ("delta" in d.data.busFactorStatus) {
+    if (d.data.busFactorStatus.delta < 0) {
+      return JETBRAINS_COLORS.golden;
     } else if (d.data.busFactorStatus.delta > 0) {
       return JETBRAINS_COLORS.brightGreen;
     }
   }
 
-  // if ("busFactorDelta" in d.data.busFactorStatus) {
-  //   if (d.data.busFactorStatus.busFactorDelta < 0) {
-  //     return JETBRAINS_COLORS.golden;
-  //   }
-  // } else 
   return UNAVAILABLE_BF_COLOR;
 }
 
