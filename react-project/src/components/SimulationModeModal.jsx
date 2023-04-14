@@ -23,20 +23,21 @@ function SimulationModeModal(props) {
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
-  const statsData = props.statsData;
-  const authorsList = "users" in statsData ? [...statsData.users] : undefined;
   const simulationVisualizationData = props.simulationData;
-  const simulationVisualizationPath = props.simulationPath;
-  // console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
-  const setTreemapPathOutFunc = () => {
+  const simulationVisualizationPath = props.simulationPath; 
+  const authorsList = "users" in simulationVisualizationData ? [...simulationVisualizationData.users] : undefined;
+  
+  const setTreemapPathOutFunc = (path) => {
     props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapOut()
+      props.reduxNavFunctions.scopeMiniTreemapOut(payloadGenerator('path', path))
     );
   };
-  const returnTreeMapHome = () =>
+  const returnTreeMapHome = () => {
     props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.returnMiniTreemapHome()
+      props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator('path', "."))
     );
+  }
+    
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
@@ -220,7 +221,7 @@ function SimulationModeModal(props) {
                           )
                         : setTreemapPathOutFunc(".")
                     }>
-                    &larr; Back
+                    &uarr; Up
                   </button>
                   <button
                     type="button"
@@ -232,7 +233,7 @@ function SimulationModeModal(props) {
                     }}
                     id="reset"
                     onClick={() => returnTreeMapHome()}>
-                    Reset &#x27F3;
+                    <i class="bi bi-house"></i> Home
                   </button>
                 </div>
               </div>

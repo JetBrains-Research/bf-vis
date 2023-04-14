@@ -41,31 +41,32 @@ function getDataWithPathQuery(fullData, pathQuery, developersToRemove) {
 }
 
 function initializeBusFactorDeltaProperties(dataRootNode) {
-  if (dataRootNode == null)
-    throw new Error("Empty data file")
-  
+  if (dataRootNode == null) throw new Error("Empty data file");
+
   if (!("busFactorStatus" in dataRootNode)) {
-    dataRootNode.busFactorStatus = {}
+    dataRootNode.busFactorStatus = {};
   }
   Object.defineProperties(dataRootNode.busFactorStatus, {
-    "nodeStatus": {
+    nodeStatus: {
       value: "original",
-      writable: true
+      writable: true,
     },
-    "delta": {
+    delta: {
       value: 0,
-      writable: true
-    }
-  })
+      writable: true,
+    },
+  });
   // dataRootNode.busFactorStatus.nodeStatus = "original";
   // dataRootNode.busFactorStatus.delta = 0;
 
   if (dataRootNode.children) {
-    for (let count = 0; count < dataRootNode.children.length; count++){
-      dataRootNode.children[count] = initializeBusFactorDeltaProperties(dataRootNode.children[count]);
+    for (let count = 0; count < dataRootNode.children.length; count++) {
+      dataRootNode.children[count] = initializeBusFactorDeltaProperties(
+        dataRootNode.children[count]
+      );
     }
   }
-  
+
   return dataRootNode;
 }
 
@@ -81,10 +82,11 @@ function getDataFromCurrentData(currentData, developersToRemove, filters) {
 
 export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
   let newDataRootNodeCopy = { ...newDataRootNode };
-  newDataRootNodeCopy.busFactorStatus = { ...newDataRootNodeCopy.busFactorStatus };
-  if(newDataRootNodeCopy.children)
-    newDataRootNodeCopy.children = [ ...newDataRootNodeCopy.children ];
-
+  newDataRootNodeCopy.busFactorStatus = {
+    ...newDataRootNodeCopy.busFactorStatus,
+  };
+  if (newDataRootNodeCopy.children)
+    newDataRootNodeCopy.children = [...newDataRootNodeCopy.children];
 
   if (oldDataRootNode === null) {
     throw new Error("Old data is null!");
@@ -134,10 +136,14 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
           newCount++;
         }
 
-        newDataRootNodeCopy.children[oldCount] = getBusFactorDeltas(
-          oldDataRootNode.children[oldCount],
-          newDataRootNodeCopy.children[oldCount]
-        );
+        if (
+          !newDataRootNodeCopy.busFactorStatus.old &&
+          !newDataRootNodeCopy.busFactorStatus.ignored
+        )
+          newDataRootNodeCopy.children[oldCount] = getBusFactorDeltas(
+            oldDataRootNode.children[oldCount],
+            newDataRootNodeCopy.children[oldCount]
+          );
       }
     }
   }
@@ -238,13 +244,7 @@ const treemapSlice = createSlice({
       }
     },
     scopeMiniTreemapIn: (state, action) => {
-      if (
-        action.payload
-        // &&
-        // action.payload.path &&
-        // action.payload.path !== state.simulation.miniTreemap.visualizationPath
-        // && getDifference(state.simulation.lastUsedRemovedAuthorsList, state.simulation.removedAuthors)
-      ) {
+      if (action.payload) {
         const nextPath = `${action.payload.path}`;
         const pathQuery =
           nextPath === "." ? "$" : `$..[?(@.path=='${nextPath}')]`;
@@ -267,44 +267,30 @@ const treemapSlice = createSlice({
         );
 
         if (newData && newData.children) {
-          state.simulation.miniTreemap.previousPathStack.push(
-            state.simulation.miniTreemap.visualizationPath
-          );
-
-          state.simulation.miniTreemap.previousVisualizationData.push(state.simulation.miniTreemap.visualizationData);
           state.simulation.miniTreemap.visualizationData = result;
           state.simulation.miniTreemap.visualizationPath = nextPath;
         }
       }
     },
     scopeMiniTreemapOut: (state, action) => {
-      const nextPath = state.simulation.miniTreemap.previousPathStack.pop();
+      const nextPath = action.payload.path;
 
-      if (nextPath) {
-        if (nextPath === ".") {
-          state.simulation.miniTreemap.visualizationData =
-            initialMiniTreeMapData;
-          state.simulation.miniTreemap.visualizationPath =
-            initialMiniTreeMapData.path;
-        } else {
-          // const pathQuery = `$..[?(@.path==="${nextPath}")]`;
-          const pathQuery =
-            nextPath === "." ? "$" : `$..[?(@.path=='${nextPath}')]`;
+      // const pathQuery = `$..[?(@.path==="${nextPath}")]`;
+      const pathQuery =
+        nextPath === "." ? "$" : `$..[?(@.path=='${nextPath}')]`;
 
-          let newData = getDataWithPathQuery(
-            initialMiniTreeMapData,
-            pathQuery,
-            state.simulation.removedAuthors
-          );
-          let oldData = jp.query(initialMiniTreeMapData, pathQuery);
-          oldData = oldData[0];
-          let result = getBusFactorDeltas(oldData, newData);
-          console.log("scopeTreemapOut", newData, pathQuery);
-          if (newData && newData.children) {
-            state.simulation.miniTreemap.visualizationData = result;
-            state.simulation.miniTreemap.visualizationPath = nextPath;
-          }
-        }
+      let newData = getDataWithPathQuery(
+        initialMiniTreeMapData,
+        pathQuery,
+        state.simulation.removedAuthors
+      );
+      let oldData = jp.query(initialMiniTreeMapData, pathQuery);
+      oldData = oldData[0];
+      let result = getBusFactorDeltas(oldData, newData);
+      console.log("scopeTreemapOut", newData, pathQuery);
+      if (newData && newData.children) {
+        state.simulation.miniTreemap.visualizationData = result;
+        state.simulation.miniTreemap.visualizationPath = nextPath;
       }
     },
     addFilter: (state, action) => {
