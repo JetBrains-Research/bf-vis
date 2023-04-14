@@ -1,13 +1,17 @@
 /** @format */
 
-import React, {useState} from "react";
-import {batch} from "react-redux";
+import React, { useState } from "react";
+import { batch } from "react-redux";
 
-import {InfoPanel} from "./InfoPanel";
-import {useTranslation} from "react-i18next";
+import { InfoPanel } from "./InfoPanel";
+import { useTranslation } from "react-i18next";
 
-import {CONFIG} from "../config";
-import {addFilter, removeFilter, selectAllFilters,} from "../reducers/treemapSlice";
+import { CONFIG } from "../config";
+import {
+  addFilter,
+  removeFilter,
+  selectAllFilters,
+} from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 import SimulationModeModal from "./SimulationModeModal";
 import { generateBreadcrumb } from "../utils/url.tsx";
@@ -24,7 +28,7 @@ function Navigator(props) {
   const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
   const [isBusFactorRecalcActive, setisBusFactorRecalcActive] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState();
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
@@ -128,7 +132,7 @@ function Navigator(props) {
                   ? setPathFunc(currentPath.split("/").slice(0, -1).join("/"))
                   : setPathFunc(".")
               }>
-              &larr; Back
+              &uarr; Up
             </button>
             <button
               type="button"
@@ -139,7 +143,7 @@ function Navigator(props) {
               }}
               id="reset"
               onClick={() => setPathFunc(".")}>
-              Reset &#x27F3;
+              <i class="bi bi-house"></i> Home 
             </button>
           </div>
         </div>
@@ -237,9 +241,7 @@ function Navigator(props) {
         statsData={statsData}
         simulationData={simulationData}
         simulationPath={simulationPath}
-        reduxNavFunctions={props.reduxNavFunctions}>
-        
-        </SimulationModeModal>
+        reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
     </div>
   );
 }

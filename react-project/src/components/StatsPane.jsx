@@ -6,8 +6,8 @@ import { dispatch } from "d3";
 import {
   disableSimulationMode,
   enableSimulationMode,
-  removedAuthors,
-  simulateAuthorRemoval,
+  selectRemovedAuthors,
+  addAuthorToRemovalList,
   undoAuthorRemoval,
 } from "../reducers/treemapSlice";
 import { useSelector } from "react-redux";
@@ -98,7 +98,7 @@ function StatsPane(props) {
     if (event.target.checked) {
       dispatch(undoAuthorRemoval(event.target.props.email));
     } else {
-      dispatch(simulateAuthorRemoval(event.target.props.email));
+      dispatch(addAuthorToRemovalList(event.target.props.email));
     }
   };
 

@@ -9,22 +9,39 @@ import TreeMap from "./TreeMap";
 import { generateBreadcrumb } from "../utils/url.tsx";
 import { useTranslation } from "react-i18next";
 import { InfoPanel } from "./InfoPanel";
+import {
+  addAuthorToRemovalList,
+  selectRemovedAuthors,
+  scopeMiniTreemapIn,
+  undoAuthorRemoval,
+} from "../reducers/treemapSlice.js";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
+import { useSelector } from "react-redux";
 
 function SimulationModeModal(props) {
   const { t, i18n } = useTranslation();
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
-  const statsData = props.statsData;
-  const authorsList = "users" in statsData ? [...statsData.users] : undefined;
   const simulationVisualizationData = props.simulationData;
-  const simulationVisualizationPath = props.simulationPath;
-  // console.log(`Simulation Viz Path: ${simulationVisualizationPath}`);
-  const setTreemapPathFunc = props.setTreemapPathFunc;
-  const returnTreeMapHome = props.setTreeMapHome;
+  const simulationVisualizationPath = props.simulationPath; 
+  const authorsList = "users" in simulationVisualizationData ? [...simulationVisualizationData.users] : undefined;
+  
+  const setTreemapPathOutFunc = (path) => {
+    props.reduxNavFunctions.dispatch(
+      props.reduxNavFunctions.scopeMiniTreemapOut(payloadGenerator('path', path))
+    );
+  };
+  const returnTreeMapHome = () => {
+    props.reduxNavFunctions.dispatch(
+      props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator('path', "."))
+    );
+  }
+    
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
+  const removedAuthorsList = useSelector(selectRemovedAuthors);
 
   if (authorsList) {
     authorsList.sort((a, b) => b.authorship - a.authorship);
@@ -39,7 +56,9 @@ function SimulationModeModal(props) {
           authorship: authorContributionPair.authorship,
           relativeScore:
             authorContributionPair.authorship / cumulativeAuthorship,
-          included: true,
+          included: removedAuthorsList.includes(authorContributionPair.email)
+            ? false
+            : true,
         };
       }
     );
@@ -58,14 +77,26 @@ function SimulationModeModal(props) {
     }
   };
 
-  const handleAuthorCheckmark = (authorScorePair) => {
+  const handleAuthorCheckmark = (e, authorScorePair) => {
     let email = authorScorePair.email;
-    authorsListContributionPercentage.map((authorScorePairOriginal) => {
-      if (authorScorePairOriginal.email === email) {
-        authorScorePairOriginal.included = !authorScorePairOriginal.included
-      }
-    })
-  }
+    console.log(email);
+    if (!e.target.checked) {
+      props.reduxNavFunctions.dispatch(addAuthorToRemovalList([email]));
+      props.reduxNavFunctions.dispatch(
+        scopeMiniTreemapIn(
+          payloadGenerator("path", simulationVisualizationPath)
+        )
+      );
+    }
+    else if (e.target.checked) {
+      props.reduxNavFunctions.dispatch(undoAuthorRemoval([email]));
+      props.reduxNavFunctions.dispatch(
+        scopeMiniTreemapIn(
+          payloadGenerator("path", simulationVisualizationPath)
+        )
+      );
+    }
+  };
 
   return (
     <div
@@ -157,7 +188,7 @@ function SimulationModeModal(props) {
                           }
                           key={pathElement}
                           onClick={() =>
-                            setTreemapPathFunc(
+                            setTreemapPathOutFunc(
                               generateBreadcrumb(i, simulationVisualizationPath)
                             )
                           }>
@@ -182,15 +213,15 @@ function SimulationModeModal(props) {
                       simulationVisualizationPath
                         .split("/")
                         .filter((r) => r !== "").length > 1
-                        ? setTreemapPathFunc(
+                        ? setTreemapPathOutFunc(
                             simulationVisualizationPath
                               .split("/")
                               .slice(0, -1)
                               .join("/")
                           )
-                        : setTreemapPathFunc(".")
+                        : setTreemapPathOutFunc(".")
                     }>
-                    &larr; Back
+                    &uarr; Up
                   </button>
                   <button
                     type="button"
@@ -201,8 +232,8 @@ function SimulationModeModal(props) {
                       color: "white",
                     }}
                     id="reset"
-                    onClick={() => setTreemapPathFunc(".")}>
-                    Reset &#x27F3;
+                    onClick={() => returnTreeMapHome()}>
+                    <i class="bi bi-house"></i> Home
                   </button>
                 </div>
               </div>
@@ -255,8 +286,9 @@ function SimulationModeModal(props) {
                                     type="checkbox"
                                     id={authorScorePair.email}
                                     checked={authorScorePair.included}
-                                    onChange={() => handleAuthorCheckmark(authorScorePair)}
-                                    ></input>
+                                    onChange={(e) =>
+                                      handleAuthorCheckmark(e, authorScorePair)
+                                    }></input>
                                 </div>
                               </td>
                               <td>{authorScorePair["email"]}</td>

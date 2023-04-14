@@ -2,8 +2,8 @@
 
 const debug = false
 
-export function calculateBusFactor(data) {
-  const developersToRemove = []
+
+export function calculateBusFactor(data, developersToRemove) {
   const result = busFactorForFolder(data, developersToRemove);
 
   if (data.children) {

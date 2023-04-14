@@ -34,10 +34,10 @@ function LegendSize(props) {
       <div
         id="legendSizeCollapsible"
         className="collapse show">
-        <p className="small">
+        {/* <p className="small">
           We have a log base 2 scale for size. Sizes are relative to other tiles
           on the same directory-level and represent file/folder size in bytes
-        </p>
+        </p> */}
         <div className="row justify-content-start align-items-center g-2 m-2">
           <div className="col">
             {generateSvgSquare(
