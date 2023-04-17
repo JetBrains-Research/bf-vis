@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { CONFIG } from "../config";
 import {
   addFilter,
+  removeAllFilters,
   removeFilter,
   selectAllFilters,
 } from "../reducers/treemapSlice";
@@ -168,15 +169,15 @@ function Navigator(props) {
           </a>
         </h4>
         <div className="filtersCollapsible collapse show">
-          <h6>
+          {/* <h6>
             Bus Factor Recalculation{" "}
             <InfoPanel
               divName="recalculationInfoPanel"
               header="How and when is bus factor recalculated?"
               body={[t("busFactor.recalculation")]}></InfoPanel>
-          </h6>
+          </h6> */}
 
-          <input
+          {/* <input
             className="btn-check"
             type="checkbox"
             role="switch"
@@ -193,13 +194,14 @@ function Navigator(props) {
             }}
             htmlFor="recalculationSwitch">
             {isBusFactorRecalcActive ? "On" : "Off"}
-          </label>
+          </label> */}
 
           <FilterWithInput
             key="Regex"
             filterPropertyType="RegEx"
             addFunction={addFilter}
             removeFunction={removeFilter}
+            removeAllFunction={removeAllFilters}
             selector={selectAllFilters}
             dispatch={dispatch}
             infoPanelDetails={[t("filters.regex")]}></FilterWithInput>
