@@ -32,9 +32,21 @@ function OffCanvasSideBar(props) {
             data-bs-dismiss="offcanvas"
             aria-label="Close"></button>
         </div>
-        <div className="offcanvas-body"><p style={{
-          textAlign:"left"
-        }} className="fs-6 fw-normal">{ props.body }</p></div>
+        <div className="offcanvas-body">
+          <p
+            style={{
+              textAlign: "left",
+            }}
+            className="fs-6 fw-normal">
+            {props.body.map((text) => {
+              if (text.startsWith("http")) {
+                return <a href={text}>{text + "\n"}</a>;
+              } else {
+                return text + "\n";
+              }
+            })}
+          </p>
+        </div>
       </div>
     </>
   );
@@ -47,7 +59,7 @@ export function InfoPanel(props) {
       <OffCanvasSideBar
         divName={props.divName}
         header={props.header}
-        body={props.body.join('\n ')}></OffCanvasSideBar>
+        body={props.body}></OffCanvasSideBar>
     </>
   );
 }

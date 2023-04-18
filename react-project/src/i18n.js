@@ -21,12 +21,14 @@ const resources = {
       },
       filters: {
         general: ["Filters to file names can be applied in 2 ways: Manually adding regular expressions or choosing predefined templates containing multiple regular expressions.", "The results returned are those files/folders that satisfy all the given regular expressions specified for filtering (i.e. intersection of the results of each regular expression applied individually)"],
-        regex: ["We appreciate that translating our ideas into regular expressions are not always the most straightforward of tasks. Here is a link to a website where you can test out your regular expressions before filtering to get better results: <a>https://regexr.com</a>"],
+        regex: ["We appreciate that translating our ideas into regular expressions are not always the most straightforward of tasks. Here is a link to a website where you can test out your regular expressions before filtering to get better results:"],
         templates: ["Templates are collections of expressions that are commonly used together to focus on certain types of files e.g. show only all JSX JS and TSX files for a React + TypeScript project", "Having them predefined allows you to apply such filters with one click instead of having to individually test regular expressions and combine them by hand"],
+        links: ["https://regexr.com"]
       },
       simMode: {
         general: ["The simulation mode of the BFViz app allows users to remove specific code authors and visualize how their removal would affect the contribution scores and the bus factor for the given project and its folders and files."],
-        detail: ["The authorship scores, and the bus factors are recalculated for all of the files and folders in the project every time a filter is added or removed as well as whenever an author is added or removed. The calculations are based on the paper by Jabrayilzade, Evtikhiev, Tüzün, and Kovalenko accessible at https://arxiv.org/abs/2202.01523 ."],
+        detail: ["The authorship scores, and the bus factors are recalculated for all of the files and folders in the project every time a filter is added or removed as well as whenever an author is added or removed. The calculations are based on the paper by Jabrayilzade, Evtikhiev, Tüzün, and Kovalenko accessible at:"],
+        links:["https://arxiv.org/abs/2202.01523"]
       },
       stats: ["This panel shows authors that have contributed to the currently visualized folder or currently selected file  along with their contribution scores and the bus factor for it."],
     },

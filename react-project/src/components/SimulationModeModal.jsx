@@ -107,7 +107,7 @@ function SimulationModeModal(props) {
         <InfoPanel
           divName="simInfoPanel"
           header="How does the simulation mode work?"
-          body={[t("simMode.general"), t("simMode.detail")]}></InfoPanel>
+          body={[t("simMode.general"), t("simMode.detail"),t("simMode.links") ]}></InfoPanel>
         <a
           className=""
           data-bs-toggle="collapse"

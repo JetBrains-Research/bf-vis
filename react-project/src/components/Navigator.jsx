@@ -204,7 +204,7 @@ function Navigator(props) {
             removeAllFunction={removeAllFilters}
             selector={selectAllFilters}
             dispatch={dispatch}
-            infoPanelDetails={[t("filters.regex")]}></FilterWithInput>
+            infoPanelDetails={[t("filters.regex"), t("filters.links") ]}></FilterWithInput>
 
           <h5>Filtering Templates</h5>
           <div className="dropdown open filtersCollapsible collapse show">
