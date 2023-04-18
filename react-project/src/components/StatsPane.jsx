@@ -16,8 +16,8 @@ import { InfoPanel } from "./InfoPanel";
 
 function StatsPane(props) {
   const { t, i18n } = useTranslation();
-  const formatPercentage = d3.format(",.1%");
-  const formatSI = d3.format(".3s");
+  const formatPercentage = d3.format(",.2%");
+  const formatSI = d3.formatPrefix(".1s", 1e0);
 
   const isFirstRender = useRef(true);
   const [numOfAuthors, setNumOfAuthors] = useState(0);
@@ -135,21 +135,33 @@ function StatsPane(props) {
         </a>
       </h4>
       <div className="col-12 statsPaneCollapsible collapse show">
-        <h5>Name</h5>
-        <p>
+        {/* <p>
           {}
           {nodeData.name}
         </p>
 
         <h5>Bus Factor</h5>
-        <p>{nodeBusFactor}</p>
+        <p>{nodeBusFactor}</p> */}
+
+        <ul className="list-unstyled">
+          <li>
+            <span className="text-break text-wrap">
+              Name: <strong>{nodeData.name}</strong>
+            </span>
+          </li>
+          <li>
+            <span className="text-break text-wrap">
+              Bus Factor: <strong>{nodeBusFactor}</strong>
+            </span>
+          </li>
+        </ul>
 
         <h5>Author Contribution</h5>
         {authorsList && topAuthors ? (
           <>
             <label
               htmlFor="authorNumberSelecter"
-              className="form-label">
+              className="form-label small">
               Showing top {numOfAuthors}
               {" of "}
               {totalNumOfAuthors}
@@ -169,33 +181,40 @@ function StatsPane(props) {
           </>
         )}
 
-        <div
+        <ul
           className="list-group list-group-flush"
           style={{
-            maxHeight: "25vh",
+            maxHeight: "40vh",
             maxWidth: "15vw",
             overflowY: "scroll",
           }}>
           {authorsList && topAuthors ? (
-            topAuthors.map((authorScorePair) => (
+            topAuthors.map((authorScorePair, index) => (
               <div
-                className="list-group-item"
+                className="list-group-item list-unstyled"
                 key={authorScorePair["email"]}>
-                <p className="small text-break text-wrap">
-                  {authorScorePair["email"]}
-                </p>
-                <h6 className="small">
-                  {formatPercentage(authorScorePair["relativeScore"])}
-                </h6>
-                <span className="small">
-                  ({formatSI(authorScorePair["authorship"])})
-                </span>
+                <li>Rank: {index}</li>
+                <li>
+                  <span className="small text-break text-wrap">
+                    <strong>{authorScorePair["email"]}</strong>
+                  </span>
+                </li>
+                <li>
+                  <span className="small">
+                    {formatPercentage(authorScorePair["relativeScore"])}
+                  </span>
+                </li>
+                <li>
+                  <span className="small">
+                    ({formatSI(authorScorePair["authorship"])})
+                  </span>
+                </li>
               </div>
             ))
           ) : (
             <p className="small fw-bold">N/A</p>
           )}
-        </div>
+        </ul>
       </div>
     </div>
   );

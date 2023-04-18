@@ -33,7 +33,7 @@ function LegendSize(props) {
       </h4>
       <div
         id="legendSizeCollapsible"
-        className="collapse show">
+        className="collapse hide">
         {/* <p className="small">
           We have a log base 2 scale for size. Sizes are relative to other tiles
           on the same directory-level and represent file/folder size in bytes
