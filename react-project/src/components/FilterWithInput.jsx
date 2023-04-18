@@ -61,7 +61,7 @@ function FilterWithInput(props) {
   };
 
   return (
-    <>
+    <div className="mt-3 mb-3">
       <h5>
         {filterPropertyType}{" "}
         {props.infoPanelDetails !== null ? (
@@ -106,7 +106,21 @@ function FilterWithInput(props) {
           </div>
         ))}
       </div>
-    </>
+
+      {currentFilters.length > 0 ? (
+        <button
+          className="btn"
+          type="button"
+          id="button-filter-remove-all"
+          style={{
+            backgroundColor: CONFIG.general.colors.jetbrains.brightRed,
+            color: "white",
+          }}
+          onClick={() => dispatch(props.removeAllFunction())}>
+          Remove All Filters
+        </button>
+      ) : null}
+    </div>
   );
 }
 
