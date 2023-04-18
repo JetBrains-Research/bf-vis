@@ -42,7 +42,7 @@ function LegendSize(props) {
           <div className="col">
             {generateSvgSquare(
               "2rem",
-              CONFIG.general.colors.jetbrains.darkGray
+              CONFIG.general.colors.jetbrains.black
             )}
           </div>
           <div className="col">10 kB</div>
@@ -51,7 +51,7 @@ function LegendSize(props) {
           <div className="col">
             {generateSvgSquare(
               "4rem",
-              CONFIG.general.colors.jetbrains.darkGray
+              CONFIG.general.colors.jetbrains.black
             )}
           </div>
           <div className="col">100 kB</div>
