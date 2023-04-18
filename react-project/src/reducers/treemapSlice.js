@@ -352,6 +352,7 @@ export const {
   // regex filter actions
   addFilter,
   removeFilter,
+  removeAllFilters,
   // inclusion filter methods
   // Simulation Mode Actions
   enableSimulationMode,
