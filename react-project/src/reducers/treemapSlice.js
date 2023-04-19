@@ -344,12 +344,6 @@ export const {
 export const selectFullData = (state) => state.treemap.mainTreemap.fullData;
 export const selectCurrentVisualizationData = (state) => {
   const nextPath = state.treemap.mainTreemap.currentVisualizationPath
-  let pathQuery
-  if (nextPath === ".") {
-    pathQuery = `$`
-  } else {
-    pathQuery = `$..[?(@.path==="${nextPath}")]`
-  }
   return goTrough(
     state.treemap.tree,
     nextPath
