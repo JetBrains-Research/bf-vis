@@ -170,9 +170,9 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentVisualizationPath
       ) {
         const nextPath = `${action.payload.path}`;
-        const pathQuery = `$..[?(@.path=='${nextPath}')]`;
-        let newData = getDataWithPathQuery(fullData, pathQuery);
-        console.log("scopeTreemapIn", newData, pathQuery);
+        // const pathQuery = `$..[?(@.path=='${nextPath}')]`;
+        let newData = goTrough(fullData, nextPath);
+        // console.log("scopeTreemapIn", newData, pathQuery);
 
         if (newData && newData.children) {
           state.mainTreemap.previousPathStack.push(
@@ -193,9 +193,9 @@ const treemapSlice = createSlice({
           state.mainTreemap.currentVisualizationPath = fullData.path;
           state.mainTreemap.currentStatsPath = fullData.path;
         } else {
-          const pathQuery = `$..[?(@.path==="${nextPath}")]`;
-          let newData = getDataWithPathQuery(fullData, pathQuery);
-          console.log("scopeTreemapOut", newData, pathQuery);
+          // const pathQuery = `$..[?(@.path==="${nextPath}")]`;
+          let newData = goTrough(fullData, nextPath);
+          // console.log("scopeTreemapOut", newData, pathQuery);
           if (newData && newData.children) {
             state.mainTreemap.currentVisualizationPath = nextPath;
             state.mainTreemap.currentStatsPath = nextPath;
@@ -356,24 +356,37 @@ export const selectCurrentVisualizationData = (state) => {
   } else {
     pathQuery = `$..[?(@.path==="${nextPath}")]`
   }
-  return getDataWithPathQuery(
+  return goTrough(
     state.treemap.tree,
-    pathQuery
+    nextPath
   )
 }
+
+function goTrough(state, path) {
+  if (path === ".") return state
+
+  const parts = path.split('/')
+  let node = state
+  for (let i = 1; i < parts.length; i++) {
+    node = node.children.filter((it) => it.name === parts[i])[0]
+  }
+  return node
+}
+
 export const selectCurrentVisualizationPath = (state) =>
   state.treemap.mainTreemap.currentVisualizationPath;
 export const selectCurrentStatsData = (state) => {
   const nextPath = state.treemap.mainTreemap.currentVisualizationPath
+  console.log(nextPath)
   let pathQuery
   if (nextPath === ".") {
     pathQuery = `$`
   } else {
     pathQuery = `$..[?(@.path==="${nextPath}")]`
   }
-  return getDataWithPathQuery(
+  return goTrough(
     state.treemap.tree,
-    pathQuery
+    nextPath
   )
 }
 export const selectCurrentStatsPath = (state) =>
