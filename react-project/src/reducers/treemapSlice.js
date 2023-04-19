@@ -152,9 +152,7 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentStatsPath
       ) {
         const newPath = `${action.payload.path}`;
-        const pathQuery = `$..[?(@.path=='${newPath}')]`;
-        let newData = getDataWithPathQuery(fullData, pathQuery);
-        console.log("scopeStatsIn", newData, pathQuery);
+        let newData = goTrough(fullData, newPath);
         if (newData) {
           state.mainTreemap.currentStatsPath = newPath;
         } else {
@@ -170,9 +168,7 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentVisualizationPath
       ) {
         const nextPath = `${action.payload.path}`;
-        // const pathQuery = `$..[?(@.path=='${nextPath}')]`;
         let newData = goTrough(fullData, nextPath);
-        // console.log("scopeTreemapIn", newData, pathQuery);
 
         if (newData && newData.children) {
           state.mainTreemap.previousPathStack.push(
@@ -193,9 +189,7 @@ const treemapSlice = createSlice({
           state.mainTreemap.currentVisualizationPath = fullData.path;
           state.mainTreemap.currentStatsPath = fullData.path;
         } else {
-          // const pathQuery = `$..[?(@.path==="${nextPath}")]`;
           let newData = goTrough(fullData, nextPath);
-          // console.log("scopeTreemapOut", newData, pathQuery);
           if (newData && newData.children) {
             state.mainTreemap.currentVisualizationPath = nextPath;
             state.mainTreemap.currentStatsPath = nextPath;
@@ -376,14 +370,7 @@ function goTrough(state, path) {
 export const selectCurrentVisualizationPath = (state) =>
   state.treemap.mainTreemap.currentVisualizationPath;
 export const selectCurrentStatsData = (state) => {
-  const nextPath = state.treemap.mainTreemap.currentVisualizationPath
-  console.log(nextPath)
-  let pathQuery
-  if (nextPath === ".") {
-    pathQuery = `$`
-  } else {
-    pathQuery = `$..[?(@.path==="${nextPath}")]`
-  }
+  const nextPath = state.treemap.mainTreemap.currentStatsPath
   return goTrough(
     state.treemap.tree,
     nextPath
