@@ -34,9 +34,7 @@ function convertTreeToState(tree) {
     tree: tree,
     initialDummyMiniTreeMapData: initialDummyMiniTreeMapData,
     mainTreemap: {
-      currentStatsData: tree,
       currentStatsPath: tree.path,
-      currentVisualizationData: tree,
       currentVisualizationPath: tree.path,
       ignored: [],
       isRecalculationEnabled: false,
@@ -57,7 +55,8 @@ function convertTreeToState(tree) {
 
 function getDataWithPathQuery(fullData, pathQuery) {
   let newData = jp.query(fullData, pathQuery);
-  let result = calculateBusFactor(newData[0]);
+  // let result = calculateBusFactor(newData[0]);
+  let result = newData[0];
 
   return result;
 }
@@ -141,9 +140,7 @@ const treemapSlice = createSlice({
     returnMainTreemapHome: (state) => {
       const fullData = state.tree
       let newData = getDataWithPathQuery(fullData, "$");
-      state.mainTreemap.currentVisualizationData = newData;
       state.mainTreemap.currentVisualizationPath = newData.path;
-      state.mainTreemap.currentStatsData = newData;
       state.mainTreemap.currentStatsPath = newData.path;
     },
     // click on a file node
@@ -160,7 +157,6 @@ const treemapSlice = createSlice({
         console.log("scopeStatsIn", newData, pathQuery);
         if (newData) {
           state.mainTreemap.currentStatsPath = newPath;
-          state.mainTreemap.currentStatsData = newData;
         } else {
           console.log("scopeStatsIn", "not changed");
         }
@@ -183,9 +179,7 @@ const treemapSlice = createSlice({
             state.mainTreemap.currentVisualizationPath
           );
           state.mainTreemap.currentVisualizationPath = nextPath;
-          state.mainTreemap.currentVisualizationData = newData;
           state.mainTreemap.currentStatsPath = nextPath;
-          state.mainTreemap.currentStatsData = newData;
         }
       }
     },
@@ -196,9 +190,7 @@ const treemapSlice = createSlice({
 
       if (nextPath) {
         if (nextPath === ".") {
-          state.mainTreemap.currentVisualizationData = fullData;
           state.mainTreemap.currentVisualizationPath = fullData.path;
-          state.mainTreemap.currentStatsData = fullData;
           state.mainTreemap.currentStatsPath = fullData.path;
         } else {
           const pathQuery = `$..[?(@.path==="${nextPath}")]`;
@@ -206,9 +198,7 @@ const treemapSlice = createSlice({
           console.log("scopeTreemapOut", newData, pathQuery);
           if (newData && newData.children) {
             state.mainTreemap.currentVisualizationPath = nextPath;
-            state.mainTreemap.currentVisualizationData = newData;
             state.mainTreemap.currentStatsPath = nextPath;
-            state.mainTreemap.currentStatsData = newData;
           }
         }
       }
@@ -322,10 +312,10 @@ const treemapSlice = createSlice({
         ...new Set(state.removedAuthors.concat(authors)),
       ];
 
-      let currentData = state.mainTreemap.currentVisualizationData;
-      const newData = getDummySimulationModeComparisonData(currentData);
-
-      state.simulation.miniTreemap.visualizationData = newData;
+      // let currentData = state.mainTreemap.currentVisualizationData;
+      // const newData = getDummySimulationModeComparisonData(currentData);
+      //
+      // state.simulation.miniTreemap.visualizationData = newData;
     },
     undoAuthorRemoval: (state, action) => {
       const authors = action.payload;
@@ -358,12 +348,34 @@ export const {
 } = treemapSlice.actions;
 //treemap data selectors
 export const selectFullData = (state) => state.treemap.mainTreemap.fullData;
-export const selectCurrentVisualizationData = (state) =>
-  state.treemap.mainTreemap.currentVisualizationData;
+export const selectCurrentVisualizationData = (state) => {
+  const nextPath = state.treemap.mainTreemap.currentVisualizationPath
+  let pathQuery
+  if (nextPath === ".") {
+    pathQuery = `$`
+  } else {
+    pathQuery = `$..[?(@.path==="${nextPath}")]`
+  }
+  return getDataWithPathQuery(
+    state.treemap.tree,
+    pathQuery
+  )
+}
 export const selectCurrentVisualizationPath = (state) =>
   state.treemap.mainTreemap.currentVisualizationPath;
-export const selectCurrentStatsData = (state) =>
-  state.treemap.mainTreemap.currentStatsData;
+export const selectCurrentStatsData = (state) => {
+  const nextPath = state.treemap.mainTreemap.currentVisualizationPath
+  let pathQuery
+  if (nextPath === ".") {
+    pathQuery = `$`
+  } else {
+    pathQuery = `$..[?(@.path==="${nextPath}")]`
+  }
+  return getDataWithPathQuery(
+    state.treemap.tree,
+    pathQuery
+  )
+}
 export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
