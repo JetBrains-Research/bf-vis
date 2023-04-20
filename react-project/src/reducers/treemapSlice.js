@@ -1,9 +1,8 @@
 /** @format */
 
-import { createSlice } from "@reduxjs/toolkit";
-import { gitRepoDirData } from "../data/project_data_recalculating";
-import * as jp from "jsonpath";
-import { calculateBusFactor } from "../utils/BusFactorUtil";
+import {createSlice} from "@reduxjs/toolkit";
+import {gitRepoDirData} from "../data/project_data_recalculating";
+import {calculateBusFactor} from "../utils/BusFactorUtil";
 
 const fullData = gitRepoDirData;
 const initialMiniTreeMapData = initializeBusFactorDeltaProperties(fullData);
@@ -33,10 +32,22 @@ const defaultState = {
   filters: [],
 };
 
-function getDataWithPathQuery(fullData, pathQuery, developersToRemove) {
-  let newData = jp.query(fullData, pathQuery);
-  let result = calculateBusFactor(newData[0], developersToRemove);
+function goThrough(state, path) {
+  if (path === ".") return state
 
+  const parts = path.split('/')
+  let node = state
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i]
+    if (i === 0 && part === "") continue
+    node = node.children.filter((it) => it.name === part)[0]
+  }
+  return node
+}
+
+function getDataWithPathQuery(fullData, pathQuery, developersToRemove) {
+  let newData = goThrough(fullData, pathQuery);
+  let result = calculateBusFactor(newData, developersToRemove);
   return result;
 }
 
@@ -81,7 +92,7 @@ function getDataFromCurrentData(currentData, developersToRemove, filters) {
 }
 
 export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
-  let newDataRootNodeCopy = { ...newDataRootNode };
+  let newDataRootNodeCopy = {...newDataRootNode};
   newDataRootNodeCopy.busFactorStatus = {
     ...newDataRootNodeCopy.busFactorStatus,
   };
@@ -113,8 +124,8 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
       oldDataRootNode.busFactorStatus.busFactor + delta <= 0
         ? "lost"
         : oldDataRootNode.busFactorStatus.busFactor + delta < 2
-        ? "danger"
-        : "ok";
+          ? "danger"
+          : "ok";
 
     if (
       oldDataRootNode.children &&
@@ -132,7 +143,7 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
         while (
           oldPath !== newDataRootNodeCopy.children[newCount].path &&
           newCount < newDataRootNodeCopy.children.length
-        ) {
+          ) {
           newCount++;
         }
 
@@ -164,7 +175,7 @@ const treemapSlice = createSlice({
   reducers: {
     // not as useful anymore, URL takes precedence, or at least, it should
     returnMainTreemapHome: (state) => {
-      let newData = getDataWithPathQuery(fullData, "$", []);
+      let newData = getDataWithPathQuery(fullData, ".", []);
       state.mainTreemap.currentVisualizationData = newData;
       state.mainTreemap.currentVisualizationPath = newData.path;
       state.mainTreemap.currentStatsData = newData;
@@ -173,7 +184,7 @@ const treemapSlice = createSlice({
     returnMiniTreemapHome: (state) => {
       let newData = getDataWithPathQuery(
         fullData,
-        "$",
+        ".",
         state.simulation.removedAuthors
       );
       state.simulation.miniTreemap.visualizationData = newData;
@@ -187,9 +198,8 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentStatsPath
       ) {
         const newPath = `${action.payload.path}`;
-        const pathQuery = `$..[?(@.path=='${newPath}')]`;
-        let newData = getDataWithPathQuery(fullData, pathQuery, []);
-        console.log("scopeStatsIn", newData, pathQuery);
+        let newData = getDataWithPathQuery(fullData, newPath, []);
+        console.log("scopeStatsIn", newData, newPath);
         if (newData) {
           state.mainTreemap.currentStatsPath = newPath;
           state.mainTreemap.currentStatsData = newData;
@@ -205,9 +215,8 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentVisualizationPath
       ) {
         const nextPath = `${action.payload.path}`;
-        const pathQuery = `$..[?(@.path=='${nextPath}')]`;
-        let newData = getDataWithPathQuery(fullData, pathQuery, []);
-        console.log("scopeTreemapIn", newData, pathQuery);
+        let newData = getDataWithPathQuery(fullData, nextPath, []);
+        console.log("scopeTreemapIn", newData, nextPath);
 
         if (newData && newData.children) {
           state.mainTreemap.previousPathStack.push(
@@ -231,9 +240,8 @@ const treemapSlice = createSlice({
           state.mainTreemap.currentStatsData = fullData;
           state.mainTreemap.currentStatsPath = fullData.path;
         } else {
-          const pathQuery = `$..[?(@.path==="${nextPath}")]`;
-          let newData = getDataWithPathQuery(fullData, pathQuery, []);
-          console.log("scopeTreemapOut", newData, pathQuery);
+          let newData = getDataWithPathQuery(fullData, nextPath, []);
+          console.log("scopeTreemapOut", newData, nextPath);
           if (newData && newData.children) {
             state.mainTreemap.currentVisualizationPath = nextPath;
             state.mainTreemap.currentVisualizationData = newData;
@@ -246,22 +254,19 @@ const treemapSlice = createSlice({
     scopeMiniTreemapIn: (state, action) => {
       if (action.payload) {
         const nextPath = `${action.payload.path}`;
-        const pathQuery =
-          nextPath === "." ? "$" : `$..[?(@.path=='${nextPath}')]`;
         let newData = getDataWithPathQuery(
           initialMiniTreeMapData,
-          pathQuery,
+          nextPath,
           state.simulation.removedAuthors
         );
-        let oldData = jp.query(initialMiniTreeMapData, pathQuery);
-        oldData = oldData[0];
+        let oldData = goThrough(initialMiniTreeMapData, nextPath);
         let result = getBusFactorDeltas(oldData, newData);
         state.simulation.lastUsedRemovedAuthorsList =
           state.simulation.removedAuthors;
         console.log(
           "scopeMiniTreemapIn",
           newData,
-          pathQuery,
+          nextPath,
           state.simulation.removedAuthors,
           result
         );
@@ -274,20 +279,14 @@ const treemapSlice = createSlice({
     },
     scopeMiniTreemapOut: (state, action) => {
       const nextPath = action.payload.path;
-
-      // const pathQuery = `$..[?(@.path==="${nextPath}")]`;
-      const pathQuery =
-        nextPath === "." ? "$" : `$..[?(@.path=='${nextPath}')]`;
-
       let newData = getDataWithPathQuery(
         initialMiniTreeMapData,
-        pathQuery,
+        nextPath,
         state.simulation.removedAuthors
       );
-      let oldData = jp.query(initialMiniTreeMapData, pathQuery);
-      oldData = oldData[0];
+      let oldData = goThrough(initialMiniTreeMapData, nextPath);
       let result = getBusFactorDeltas(oldData, newData);
-      console.log("scopeTreemapOut", newData, pathQuery);
+      console.log("scopeTreemapOut", newData, nextPath);
       if (newData && newData.children) {
         state.simulation.miniTreemap.visualizationData = result;
         state.simulation.miniTreemap.visualizationPath = nextPath;
