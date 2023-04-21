@@ -12,7 +12,6 @@ const defaultState = {
   tree: fullData,
   mainTreemap: {
     currentStatsPath: fullData.path,
-    currentVisualizationData: fullData,
     currentVisualizationPath: fullData.path,
     ignored: [],
     isRecalculationEnabled: false,
@@ -176,7 +175,6 @@ const treemapSlice = createSlice({
     // not as useful anymore, URL takes precedence, or at least, it should
     returnMainTreemapHome: (state) => {
       let newData = getDataWithPathQuery(fullData, ".", []);
-      state.mainTreemap.currentVisualizationData = newData;
       state.mainTreemap.currentVisualizationPath = newData.path;
       state.mainTreemap.currentStatsPath = newData.path;
     },
@@ -221,7 +219,6 @@ const treemapSlice = createSlice({
             state.mainTreemap.currentVisualizationPath
           );
           state.mainTreemap.currentVisualizationPath = nextPath;
-          state.mainTreemap.currentVisualizationData = newData;
           state.mainTreemap.currentStatsPath = nextPath;
         }
       }
@@ -232,7 +229,6 @@ const treemapSlice = createSlice({
 
       if (nextPath) {
         if (nextPath === ".") {
-          state.mainTreemap.currentVisualizationData = fullData;
           state.mainTreemap.currentVisualizationPath = fullData.path;
           state.mainTreemap.currentStatsPath = fullData.path;
         } else {
@@ -240,7 +236,6 @@ const treemapSlice = createSlice({
           console.log("scopeTreemapOut", newData, nextPath);
           if (newData && newData.children) {
             state.mainTreemap.currentVisualizationPath = nextPath;
-            state.mainTreemap.currentVisualizationData = newData;
             state.mainTreemap.currentStatsPath = nextPath;
           }
         }
@@ -360,7 +355,7 @@ export const {
 //treemap data selectors
 export const selectFullData = (state) => state.treemap.mainTreemap.fullData;
 export const selectCurrentVisualizationData = (state) =>
-  state.treemap.mainTreemap.currentVisualizationData;
+  goThrough(state.treemap.tree, state.treemap.mainTreemap.currentVisualizationPath);
 export const selectCurrentVisualizationPath = (state) =>
   state.treemap.mainTreemap.currentVisualizationPath;
 export const selectCurrentStatsData = (state) =>
