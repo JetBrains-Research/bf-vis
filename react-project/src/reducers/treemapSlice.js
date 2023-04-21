@@ -44,7 +44,7 @@ function goThrough(state, path) {
   return node
 }
 
-function getDataWithPathQuery(fullData, pathQuery, developersToRemove) {
+function getDataRecalculculated(fullData, pathQuery, developersToRemove) {
   let newData = goThrough(fullData, pathQuery);
   let result = calculateBusFactor(newData, developersToRemove);
   return result;
@@ -174,12 +174,12 @@ const treemapSlice = createSlice({
   reducers: {
     // not as useful anymore, URL takes precedence, or at least, it should
     returnMainTreemapHome: (state) => {
-      let newData = getDataWithPathQuery(fullData, ".", []);
+      let newData = goThrough(fullData, ".");
       state.mainTreemap.currentVisualizationPath = newData.path;
       state.mainTreemap.currentStatsPath = newData.path;
     },
     returnMiniTreemapHome: (state) => {
-      let newData = getDataWithPathQuery(
+      let newData = getDataRecalculculated(
         fullData,
         ".",
         state.simulation.removedAuthors
@@ -195,7 +195,7 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentStatsPath
       ) {
         const newPath = `${action.payload.path}`;
-        let newData = getDataWithPathQuery(fullData, newPath, []);
+        let newData = goThrough(fullData, newPath);
         console.log("scopeStatsIn", newData, newPath);
         if (newData) {
           state.mainTreemap.currentStatsPath = newPath;
@@ -211,7 +211,7 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentVisualizationPath
       ) {
         const nextPath = `${action.payload.path}`;
-        let newData = getDataWithPathQuery(fullData, nextPath, []);
+        let newData = goThrough(fullData, nextPath);
         console.log("scopeTreemapIn", newData, nextPath);
 
         if (newData && newData.children) {
@@ -232,7 +232,7 @@ const treemapSlice = createSlice({
           state.mainTreemap.currentVisualizationPath = fullData.path;
           state.mainTreemap.currentStatsPath = fullData.path;
         } else {
-          let newData = getDataWithPathQuery(fullData, nextPath, []);
+          let newData = goThrough(fullData, nextPath);
           console.log("scopeTreemapOut", newData, nextPath);
           if (newData && newData.children) {
             state.mainTreemap.currentVisualizationPath = nextPath;
@@ -244,7 +244,7 @@ const treemapSlice = createSlice({
     scopeMiniTreemapIn: (state, action) => {
       if (action.payload) {
         const nextPath = `${action.payload.path}`;
-        let newData = getDataWithPathQuery(
+        let newData = getDataRecalculculated(
           initialMiniTreeMapData,
           nextPath,
           state.simulation.removedAuthors
@@ -269,7 +269,7 @@ const treemapSlice = createSlice({
     },
     scopeMiniTreemapOut: (state, action) => {
       const nextPath = action.payload.path;
-      let newData = getDataWithPathQuery(
+      let newData = getDataRecalculculated(
         initialMiniTreeMapData,
         nextPath,
         state.simulation.removedAuthors
