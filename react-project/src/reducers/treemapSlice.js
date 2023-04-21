@@ -9,8 +9,8 @@ const initialMiniTreeMapData = initializeBusFactorDeltaProperties(fullData);
 
 // Initial State for this slice
 const defaultState = {
+  tree: fullData,
   mainTreemap: {
-    currentStatsData: fullData,
     currentStatsPath: fullData.path,
     currentVisualizationData: fullData,
     currentVisualizationPath: fullData.path,
@@ -178,7 +178,6 @@ const treemapSlice = createSlice({
       let newData = getDataWithPathQuery(fullData, ".", []);
       state.mainTreemap.currentVisualizationData = newData;
       state.mainTreemap.currentVisualizationPath = newData.path;
-      state.mainTreemap.currentStatsData = newData;
       state.mainTreemap.currentStatsPath = newData.path;
     },
     returnMiniTreemapHome: (state) => {
@@ -202,7 +201,6 @@ const treemapSlice = createSlice({
         console.log("scopeStatsIn", newData, newPath);
         if (newData) {
           state.mainTreemap.currentStatsPath = newPath;
-          state.mainTreemap.currentStatsData = newData;
         } else {
           console.log("scopeStatsIn", "not changed");
         }
@@ -225,7 +223,6 @@ const treemapSlice = createSlice({
           state.mainTreemap.currentVisualizationPath = nextPath;
           state.mainTreemap.currentVisualizationData = newData;
           state.mainTreemap.currentStatsPath = nextPath;
-          state.mainTreemap.currentStatsData = newData;
         }
       }
     },
@@ -237,7 +234,6 @@ const treemapSlice = createSlice({
         if (nextPath === ".") {
           state.mainTreemap.currentVisualizationData = fullData;
           state.mainTreemap.currentVisualizationPath = fullData.path;
-          state.mainTreemap.currentStatsData = fullData;
           state.mainTreemap.currentStatsPath = fullData.path;
         } else {
           let newData = getDataWithPathQuery(fullData, nextPath, []);
@@ -246,7 +242,6 @@ const treemapSlice = createSlice({
             state.mainTreemap.currentVisualizationPath = nextPath;
             state.mainTreemap.currentVisualizationData = newData;
             state.mainTreemap.currentStatsPath = nextPath;
-            state.mainTreemap.currentStatsData = newData;
           }
         }
       }
@@ -369,7 +364,8 @@ export const selectCurrentVisualizationData = (state) =>
 export const selectCurrentVisualizationPath = (state) =>
   state.treemap.mainTreemap.currentVisualizationPath;
 export const selectCurrentStatsData = (state) =>
-  state.treemap.mainTreemap.currentStatsData;
+  goThrough(state.treemap.tree, state.treemap.mainTreemap.currentStatsPath);
+
 export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
