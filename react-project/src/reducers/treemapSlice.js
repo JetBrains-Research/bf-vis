@@ -4,32 +4,57 @@ import {createSlice} from "@reduxjs/toolkit";
 import {gitRepoDirData} from "../data/project_data_recalculating";
 import {calculateBusFactor} from "../utils/BusFactorUtil";
 
-const fullData = gitRepoDirData;
-const initialMiniTreeMapData = initializeBusFactorDeltaProperties(fullData);
+const defaultTree = {
+  "name": "PlaceHolder",
+  "path": ".",
+  "bytes": 1,
+  "busFactorStatus": {
+    "busFactor": 1
+  },
+  "users": [
+    {
+      "email": "place.holder@mail.com",
+      "authorship": 0.5
+    },],
+  "children": [
+    {
+      "name": "place_holder",
+      "path": "/place_holder",
+      "bytes": 1,
+      "busFactorStatus": {
+        "old": true
+      }
+    },]
+}
 
-// Initial State for this slice
-const defaultState = {
-  tree: fullData,
-  mainTreemap: {
-    currentStatsPath: fullData.path,
-    currentVisualizationPath: fullData.path,
-    ignored: [],
-    isRecalculationEnabled: false,
-    previousPathStack: [],
-  },
-  simulation: {
-    isSimulationMode: false,
-    lastUsedRemovedAuthorsList: [],
-    miniTreemap: {
+function convertTreeToState(tree) {
+  // const initializedTreeMapData =
+  //   initializeBusFactorDeltaProperties(tree);
+  return {
+    tree: tree,
+    mainTreemap: {
+      currentStatsPath: tree.path,
+      currentVisualizationPath: tree.path,
+      ignored: [],
+      isRecalculationEnabled: false,
       previousPathStack: [],
-      previousVisualizationData: [],
-      visualizationData: initialMiniTreeMapData,
-      visualizationPath: fullData.path,
     },
-    removedAuthors: [],
-  },
-  filters: [],
-};
+    simulation: {
+      isSimulationMode: false,
+      lastUsedRemovedAuthorsList: [],
+      miniTreemap: {
+        previousPathStack: [],
+        previousVisualizationData: [],
+        // TODO: remove
+        visualizationData: tree,
+        visualizationPath: tree.path,
+      },
+      removedAuthors: [],
+    },
+    filters: [],
+  };
+}
+
 
 function goThrough(state, path) {
   if (path === ".") return state
@@ -50,7 +75,7 @@ function getDataRecalculculated(fullData, pathQuery, developersToRemove) {
   return result;
 }
 
-function initializeBusFactorDeltaProperties(dataRootNode) {
+export function initializeBusFactorDeltaProperties(dataRootNode) {
   if (dataRootNode == null) throw new Error("Empty data file");
 
   if (!("busFactorStatus" in dataRootNode)) {
@@ -170,17 +195,20 @@ function getDifference(a1, a2) {
 // Definition of the slice and its reducer function
 const treemapSlice = createSlice({
   name: "treemap",
-  initialState: defaultState,
+  initialState: convertTreeToState(defaultTree),
   reducers: {
+    setNewTree: (state, action) => {
+      return {...convertTreeToState(action.payload)}
+    },
     // not as useful anymore, URL takes precedence, or at least, it should
     returnMainTreemapHome: (state) => {
-      let newData = goThrough(fullData, ".");
+      let newData = goThrough(state.tree, ".");
       state.mainTreemap.currentVisualizationPath = newData.path;
       state.mainTreemap.currentStatsPath = newData.path;
     },
     returnMiniTreemapHome: (state) => {
       let newData = getDataRecalculculated(
-        fullData,
+        state.tree,
         ".",
         state.simulation.removedAuthors
       );
@@ -195,7 +223,7 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentStatsPath
       ) {
         const newPath = `${action.payload.path}`;
-        let newData = goThrough(fullData, newPath);
+        let newData = goThrough(state.tree, newPath);
         console.log("scopeStatsIn", newData, newPath);
         if (newData) {
           state.mainTreemap.currentStatsPath = newPath;
@@ -211,7 +239,7 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentVisualizationPath
       ) {
         const nextPath = `${action.payload.path}`;
-        let newData = goThrough(fullData, nextPath);
+        let newData = goThrough(state.tree, nextPath);
         console.log("scopeTreemapIn", newData, nextPath);
 
         if (newData && newData.children) {
@@ -226,6 +254,7 @@ const treemapSlice = createSlice({
     // click the back button
     scopeMainTreemapOut: (state) => {
       const nextPath = state.mainTreemap.previousPathStack.pop();
+      const fullData = state.tree
 
       if (nextPath) {
         if (nextPath === ".") {
@@ -245,11 +274,11 @@ const treemapSlice = createSlice({
       if (action.payload) {
         const nextPath = `${action.payload.path}`;
         let newData = getDataRecalculculated(
-          initialMiniTreeMapData,
+          state.tree,
           nextPath,
           state.simulation.removedAuthors
         );
-        let oldData = goThrough(initialMiniTreeMapData, nextPath);
+        let oldData = goThrough(state.tree, nextPath);
         let result = getBusFactorDeltas(oldData, newData);
         state.simulation.lastUsedRemovedAuthorsList =
           state.simulation.removedAuthors;
@@ -270,11 +299,11 @@ const treemapSlice = createSlice({
     scopeMiniTreemapOut: (state, action) => {
       const nextPath = action.payload.path;
       let newData = getDataRecalculculated(
-        initialMiniTreeMapData,
+        state.tree,
         nextPath,
         state.simulation.removedAuthors
       );
-      let oldData = goThrough(initialMiniTreeMapData, nextPath);
+      let oldData = goThrough(state.tree, nextPath);
       let result = getBusFactorDeltas(oldData, newData);
       console.log("scopeTreemapOut", newData, nextPath);
       if (newData && newData.children) {
@@ -333,6 +362,7 @@ const treemapSlice = createSlice({
 
 // Exports
 export const {
+  setNewTree,
   // Treemap Navigation actions
   scopeStatsIn,
   scopeMainTreemapIn,
