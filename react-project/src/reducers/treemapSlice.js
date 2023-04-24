@@ -27,8 +27,6 @@ const defaultTree = {
 }
 
 function convertTreeToState(tree) {
-  // const initializedTreeMapData =
-  //   initializeBusFactorDeltaProperties(tree);
   return {
     tree: tree,
     mainTreemap: {
@@ -44,7 +42,6 @@ function convertTreeToState(tree) {
       miniTreemap: {
         previousPathStack: [],
         previousVisualizationData: [],
-        visualizationData: initializeBusFactorDeltaProperties(tree),
         visualizationPath: tree.path,
       },
       removedAuthors: [],
@@ -54,11 +51,11 @@ function convertTreeToState(tree) {
 }
 
 
-function goThrough(state, path) {
-  if (path === ".") return state
+function goThroughTree(tree, path) {
+  if (path === ".") return tree
 
   const parts = path.split('/')
-  let node = state
+  let node = tree
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i]
     if (i === 0 && part === "") continue
@@ -68,9 +65,8 @@ function goThrough(state, path) {
 }
 
 function getDataRecalculculated(fullData, pathQuery, developersToRemove) {
-  let newData = goThrough(fullData, pathQuery);
-  let result = calculateBusFactor(newData, developersToRemove);
-  return result;
+  let newData = goThroughTree(fullData, pathQuery);
+  return calculateBusFactor(newData, developersToRemove);
 }
 
 export function initializeBusFactorDeltaProperties(node) {
@@ -236,7 +232,7 @@ const treemapSlice = createSlice({
       ) {
         const newPath = `${action.payload.path}`;
         // TODO: delete?
-        let newData = goThrough(state.tree, newPath);
+        let newData = goThroughTree(state.tree, newPath);
         console.log("scopeStatsIn", newData, newPath);
         if (newData) {
           return {
@@ -258,7 +254,7 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentVisualizationPath
       ) {
         const nextPath = `${action.payload.path}`;
-        let newData = goThrough(state.tree, nextPath);
+        let newData = goThroughTree(state.tree, nextPath);
         console.log("scopeTreemapIn", newData, nextPath);
 
         if (newData && newData.children) {
@@ -273,6 +269,13 @@ const treemapSlice = createSlice({
               previousPathStack: prevStack,
               currentVisualizationPath: nextPath,
               currentStatsPath: nextPath
+            },
+            simulation: {
+              ...state.simulation,
+              miniTreemap: {
+                ...state.simulation.miniTreemap,
+                visualizationPath: nextPath
+              }
             }
           }
         }
@@ -286,7 +289,7 @@ const treemapSlice = createSlice({
       const fullData = state.tree
 
       if (nextPath) {
-        let newData = goThrough(fullData, nextPath);
+        let newData = goThroughTree(fullData, nextPath);
         console.log("scopeTreemapOut", newData, nextPath);
         return {
           ...state,
@@ -295,6 +298,13 @@ const treemapSlice = createSlice({
             previousPathStack: newStack,
             currentVisualizationPath: nextPath,
             currentStatsPath: nextPath
+          },
+          simulation: {
+            ...state.simulation,
+            miniTreemap: {
+              ...state.simulation.miniTreemap,
+              visualizationPath: nextPath
+            }
           }
         }
       }
@@ -302,64 +312,36 @@ const treemapSlice = createSlice({
     scopeMiniTreemapIn: (state, action) => {
       if (action.payload) {
         const nextPath = `${action.payload.path}`;
-        let newData = getDataRecalculculated(
-          state.tree,
-          nextPath,
-          state.simulation.removedAuthors
-        );
-        let oldData = goThrough(state.tree, nextPath);
-        let result = getBusFactorDeltas(oldData, newData);
         console.log(
           "scopeMiniTreemapIn",
-          newData,
           nextPath,
           state.simulation.removedAuthors,
-          result
         );
 
-        if (newData && newData.children) {
-          return {
-            ...state,
-            simulation: {
-              ...state.simulation,
-              lastUsedRemovedAuthorsList: state.simulation.removedAuthors,
-              miniTreemap: {
-                ...state.simulation.miniTreemap,
-                visualizationData: result,
-                visualizationPath: nextPath
-              }
-            }
-          }
-        }
         return {
           ...state,
           simulation: {
             ...state.simulation,
-            lastUsedRemovedAuthorsList: state.simulation.removedAuthors
+            lastUsedRemovedAuthorsList: state.simulation.removedAuthors,
+            miniTreemap: {
+              ...state.simulation.miniTreemap,
+              visualizationPath: nextPath
+            }
           }
         }
       }
     },
     scopeMiniTreemapOut: (state, action) => {
       const nextPath = action.payload.path;
-      let newData = getDataRecalculculated(
-        state.tree,
-        nextPath,
-        state.simulation.removedAuthors
-      );
-      let oldData = goThrough(state.tree, nextPath);
-      let result = getBusFactorDeltas(oldData, newData);
-      console.log("scopeTreemapOut", newData, nextPath);
-      if (newData && newData.children) {
-        return {
-          ...state,
-          simulation: {
-            ...state.simulation,
-            miniTreemap: {
-              ...state.simulation.miniTreemap,
-              visualizationData: result,
-              visualizationPath: nextPath
-            }
+      console.log("scopeMiniTreemapOut",
+        nextPath);
+      return {
+        ...state,
+        simulation: {
+          ...state.simulation,
+          miniTreemap: {
+            ...state.simulation.miniTreemap,
+            visualizationPath: nextPath
           }
         }
       }
@@ -390,16 +372,22 @@ const treemapSlice = createSlice({
         filters: []
       }
     },
-    enableSimulationMode: (state) => {
+    enableSimulationMode: (state, action) => {
       return {
         ...state,
-        isSimulationMode: true
+        simulation: {
+          ...state.simulation,
+          isSimulationMode: true
+        }
       }
     },
-    disableSimulationMode: (state) => {
+    disableSimulationMode: (state, action) => {
       return {
         ...state,
-        isSimulationMode: false
+        simulation: {
+          ...state.simulation,
+          isSimulationMode: false
+        }
       }
     },
     addAuthorToRemovalList: (state, action) => {
@@ -467,11 +455,11 @@ export const {
 //treemap data selectors
 export const selectFullData = (state) => state.treemap.mainTreemap.fullData;
 export const selectCurrentVisualizationData = (state) =>
-  goThrough(state.treemap.tree, state.treemap.mainTreemap.currentVisualizationPath);
+  goThroughTree(state.treemap.tree, state.treemap.mainTreemap.currentVisualizationPath);
 export const selectCurrentVisualizationPath = (state) =>
   state.treemap.mainTreemap.currentVisualizationPath;
 export const selectCurrentStatsData = (state) =>
-  goThrough(state.treemap.tree, state.treemap.mainTreemap.currentStatsPath);
+  goThroughTree(state.treemap.tree, state.treemap.mainTreemap.currentStatsPath);
 
 export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
@@ -480,8 +468,21 @@ export const selectAllFilters = (state) => state.treemap.filters;
 //simulation mode selectors
 export const isSimulationMode = (state) =>
   state.treemap.simulation.isSimulationMode;
-export const simulationVisualizationData = (state) =>
-  state.treemap.simulation.miniTreemap.visualizationData;
+export const simulationVisualizationData = (state) => {
+  const path = state.treemap.simulation.miniTreemap.visualizationPath
+  if (state.treemap.simulation.isSimulationMode) {
+    const newData = getDataRecalculculated(
+      state.treemap.tree,
+      path,
+      state.treemap.simulation.removedAuthors
+    );
+    let oldData = goThroughTree(state.treemap.tree, path);
+    return getBusFactorDeltas(oldData, newData);
+  }
+  // TODO: replace
+  return initializeBusFactorDeltaProperties(goThroughTree(state.treemap.tree, path))
+}
+
 export const simulationVisualizationPath = (state) =>
   state.treemap.simulation.miniTreemap.visualizationPath;
 export const selectRemovedAuthors = (state) =>

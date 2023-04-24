@@ -87,7 +87,6 @@ function Visualization() {
       if (urlStatsPath && urlStatsPath !== urlDataPath) {
         batch(() => {
           dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
-          dispatch(scopeMiniTreemapIn(payloadGenerator("path", urlDataPath)));
           dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
         });
       } else {
@@ -100,7 +99,6 @@ function Visualization() {
         }
         batch(() => {
           dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
-          dispatch(scopeMiniTreemapIn(payloadGenerator("path", urlDataPath)));
         });
       }
     }

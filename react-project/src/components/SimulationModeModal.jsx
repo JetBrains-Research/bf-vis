@@ -1,32 +1,35 @@
 /** @format */
 
-import { format } from "../d3/format.tsx";
+import {format} from "../d3/format.tsx";
 import * as tiling from "../d3/tiling.tsx";
-import { useState } from "react";
-import { CONFIG } from "../config";
+import React, {useState} from "react";
+import {CONFIG} from "../config";
 import TreeMap from "./TreeMap";
 
-import { generateBreadcrumb } from "../utils/url.tsx";
-import { useTranslation } from "react-i18next";
-import { InfoPanel } from "./InfoPanel";
+import {generateBreadcrumb} from "../utils/url.tsx";
+import {useTranslation} from "react-i18next";
+import {InfoPanel} from "./InfoPanel";
 import {
-  addAuthorToRemovalList,
-  selectRemovedAuthors,
+  addAuthorToRemovalList, disableSimulationMode, enableSimulationMode,
   scopeMiniTreemapIn,
+  selectRemovedAuthors,
   undoAuthorRemoval,
 } from "../reducers/treemapSlice.js";
-import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
-import { useSelector } from "react-redux";
+import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
+import {useSelector} from "react-redux";
+import {Modal} from "react-bootstrap";
+import {dispatch} from "d3";
 
 function SimulationModeModal(props) {
-  const { t, i18n } = useTranslation();
+  const {t, i18n} = useTranslation();
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
   const simulationVisualizationData = props.simulationData;
-  const simulationVisualizationPath = props.simulationPath; 
+  const simulationVisualizationPath = props.simulationPath;
   const authorsList = "users" in simulationVisualizationData ? [...simulationVisualizationData.users] : undefined;
-  
+  const [show, setShow] = useState(false);
+
   const setTreemapPathOutFunc = (path) => {
     props.reduxNavFunctions.dispatch(
       props.reduxNavFunctions.scopeMiniTreemapOut(payloadGenerator('path', path))
@@ -37,7 +40,7 @@ function SimulationModeModal(props) {
       props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator('path', "."))
     );
   }
-    
+
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
@@ -85,8 +88,7 @@ function SimulationModeModal(props) {
           payloadGenerator("path", simulationVisualizationPath)
         )
       );
-    }
-    else if (e.target.checked) {
+    } else if (e.target.checked) {
       props.reduxNavFunctions.dispatch(undoAuthorRemoval([email]));
       props.reduxNavFunctions.dispatch(
         scopeMiniTreemapIn(
@@ -95,6 +97,21 @@ function SimulationModeModal(props) {
       );
     }
   };
+
+  const handleClose = () => {
+    console.log("close called")
+    setShow(false)
+    props.reduxNavFunctions.dispatch(
+      disableSimulationMode()
+    )
+  };
+  const handleShow = () => {
+    console.log("show called")
+    setShow(true);
+    props.reduxNavFunctions.dispatch(
+      enableSimulationMode()
+    )
+  }
 
   return (
     <div
@@ -127,75 +144,67 @@ function SimulationModeModal(props) {
         <button
           type="button"
           className="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#exampleModal">
+          onClick={handleShow}
+        >
           Configure Simulation
         </button>
       </div>
 
       {/* Modal */}
-      <div
-        className="modal fade"
-        id="exampleModal"
-        tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1
-                className="modal-title fs-5"
-                id="exampleModalLabel">
-                Simulation Mode Configuration
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-              <div className="col-auto">
-                <TreeMap
-                  colorDefinitions={CONFIG.general.colors.jetbrains}
-                  containerId={CONFIG.simulation.ids.treemapContainerId}
-                  data={simulationVisualizationData}
-                  dataNormalizationFunction={Math.log2}
-                  dataPath={simulationVisualizationPath}
-                  initialHeight={CONFIG.simulation.layout.height}
-                  initialWidth={CONFIG.simulation.layout.width}
-                  padding={CONFIG.simulation.layout.overallPadding}
-                  svgId={CONFIG.simulation.ids.treemapSvgId}
-                  tilingFunction={tiling.squarify}
-                  topPadding={CONFIG.simulation.layout.topPadding}
-                  type="mini"
-                  reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
+      <Modal show={show} onHide={handleClose} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Simulation Mode Configuration
+          </Modal.Title>
+        </Modal.Header>
 
+        <Modal.Body>
+          <div>
+            <div className="col-auto">
+              <TreeMap
+                colorDefinitions={CONFIG.general.colors.jetbrains}
+                containerId={CONFIG.simulation.ids.treemapContainerId}
+                data={simulationVisualizationData}
+                dataNormalizationFunction={Math.log2}
+                dataPath={simulationVisualizationPath}
+                initialHeight={CONFIG.simulation.layout.height}
+                initialWidth={CONFIG.simulation.layout.width}
+                padding={CONFIG.simulation.layout.overallPadding}
+                svgId={CONFIG.simulation.ids.treemapSvgId}
+                tilingFunction={tiling.squarify}
+                topPadding={CONFIG.simulation.layout.topPadding}
+                type="mini"
+                reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
+
+              <center>
                 <h6>Path</h6>
-                <nav aria-label="breadcrumb">
-                  <ol className="breadcrumb">
-                    {simulationVisualizationPath
-                      .split("/")
-                      .map((pathElement, i) => (
-                        <li
-                          className={
-                            i <
-                            simulationVisualizationPath.split("/").length - 1
-                              ? "btn btn-link breadcrumb-item p-1"
-                              : "btn btn-link breadcrumb-item active p-1"
-                          }
-                          key={pathElement}
-                          onClick={() =>
-                            setTreemapPathOutFunc(
-                              generateBreadcrumb(i, simulationVisualizationPath)
-                            )
-                          }>
-                          {pathElement}
-                        </li>
-                      ))}
-                  </ol>
-                </nav>
+              </center>
 
+              <nav aria-label="breadcrumb">
+                <ol className="breadcrumb">
+                  {simulationVisualizationPath
+                    .split("/")
+                    .map((pathElement, i) => (
+                      <li
+                        className={
+                          i <
+                          simulationVisualizationPath.split("/").length - 1
+                            ? "btn btn-link breadcrumb-item p-1"
+                            : "btn btn-link breadcrumb-item active p-1"
+                        }
+                        key={pathElement}
+                        onClick={() =>
+                          setTreemapPathOutFunc(
+                            generateBreadcrumb(i, simulationVisualizationPath)
+                          )
+                        }>
+                        {pathElement}
+                      </li>
+                    ))}
+                </ol>
+              </nav>
+
+              <center>
                 <div
                   className="btn-group"
                   role="group">
@@ -212,11 +221,11 @@ function SimulationModeModal(props) {
                         .split("/")
                         .filter((r) => r !== "").length > 1
                         ? setTreemapPathOutFunc(
-                            simulationVisualizationPath
-                              .split("/")
-                              .slice(0, -1)
-                              .join("/")
-                          )
+                          simulationVisualizationPath
+                            .split("/")
+                            .slice(0, -1)
+                            .join("/")
+                        )
                         : setTreemapPathOutFunc(".")
                     }>
                     &uarr; Up
@@ -226,89 +235,89 @@ function SimulationModeModal(props) {
                     className="btn"
                     style={{
                       backgroundColor:
-                        CONFIG.general.colors.jetbrains.brightRed,
+                      CONFIG.general.colors.jetbrains.brightRed,
                       color: "white",
                     }}
                     id="reset"
                     onClick={() => returnTreeMapHome()}>
-                    <i class="bi bi-house"></i> Home
+                    <i className="bi bi-house"></i> Home
                   </button>
                 </div>
-              </div>
+              </center>
+            </div>
 
-              <div className="col-auto">
-                <div className="input-group">
-                  <input
-                    type="text"
-                    className="form-control"
-                    onChange={handleSearchTextChange}
-                    aria-describedby="input-file-extension"></input>
+            <div className="col-auto">
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  onChange={handleSearchTextChange}
+                  aria-describedby="input-file-extension"></input>
 
-                  <button
-                    className="btn btn-dark"
-                    type="button"
-                    id="button-filter-add">
-                    Search
-                  </button>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  maxHeight: "30vh",
-                  overflowY: "scroll",
-                }}>
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Included?</th>
-                      <th>Email</th>
-                      <th>Authorship</th>
-                      <th>Relative Contribution (to current location)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {authorsList && authorsListContributionPercentage
-                      ? authorsListContributionPercentage
-                          .filter((element) =>
-                            element["email"].includes(nameFilterValue)
-                          )
-                          .map((authorScorePair, index) => (
-                            <tr key={authorScorePair["email"]}>
-                              <td>{index + 1}</td>
-                              <td>
-                                <div className="form-check form-check-inline">
-                                  <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id={authorScorePair.email}
-                                    checked={authorScorePair.included}
-                                    onChange={(e) =>
-                                      handleAuthorCheckmark(e, authorScorePair)
-                                    }></input>
-                                </div>
-                              </td>
-                              <td>{authorScorePair["email"]}</td>
-                              <td>
-                                {" "}
-                                {formatSI(authorScorePair["authorship"])}
-                              </td>
-                              <td>
-                                {formatPercentage(
-                                  authorScorePair["relativeScore"]
-                                )}
-                              </td>
-                            </tr>
-                          ))
-                      : null}
-                  </tbody>
-                </table>
+                <button
+                  className="btn btn-dark"
+                  type="button"
+                  id="button-filter-add">
+                  Search
+                </button>
               </div>
             </div>
+
+            <div
+              style={{
+                maxHeight: "30vh",
+                overflowY: "scroll",
+              }}>
+              <table className="table table-striped">
+                <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Included?</th>
+                  <th>Email</th>
+                  <th>Authorship</th>
+                  <th>Relative Contribution (to current location)</th>
+                </tr>
+                </thead>
+                <tbody>
+                {authorsList && authorsListContributionPercentage
+                  ? authorsListContributionPercentage
+                    .filter((element) =>
+                      element["email"].includes(nameFilterValue)
+                    )
+                    .map((authorScorePair, index) => (
+                      <tr key={authorScorePair["email"]}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <div className="form-check form-check-inline">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              id={authorScorePair.email}
+                              checked={authorScorePair.included}
+                              onChange={(e) =>
+                                handleAuthorCheckmark(e, authorScorePair)
+                              }></input>
+                          </div>
+                        </td>
+                        <td>{authorScorePair["email"]}</td>
+                        <td>
+                          {" "}
+                          {formatSI(authorScorePair["authorship"])}
+                        </td>
+                        <td>
+                          {formatPercentage(
+                            authorScorePair["relativeScore"]
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  : null}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
