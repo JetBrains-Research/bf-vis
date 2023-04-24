@@ -56,9 +56,7 @@ function SimulationModeModal(props) {
           authorship: authorContributionPair.authorship,
           relativeScore:
             authorContributionPair.authorship / cumulativeAuthorship,
-          included: removedAuthorsList.includes(authorContributionPair.email)
-            ? false
-            : true,
+          included: !removedAuthorsList.includes(authorContributionPair.email),
         };
       }
     );
