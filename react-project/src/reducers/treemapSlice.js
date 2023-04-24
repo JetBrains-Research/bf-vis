@@ -84,8 +84,17 @@ export function initializeBusFactorDeltaProperties(node) {
           Object.fromEntries(Object.entries(it).filter(e => e[0] !== 'children'))
         if (!result.busFactorStatus) {
           result["busFactorStatus"] = {}
+          return result
         }
-        return result
+        return {
+          ...result,
+          busFactorStatus: {
+            ...result.busFactorStatus,
+            nodeStatus: "original",
+            delta: 0
+          }
+        }
+
       })
     }
   }
