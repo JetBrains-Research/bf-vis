@@ -10,7 +10,9 @@ import {generateBreadcrumb} from "../utils/url.tsx";
 import {useTranslation} from "react-i18next";
 import {InfoPanel} from "./InfoPanel";
 import {
-  addAuthorToRemovalList, disableSimulationMode, enableSimulationMode,
+  addAuthorToRemovalList,
+  disableSimulationMode,
+  enableSimulationMode,
   scopeMiniTreemapIn,
   selectRemovedAuthors,
   undoAuthorRemoval,
@@ -18,7 +20,6 @@ import {
 import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
 import {useSelector} from "react-redux";
 import {Modal} from "react-bootstrap";
-import {dispatch} from "d3";
 
 function SimulationModeModal(props) {
   const {t, i18n} = useTranslation();
@@ -161,50 +162,48 @@ function SimulationModeModal(props) {
         <Modal.Body>
           <div>
             <div className="col-auto">
-              <TreeMap
-                colorDefinitions={CONFIG.general.colors.jetbrains}
-                containerId={CONFIG.simulation.ids.treemapContainerId}
-                data={simulationVisualizationData}
-                dataNormalizationFunction={Math.log2}
-                dataPath={simulationVisualizationPath}
-                initialHeight={CONFIG.simulation.layout.height}
-                initialWidth={CONFIG.simulation.layout.width}
-                padding={CONFIG.simulation.layout.overallPadding}
-                svgId={CONFIG.simulation.ids.treemapSvgId}
-                tilingFunction={tiling.squarify}
-                topPadding={CONFIG.simulation.layout.topPadding}
-                type="mini"
-                reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
-
               <center>
+
+                <TreeMap
+                  colorDefinitions={CONFIG.general.colors.jetbrains}
+                  containerId={CONFIG.simulation.ids.treemapContainerId}
+                  data={simulationVisualizationData}
+                  dataNormalizationFunction={Math.log2}
+                  dataPath={simulationVisualizationPath}
+                  initialHeight={CONFIG.simulation.layout.height}
+                  initialWidth={CONFIG.simulation.layout.width}
+                  padding={CONFIG.simulation.layout.overallPadding}
+                  svgId={CONFIG.simulation.ids.treemapSvgId}
+                  tilingFunction={tiling.squarify}
+                  topPadding={CONFIG.simulation.layout.topPadding}
+                  type="mini"
+                  reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
+
                 <h6>Path</h6>
-              </center>
+                <nav aria-label="breadcrumb">
+                  <ol className="breadcrumb">
+                    {simulationVisualizationPath
+                      .split("/")
+                      .map((pathElement, i) => (
+                        <li
+                          className={
+                            i <
+                            simulationVisualizationPath.split("/").length - 1
+                              ? "btn btn-link breadcrumb-item p-1"
+                              : "btn btn-link breadcrumb-item active p-1"
+                          }
+                          key={pathElement}
+                          onClick={() =>
+                            setTreemapPathOutFunc(
+                              generateBreadcrumb(i, simulationVisualizationPath)
+                            )
+                          }>
+                          {pathElement}
+                        </li>
+                      ))}
+                  </ol>
+                </nav>
 
-              <nav aria-label="breadcrumb">
-                <ol className="breadcrumb">
-                  {simulationVisualizationPath
-                    .split("/")
-                    .map((pathElement, i) => (
-                      <li
-                        className={
-                          i <
-                          simulationVisualizationPath.split("/").length - 1
-                            ? "btn btn-link breadcrumb-item p-1"
-                            : "btn btn-link breadcrumb-item active p-1"
-                        }
-                        key={pathElement}
-                        onClick={() =>
-                          setTreemapPathOutFunc(
-                            generateBreadcrumb(i, simulationVisualizationPath)
-                          )
-                        }>
-                        {pathElement}
-                      </li>
-                    ))}
-                </ol>
-              </nav>
-
-              <center>
                 <div
                   className="btn-group"
                   role="group">
