@@ -1,7 +1,6 @@
 /** @format */
 
 import {createSlice} from "@reduxjs/toolkit";
-import {gitRepoDirData} from "../data/project_data_recalculating";
 import {calculateBusFactor} from "../utils/BusFactorUtil";
 
 const defaultTree = {
@@ -45,8 +44,7 @@ function convertTreeToState(tree) {
       miniTreemap: {
         previousPathStack: [],
         previousVisualizationData: [],
-        // TODO: remove
-        visualizationData: tree,
+        visualizationData: initializeBusFactorDeltaProperties(tree),
         visualizationPath: tree.path,
       },
       removedAuthors: [],
@@ -75,34 +73,27 @@ function getDataRecalculculated(fullData, pathQuery, developersToRemove) {
   return result;
 }
 
-export function initializeBusFactorDeltaProperties(dataRootNode) {
-  if (dataRootNode == null) throw new Error("Empty data file");
+export function initializeBusFactorDeltaProperties(node) {
+  if (node == null) throw new Error("Empty data file");
 
-  if (!("busFactorStatus" in dataRootNode)) {
-    dataRootNode.busFactorStatus = {};
-  }
-  Object.defineProperties(dataRootNode.busFactorStatus, {
-    nodeStatus: {
-      value: "original",
-      writable: true,
-    },
-    delta: {
-      value: 0,
-      writable: true,
-    },
-  });
-  // dataRootNode.busFactorStatus.nodeStatus = "original";
-  // dataRootNode.busFactorStatus.delta = 0;
-
-  if (dataRootNode.children) {
-    for (let count = 0; count < dataRootNode.children.length; count++) {
-      dataRootNode.children[count] = initializeBusFactorDeltaProperties(
-        dataRootNode.children[count]
-      );
+  if (node.children) {
+    return {
+      ...node,
+      children: node.children.map((it) => {
+        const result =
+          Object.fromEntries(Object.entries(it).filter(e => e[0] !== 'children'))
+        if (!result.busFactorStatus) {
+          result["busFactorStatus"] = {}
+        }
+        return result
+      })
     }
   }
 
-  return dataRootNode;
+  return {
+    ...node,
+    ...(!node.busFactorStatus) && {busFactorStatus: {}},
+  }
 }
 
 export function getRecalculatedBusFactorData(baseData, developersToRemove) {
@@ -125,10 +116,6 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
 
   if (oldDataRootNode === null) {
     throw new Error("Old data is null!");
-  }
-
-  if (newDataRootNodeCopy === null) {
-    throw new Error("New data is null!");
   }
 
   if (oldDataRootNode.name !== newDataRootNodeCopy.name) {
@@ -202,9 +189,15 @@ const treemapSlice = createSlice({
     },
     // not as useful anymore, URL takes precedence, or at least, it should
     returnMainTreemapHome: (state) => {
-      let newData = goThrough(state.tree, ".");
-      state.mainTreemap.currentVisualizationPath = newData.path;
-      state.mainTreemap.currentStatsPath = newData.path;
+      const path = state.tree.path
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          currentVisualizationPath: path,
+          currentStatsPath: path
+        }
+      }
     },
     returnMiniTreemapHome: (state) => {
       let newData = getDataRecalculculated(
@@ -212,8 +205,19 @@ const treemapSlice = createSlice({
         ".",
         state.simulation.removedAuthors
       );
-      state.simulation.miniTreemap.visualizationData = newData;
-      state.simulation.miniTreemap.visualizationPath = newData.path;
+
+      return {
+        ...state,
+        simulation: {
+          ...state.simulation,
+          miniTreemap: {
+            ...state.simulation.miniTreemap,
+            // TODO: change
+            visualizationData: newData,
+            visualizationPath: newData.path
+          }
+        }
+      }
     },
     // click on a file node
     scopeStatsIn: (state, action) => {
@@ -223,13 +227,20 @@ const treemapSlice = createSlice({
         action.payload.path !== state.mainTreemap.currentStatsPath
       ) {
         const newPath = `${action.payload.path}`;
+        // TODO: delete?
         let newData = goThrough(state.tree, newPath);
         console.log("scopeStatsIn", newData, newPath);
         if (newData) {
-          state.mainTreemap.currentStatsPath = newPath;
-        } else {
-          console.log("scopeStatsIn", "not changed");
+          return {
+            ...state,
+            mainTreemap: {
+              ...state.mainTreemap,
+              currentStatsPath: newPath
+            }
+          }
         }
+        console.log("scopeStatsIn", "not changed");
+        return state
       }
     },
     // click on a folder node
@@ -243,29 +254,39 @@ const treemapSlice = createSlice({
         console.log("scopeTreemapIn", newData, nextPath);
 
         if (newData && newData.children) {
-          state.mainTreemap.previousPathStack.push(
+          const prevStack = Array.from(state.mainTreemap.previousPathStack)
+          prevStack.push(
             state.mainTreemap.currentVisualizationPath
           );
-          state.mainTreemap.currentVisualizationPath = nextPath;
-          state.mainTreemap.currentStatsPath = nextPath;
+          return {
+            ...state,
+            mainTreemap: {
+              ...state.mainTreemap,
+              previousPathStack: prevStack,
+              currentVisualizationPath: nextPath,
+              currentStatsPath: nextPath
+            }
+          }
         }
+        return state
       }
     },
     // click the back button
     scopeMainTreemapOut: (state) => {
-      const nextPath = state.mainTreemap.previousPathStack.pop();
+      const newStack = Array.from(state.mainTreemap.previousPathStack)
+      const nextPath = newStack.pop();
       const fullData = state.tree
 
       if (nextPath) {
-        if (nextPath === ".") {
-          state.mainTreemap.currentVisualizationPath = fullData.path;
-          state.mainTreemap.currentStatsPath = fullData.path;
-        } else {
-          let newData = goThrough(fullData, nextPath);
-          console.log("scopeTreemapOut", newData, nextPath);
-          if (newData && newData.children) {
-            state.mainTreemap.currentVisualizationPath = nextPath;
-            state.mainTreemap.currentStatsPath = nextPath;
+        let newData = goThrough(fullData, nextPath);
+        console.log("scopeTreemapOut", newData, nextPath);
+        return {
+          ...state,
+          mainTreemap: {
+            ...state.mainTreemap,
+            previousPathStack: newStack,
+            currentVisualizationPath: nextPath,
+            currentStatsPath: nextPath
           }
         }
       }
@@ -280,8 +301,6 @@ const treemapSlice = createSlice({
         );
         let oldData = goThrough(state.tree, nextPath);
         let result = getBusFactorDeltas(oldData, newData);
-        state.simulation.lastUsedRemovedAuthorsList =
-          state.simulation.removedAuthors;
         console.log(
           "scopeMiniTreemapIn",
           newData,
@@ -291,8 +310,25 @@ const treemapSlice = createSlice({
         );
 
         if (newData && newData.children) {
-          state.simulation.miniTreemap.visualizationData = result;
-          state.simulation.miniTreemap.visualizationPath = nextPath;
+          return {
+            ...state,
+            simulation: {
+              ...state.simulation,
+              lastUsedRemovedAuthorsList: state.simulation.removedAuthors,
+              miniTreemap: {
+                ...state.simulation.miniTreemap,
+                visualizationData: result,
+                visualizationPath: nextPath
+              }
+            }
+          }
+        }
+        return {
+          ...state,
+          simulation: {
+            ...state.simulation,
+            lastUsedRemovedAuthorsList: state.simulation.removedAuthors
+          }
         }
       }
     },
@@ -307,55 +343,94 @@ const treemapSlice = createSlice({
       let result = getBusFactorDeltas(oldData, newData);
       console.log("scopeTreemapOut", newData, nextPath);
       if (newData && newData.children) {
-        state.simulation.miniTreemap.visualizationData = result;
-        state.simulation.miniTreemap.visualizationPath = nextPath;
+        return {
+          ...state,
+          simulation: {
+            ...state.simulation,
+            miniTreemap: {
+              ...state.simulation.miniTreemap,
+              visualizationData: result,
+              visualizationPath: nextPath
+            }
+          }
+        }
       }
     },
     addFilter: (state, action) => {
       const newFilterExps = action.payload;
-
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
-        state.filters = [...new Set(state.filters.concat(newFilterExps))];
+        return {
+          ...state,
+          filters: [...new Set(state.filters.concat(newFilterExps))]
+        }
       }
     },
     removeFilter: (state, action) => {
       const newFilterExps = action.payload;
-
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
-        state.filters = state.filters.filter(
-          (element) => !newFilterExps.includes(element)
-        );
+        return {
+          ...state,
+          filters: state.filters.filter(
+            (element) => !newFilterExps.includes(element)
+          )
+        }
       }
     },
     removeAllFilters: (state, action) => {
-      state.filters = [];
+      return {
+        ...state,
+        filters: []
+      }
     },
     enableSimulationMode: (state) => {
-      state.isSimulationMode = true;
+      // TODO: add new field with files and deltas
+      return {
+        ...state,
+        isSimulationMode: true
+      }
     },
     disableSimulationMode: (state) => {
-      state.isSimulationMode = false;
+      return {
+        ...state,
+        isSimulationMode: false
+      }
     },
     addAuthorToRemovalList: (state, action) => {
       const authors = action.payload;
-      state.simulation.lastUsedRemovedAuthorsList = selectRemovedAuthors;
-      state.simulation.removedAuthors = [
-        ...new Set(state.simulation.removedAuthors.concat(authors)),
-      ];
-
-      // let currentData = state.mainTreemap.currentVisualizationData;
-      // const newData = getDummySimulationModeComparisonData(currentData);
-      // state.simulation.miniTreemap.visualizationData = newData;
+      const removedAuthors = state.simulation.removedAuthors
+      return {
+        ...state,
+        simulation: {
+          ...state.simulation,
+          lastUsedRemovedAuthorsList: removedAuthors,
+          removedAuthors: [
+            ...new Set(state.simulation.removedAuthors.concat(authors)),
+          ]
+        }
+      }
     },
     undoAuthorRemoval: (state, action) => {
       const authors = action.payload;
-      state.simulation.removedAuthors = state.simulation.removedAuthors.filter(
-        (element) => !authors.includes(element)
-      );
+      return {
+        ...state,
+        simulation: {
+          ...state.simulation,
+          removedAuthors: state.simulation.removedAuthors.filter(
+            (element) => !authors.includes(element)
+          )
+        }
+      }
     },
     clearAuthorRemovalList: (state) => {
-      state.simulation.lastUsedRemovedAuthorsList = selectRemovedAuthors;
-      state.simulation.removedAuthors = [];
+      const removedAuthors = state.simulation.removedAuthors
+      return {
+        ...state,
+        simulation: {
+          ...state.simulation,
+          lastUsedRemovedAuthorsList: removedAuthors,
+          removedAuthors: []
+        }
+      }
     },
   },
 });
