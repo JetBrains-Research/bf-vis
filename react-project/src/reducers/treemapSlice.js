@@ -470,6 +470,7 @@ export const isSimulationMode = (state) =>
   state.treemap.simulation.isSimulationMode;
 export const simulationVisualizationData = (state) => {
   const path = state.treemap.simulation.miniTreemap.visualizationPath
+  // TODO: add recalculation logic authors
   if (state.treemap.simulation.isSimulationMode) {
     const newData = getDataRecalculculated(
       state.treemap.tree,
