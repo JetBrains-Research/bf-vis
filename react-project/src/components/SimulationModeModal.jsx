@@ -100,14 +100,12 @@ function SimulationModeModal(props) {
   };
 
   const handleClose = () => {
-    console.log("close called")
     setShow(false)
     props.reduxNavFunctions.dispatch(
       disableSimulationMode()
     )
   };
   const handleShow = () => {
-    console.log("show called")
     setShow(true);
     props.reduxNavFunctions.dispatch(
       enableSimulationMode()
