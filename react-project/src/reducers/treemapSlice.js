@@ -212,7 +212,6 @@ const treemapSlice = createSlice({
           ...state.simulation,
           miniTreemap: {
             ...state.simulation.miniTreemap,
-            // TODO: change
             visualizationData: newData,
             visualizationPath: newData.path
           }
@@ -383,7 +382,6 @@ const treemapSlice = createSlice({
       }
     },
     enableSimulationMode: (state) => {
-      // TODO: add new field with files and deltas
       return {
         ...state,
         isSimulationMode: true
