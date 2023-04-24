@@ -6,7 +6,7 @@ import {Provider, useDispatch} from "react-redux";
 
 import { BrowserRouter } from "react-router-dom";
 
-import App from "./components/App";
+import Visualization from "./components/Visualization";
 import { store } from "./store";
 import './i18n';
 
@@ -32,7 +32,7 @@ function AppM() {
     dispatch(setNewTree(tree))
   }, []);
 
-  return (<App/>)
+  return (<Visualization/>)
 }
 
 root.render(

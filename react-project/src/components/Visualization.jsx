@@ -29,7 +29,7 @@ import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
 
-function App() {
+function Visualization() {
   const dispatch = useDispatch();
 
   const currentVisualizationData = useDeferredValue(
@@ -160,4 +160,4 @@ function App() {
   );
 }
 
-export default App;
+export default Visualization;
