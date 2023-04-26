@@ -64,7 +64,7 @@ function goThroughTree(tree, path) {
   return node
 }
 
-function getDataRecalculculated(fullData, pathQuery, developersToRemove) {
+function getDataRecalculated(fullData, pathQuery, developersToRemove) {
   let newData = goThroughTree(fullData, pathQuery);
   return calculateBusFactor(newData, developersToRemove);
 }
@@ -205,7 +205,7 @@ const treemapSlice = createSlice({
       }
     },
     returnMiniTreemapHome: (state) => {
-      let newData = getDataRecalculculated(
+      let newData = getDataRecalculated(
         state.tree,
         ".",
         state.simulation.removedAuthors
@@ -472,7 +472,7 @@ export const simulationVisualizationData = (state) => {
   const path = state.treemap.simulation.miniTreemap.visualizationPath
   // TODO: add recalculation logic authors
   if (state.treemap.simulation.isSimulationMode) {
-    const newData = getDataRecalculculated(
+    const newData = getDataRecalculated(
       state.treemap.tree,
       path,
       state.treemap.simulation.removedAuthors
