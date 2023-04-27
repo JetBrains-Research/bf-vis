@@ -298,22 +298,22 @@ bus factor: ${
     .append("xhtml:i")
     .attr("class", CONFIG.treemap.classes.folderIcon)
     .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.icon.fontSize);
+    .style("font-size", CONFIG.treemap.children.icon.miniFontSize);
 
   textBox
     .append("xhtml:p")
     .text((d) => {
-      return `${d.data.name} ${
-        "delta" in d.data.busFactorStatus
-          ? "[" + d.data.busFactorStatus.delta + "]"
+      return ` ${
+        "delta" in d.data.busFactorStatus && d.data.busFactorStatus.delta !== 0
+          ? "[" + (d.data.busFactorStatus.busFactor - d.data.busFactorStatus.delta) + " -> " + d.data.busFactorStatus.busFactor + "]"
           : ""
-      }`;
+      } ${d.data.name}`;
     })
     .attr("class", "text-truncate")
     .attr("id", (d) => `p-${d.nodeUid}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.p.fontSize);
+    .style("font-size", CONFIG.treemap.children.p.miniFontSize);
 }
 
 export function drawTreemapFromGeneratedLayout(svg, root, setPathFunction) {
