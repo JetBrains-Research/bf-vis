@@ -33,15 +33,17 @@ function SimulationModeModal(props) {
 
   const setTreemapPathOutFunc = (path) => {
     props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapOut(payloadGenerator('path', path))
+      props.reduxNavFunctions.scopeMiniTreemapOut(
+        payloadGenerator("path", path)
+      )
     );
   };
   const returnTreeMapHome = () => {
     props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator('path', "."))
+      props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator("path", "."))
     );
-  }
 
+  }
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
@@ -121,7 +123,11 @@ function SimulationModeModal(props) {
         <InfoPanel
           divName="simInfoPanel"
           header="How does the simulation mode work?"
-          body={[t("simMode.general"), t("simMode.detail")]}></InfoPanel>
+          body={[
+            t("simMode.general"),
+            t("simMode.detail"),
+            t("simMode.links"),
+          ]}></InfoPanel>
         <a
           className=""
           data-bs-toggle="collapse"
@@ -177,8 +183,8 @@ function SimulationModeModal(props) {
                   type="mini"
                   reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
 
-                <h6>Path</h6>
                 <nav aria-label="breadcrumb">
+                  <strong>Path:</strong>
                   <ol className="breadcrumb">
                     {simulationVisualizationPath
                       .split("/")
@@ -201,10 +207,22 @@ function SimulationModeModal(props) {
                       ))}
                   </ol>
                 </nav>
+              </div>
 
-                <div
-                  className="btn-group"
-                  role="group">
+              <div className="col-auto">
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    onChange={handleSearchTextChange}
+                    aria-describedby="input-file-extension"></input>
+
+                  <button
+                    className="btn btn-dark"
+                    type="button"
+                    id="button-filter-add">
+                    Search
+                  </button>
                   <button
                     type="button"
                     className="btn"

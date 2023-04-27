@@ -11,9 +11,9 @@ function RightColumn(props) {
 
   return (
     <div className="col p-1">
+      <StatsPane data={statsData}></StatsPane>
       <LegendColor></LegendColor>
       <LegendSize></LegendSize>      
-      <StatsPane data={statsData}></StatsPane>
     </div>
   );
 }
