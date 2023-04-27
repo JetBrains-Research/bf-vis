@@ -1,14 +1,14 @@
 /** @format */
 
-import {format} from "../d3/format.tsx";
+import { format } from "../d3/format.tsx";
 import * as tiling from "../d3/tiling.tsx";
-import React, {useState} from "react";
-import {CONFIG} from "../config";
+import React, { useState } from "react";
+import { CONFIG } from "../config";
 import TreeMap from "./TreeMap";
 
-import {generateBreadcrumb} from "../utils/url.tsx";
-import {useTranslation} from "react-i18next";
-import {InfoPanel} from "./InfoPanel";
+import { generateBreadcrumb } from "../utils/url.tsx";
+import { useTranslation } from "react-i18next";
+import { InfoPanel } from "./InfoPanel";
 import {
   addAuthorToRemovalList,
   disableSimulationMode,
@@ -17,18 +17,22 @@ import {
   selectRemovedAuthors,
   undoAuthorRemoval,
 } from "../reducers/treemapSlice.js";
-import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
-import {useSelector} from "react-redux";
-import {Modal} from "react-bootstrap";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
+import { useSelector } from "react-redux";
+import { Modal, Table } from "react-bootstrap";
+import LegendSimColor from "./LegendSimColor.jsx";
 
 function SimulationModeModal(props) {
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
   const simulationVisualizationData = props.simulationData;
   const simulationVisualizationPath = props.simulationPath;
-  const authorsList = "users" in simulationVisualizationData ? [...simulationVisualizationData.users] : undefined;
+  const authorsList =
+    "users" in simulationVisualizationData
+      ? [...simulationVisualizationData.users]
+      : undefined;
   const [show, setShow] = useState(false);
 
   const setTreemapPathOutFunc = (path) => {
@@ -42,8 +46,7 @@ function SimulationModeModal(props) {
     props.reduxNavFunctions.dispatch(
       props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator("path", "."))
     );
-
-  }
+  };
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
@@ -102,17 +105,13 @@ function SimulationModeModal(props) {
   };
 
   const handleClose = () => {
-    setShow(false)
-    props.reduxNavFunctions.dispatch(
-      disableSimulationMode()
-    )
+    setShow(false);
+    props.reduxNavFunctions.dispatch(disableSimulationMode());
   };
   const handleShow = () => {
     setShow(true);
-    props.reduxNavFunctions.dispatch(
-      enableSimulationMode()
-    )
-  }
+    props.reduxNavFunctions.dispatch(enableSimulationMode());
+  };
 
   return (
     <div
@@ -149,25 +148,24 @@ function SimulationModeModal(props) {
         <button
           type="button"
           className="btn btn-primary"
-          onClick={handleShow}
-        >
+          onClick={handleShow}>
           Configure Simulation
         </button>
       </div>
 
       {/* Modal */}
-      <Modal show={show} onHide={handleClose} size="lg">
+      <Modal
+        show={show}
+        onHide={handleClose}
+        size="fullscreen">
         <Modal.Header closeButton>
-          <Modal.Title>
-            Simulation Mode Configuration
-          </Modal.Title>
+          <Modal.Title>Simulate Author Removal</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
-          <div>
-            <div className="col-auto">
+          <div className="row">
+            <div className="col-8">
               <center>
-
                 <TreeMap
                   colorDefinitions={CONFIG.general.colors.jetbrains}
                   containerId={CONFIG.simulation.ids.treemapContainerId}
@@ -182,86 +180,33 @@ function SimulationModeModal(props) {
                   topPadding={CONFIG.simulation.layout.topPadding}
                   type="mini"
                   reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
-
-                <nav aria-label="breadcrumb">
-                  <strong>Path:</strong>
-                  <ol className="breadcrumb">
-                    {simulationVisualizationPath
-                      .split("/")
-                      .map((pathElement, i) => (
-                        <li
-                          className={
-                            i <
-                            simulationVisualizationPath.split("/").length - 1
-                              ? "btn btn-link breadcrumb-item p-1"
-                              : "btn btn-link breadcrumb-item active p-1"
-                          }
-                          key={pathElement}
-                          onClick={() =>
-                            setTreemapPathOutFunc(
-                              generateBreadcrumb(i, simulationVisualizationPath)
-                            )
-                          }>
-                          {pathElement}
-                        </li>
-                      ))}
-                  </ol>
-                </nav>
-              </div>
-
-              <div className="col-auto">
-                <div className="input-group">
-                  <input
-                    type="text"
-                    className="form-control"
-                    onChange={handleSearchTextChange}
-                    aria-describedby="input-file-extension"></input>
-
-                  <button
-                    className="btn btn-dark"
-                    type="button"
-                    id="button-filter-add">
-                    Search
-                  </button>
-                  <button
-                    type="button"
-                    className="btn"
-                    style={{
-                      backgroundColor: CONFIG.general.colors.jetbrains.blue,
-                      color: "white",
-                    }}
-                    id="back"
-                    onClick={() =>
-                      simulationVisualizationPath
-                        .split("/")
-                        .filter((r) => r !== "").length > 1
-                        ? setTreemapPathOutFunc(
-                          simulationVisualizationPath
-                            .split("/")
-                            .slice(0, -1)
-                            .join("/")
-                        )
-                        : setTreemapPathOutFunc(".")
-                    }>
-                    &uarr; Up
-                  </button>
-                  <button
-                    type="button"
-                    className="btn"
-                    style={{
-                      backgroundColor:
-                      CONFIG.general.colors.jetbrains.brightRed,
-                      color: "white",
-                    }}
-                    id="reset"
-                    onClick={() => returnTreeMapHome()}>
-                    <i className="bi bi-house"></i> Home
-                  </button>
-                </div>
               </center>
             </div>
 
-            <div className="col-auto">
+            <div className="col-4">
+              <nav aria-label="breadcrumb">
+                <strong>Path:</strong>
+                <ol className="breadcrumb">
+                  {simulationVisualizationPath
+                    .split("/")
+                    .map((pathElement, i) => (
+                      <li
+                        className={
+                          i < simulationVisualizationPath.split("/").length - 1
+                            ? "btn btn-link breadcrumb-item p-1"
+                            : "btn btn-link breadcrumb-item active p-1"
+                        }
+                        key={pathElement}
+                        onClick={() =>
+                          setTreemapPathOutFunc(
+                            generateBreadcrumb(i, simulationVisualizationPath)
+                          )
+                        }>
+                        {pathElement}
+                      </li>
+                    ))}
+                </ol>
+              </nav>
               <div className="input-group">
                 <input
                   type="text"
@@ -275,62 +220,93 @@ function SimulationModeModal(props) {
                   id="button-filter-add">
                   Search
                 </button>
+                <button
+                  type="button"
+                  className="btn"
+                  style={{
+                    backgroundColor: CONFIG.general.colors.jetbrains.blue,
+                    color: "white",
+                  }}
+                  id="back"
+                  onClick={() =>
+                    simulationVisualizationPath
+                      .split("/")
+                      .filter((r) => r !== "").length > 1
+                      ? setTreemapPathOutFunc(
+                          simulationVisualizationPath
+                            .split("/")
+                            .slice(0, -1)
+                            .join("/")
+                        )
+                      : setTreemapPathOutFunc(".")
+                  }>
+                  &uarr; Up
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  style={{
+                    backgroundColor: CONFIG.general.colors.jetbrains.brightRed,
+                    color: "white",
+                  }}
+                  id="reset"
+                  onClick={() => returnTreeMapHome()}>
+                  <i className="bi bi-house"></i> Home
+                </button>
+              </div>
+              {/* </div> */}
+
+              <div
+                style={{
+                  maxHeight: "65vh",
+                  maxWidth: "30vw",
+                  overflowY: "scroll",
+                }}>
+                <Table striped bordered responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Included?</th>
+                      <th>Email</th>
+                      <th>Relative Contribution (to current location)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {authorsList && authorsListContributionPercentage
+                      ? authorsListContributionPercentage
+                          .filter((element) =>
+                            element["email"].includes(nameFilterValue)
+                          )
+                          .map((authorScorePair, index) => (
+                            <tr key={authorScorePair["email"]}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <div className="form-check form-check-inline">
+                                  <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id={authorScorePair.email}
+                                    checked={authorScorePair.included}
+                                    onChange={(e) =>
+                                      handleAuthorCheckmark(e, authorScorePair)
+                                    }></input>
+                                </div>
+                              </td>
+                              <td>{authorScorePair["email"]}</td>
+                              <td>
+                                {formatPercentage(
+                                  authorScorePair["relativeScore"]
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                      : null}
+                  </tbody>
+                </Table>
               </div>
             </div>
-
-            <div
-              style={{
-                maxHeight: "30vh",
-                overflowY: "scroll",
-              }}>
-              <table className="table table-striped">
-                <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Included?</th>
-                  <th>Email</th>
-                  <th>Authorship</th>
-                  <th>Relative Contribution (to current location)</th>
-                </tr>
-                </thead>
-                <tbody>
-                {authorsList && authorsListContributionPercentage
-                  ? authorsListContributionPercentage
-                    .filter((element) =>
-                      element["email"].includes(nameFilterValue)
-                    )
-                    .map((authorScorePair, index) => (
-                      <tr key={authorScorePair["email"]}>
-                        <td>{index + 1}</td>
-                        <td>
-                          <div className="form-check form-check-inline">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              id={authorScorePair.email}
-                              checked={authorScorePair.included}
-                              onChange={(e) =>
-                                handleAuthorCheckmark(e, authorScorePair)
-                              }></input>
-                          </div>
-                        </td>
-                        <td>{authorScorePair["email"]}</td>
-                        <td>
-                          {" "}
-                          {formatSI(authorScorePair["authorship"])}
-                        </td>
-                        <td>
-                          {formatPercentage(
-                            authorScorePair["relativeScore"]
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  : null}
-                </tbody>
-              </table>
-            </div>
           </div>
+          <LegendSimColor></LegendSimColor>
         </Modal.Body>
       </Modal>
     </div>

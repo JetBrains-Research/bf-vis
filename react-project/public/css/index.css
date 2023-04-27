@@ -63,3 +63,9 @@ a[aria-expanded=false] .bi-plus-circle-fill {
 ::-webkit-scrollbar-thumb:hover {
   background: #fe2857;
 }
+
+td {
+  white-space: normal !important; 
+  word-wrap: break-word;
+  font-size: small;  
+}
