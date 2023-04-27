@@ -25,7 +25,7 @@ function LegendSize(props) {
           data-bs-toggle="collapse"
           data-bs-target="#legendSizeCollapsible"
           role="button"
-          aria-expanded="true"
+          aria-expanded="false"
           aria-controls="legendSizeCollapsible">
           <i className="bi bi-plus-circle-fill"></i>
           <i className="bi bi-dash-circle-fill"></i>
