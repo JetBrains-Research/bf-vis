@@ -24,20 +24,24 @@ function SimulationModeModal(props) {
   const formatSI = format(".3s");
 
   const simulationVisualizationData = props.simulationData;
-  const simulationVisualizationPath = props.simulationPath; 
-  const authorsList = "users" in simulationVisualizationData ? [...simulationVisualizationData.users] : undefined;
-  
+  const simulationVisualizationPath = props.simulationPath;
+  const authorsList =
+    "users" in simulationVisualizationData
+      ? [...simulationVisualizationData.users]
+      : undefined;
+
   const setTreemapPathOutFunc = (path) => {
     props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapOut(payloadGenerator('path', path))
+      props.reduxNavFunctions.scopeMiniTreemapOut(
+        payloadGenerator("path", path)
+      )
     );
   };
   const returnTreeMapHome = () => {
     props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator('path', "."))
+      props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator("path", "."))
     );
-  }
-    
+  };
 
   let authorsListContributionPercentage = undefined;
   const [nameFilterValue, setNameFilterValue] = useState("");
@@ -87,8 +91,7 @@ function SimulationModeModal(props) {
           payloadGenerator("path", simulationVisualizationPath)
         )
       );
-    }
-    else if (e.target.checked) {
+    } else if (e.target.checked) {
       props.reduxNavFunctions.dispatch(undoAuthorRemoval([email]));
       props.reduxNavFunctions.dispatch(
         scopeMiniTreemapIn(
@@ -107,7 +110,11 @@ function SimulationModeModal(props) {
         <InfoPanel
           divName="simInfoPanel"
           header="How does the simulation mode work?"
-          body={[t("simMode.general"), t("simMode.detail"),t("simMode.links") ]}></InfoPanel>
+          body={[
+            t("simMode.general"),
+            t("simMode.detail"),
+            t("simMode.links"),
+          ]}></InfoPanel>
         <a
           className=""
           data-bs-toggle="collapse"
@@ -173,8 +180,8 @@ function SimulationModeModal(props) {
                   type="mini"
                   reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
 
-                <h6>Path</h6>
                 <nav aria-label="breadcrumb">
+                  <strong>Path:</strong>
                   <ol className="breadcrumb">
                     {simulationVisualizationPath
                       .split("/")
@@ -197,10 +204,22 @@ function SimulationModeModal(props) {
                       ))}
                   </ol>
                 </nav>
+              </div>
 
-                <div
-                  className="btn-group"
-                  role="group">
+              <div className="col-auto">
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    onChange={handleSearchTextChange}
+                    aria-describedby="input-file-extension"></input>
+
+                  <button
+                    className="btn btn-dark"
+                    type="button"
+                    id="button-filter-add">
+                    Search
+                  </button>
                   <button
                     type="button"
                     className="btn"
@@ -238,23 +257,6 @@ function SimulationModeModal(props) {
                 </div>
               </div>
 
-              <div className="col-auto">
-                <div className="input-group">
-                  <input
-                    type="text"
-                    className="form-control"
-                    onChange={handleSearchTextChange}
-                    aria-describedby="input-file-extension"></input>
-
-                  <button
-                    className="btn btn-dark"
-                    type="button"
-                    id="button-filter-add">
-                    Search
-                  </button>
-                </div>
-              </div>
-
               <div
                 style={{
                   maxHeight: "30vh",
@@ -266,7 +268,7 @@ function SimulationModeModal(props) {
                       <th>#</th>
                       <th>Included?</th>
                       <th>Email</th>
-                      <th>Authorship</th>
+                      {/* <th>Authorship</th> */}
                       <th>Relative Contribution (to current location)</th>
                     </tr>
                   </thead>
@@ -292,10 +294,10 @@ function SimulationModeModal(props) {
                                 </div>
                               </td>
                               <td>{authorScorePair["email"]}</td>
-                              <td>
+                              {/* <td>
                                 {" "}
                                 {formatSI(authorScorePair["authorship"])}
-                              </td>
+                              </td> */}
                               <td>
                                 {formatPercentage(
                                   authorScorePair["relativeScore"]
@@ -308,19 +310,7 @@ function SimulationModeModal(props) {
                 </table>
               </div>
             </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal">
-                Close
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary">
-                Apply configuration
-              </button>
-            </div>
+            <div className="modal-footer"></div>
           </div>
         </div>
       </div>
