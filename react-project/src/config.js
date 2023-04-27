@@ -87,14 +87,10 @@ export const CONFIG = {
   },
   filters: {
     "Python project": {
-      extensions: [".md", ".1"],
-      fileNames: [".git"],
-      fileNamePrefixes: ["jdk"],
+      extensions: ["^.*\.(py)|(ipynb)$"],
     },
     "Java Project": {
-      extensions: [".json", ".js"],
-      fileNames: ["src"],
-      fileNamePrefixes: ["java"],
+      extensions: ["^.*\.(jar)|(java)$"],
     },
   },
 };
