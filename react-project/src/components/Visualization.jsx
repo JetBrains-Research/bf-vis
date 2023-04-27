@@ -29,7 +29,7 @@ import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
 
-function App() {
+function Visualization() {
   const dispatch = useDispatch();
 
   const currentVisualizationData = useDeferredValue(
@@ -87,7 +87,6 @@ function App() {
       if (urlStatsPath && urlStatsPath !== urlDataPath) {
         batch(() => {
           dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
-          dispatch(scopeMiniTreemapIn(payloadGenerator("path", urlDataPath)));
           dispatch(scopeStatsIn(payloadGenerator("path", urlStatsPath)));
         });
       } else {
@@ -100,7 +99,6 @@ function App() {
         }
         batch(() => {
           dispatch(scopeMainTreemapIn(payloadGenerator("path", urlDataPath)));
-          dispatch(scopeMiniTreemapIn(payloadGenerator("path", urlDataPath)));
         });
       }
     }
@@ -160,4 +158,4 @@ function App() {
   );
 }
 
-export default App;
+export default Visualization;

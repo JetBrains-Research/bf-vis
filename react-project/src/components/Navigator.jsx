@@ -144,7 +144,7 @@ function Navigator(props) {
               }}
               id="reset"
               onClick={() => setPathFunc(".")}>
-              <i class="bi bi-house"></i> Home 
+              <i className="bi bi-house"></i> Home
             </button>
           </div>
         </div>
