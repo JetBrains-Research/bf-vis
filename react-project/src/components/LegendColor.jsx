@@ -52,7 +52,7 @@ function LegendColor(props) {
         </h4>
         <div
           id="legendColorCollapsible"
-          className="collapse hide">
+          className="collapse show">
           {/* <p className="small">Red is lower, green is higher</p> */}
           {scale.map((element) => {
             return (
