@@ -11,6 +11,7 @@ import {
   undoAuthorRemoval,
 } from "../reducers/treemapSlice";
 import { useSelector } from "react-redux";
+import { Tab, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { InfoPanel } from "./InfoPanel";
 
@@ -106,10 +107,13 @@ function StatsPane(props) {
     if (isFirstRender.current) {
       isFirstRender.current = false;
     }
-    if (nodeBusFactor && nodeBusFactor > 0) {
-      setNumOfAuthors(nodeBusFactor);
-    } else if (totalNumOfAuthors) {
-      setNumOfAuthors(totalNumOfAuthors);
+    // if (nodeBusFactor && nodeBusFactor > 0) {
+    //   setNumOfAuthors(nodeBusFactor);
+    // } else
+    if (totalNumOfAuthors) {
+      totalNumOfAuthors > 10
+        ? setNumOfAuthors(10)
+        : setNumOfAuthors(totalNumOfAuthors);
     }
   }, [nodeBusFactor, totalNumOfAuthors]);
 
@@ -135,14 +139,6 @@ function StatsPane(props) {
         </a>
       </h4>
       <div className="col-12 statsPaneCollapsible collapse show">
-        {/* <p>
-          {}
-          {nodeData.name}
-        </p>
-
-        <h5>Bus Factor</h5>
-        <p>{nodeBusFactor}</p> */}
-
         <ul className="list-unstyled">
           <li>
             <span className="text-break text-wrap">
@@ -181,42 +177,39 @@ function StatsPane(props) {
           </>
         )}
 
-        <ul
-          className="list-group list-group-flush"
+        <div
           style={{
-            maxHeight: "40vh",
-            maxWidth: "15vw",
+            maxHeight: "50vh",
+            maxWidth: "30vw",
             overflowY: "scroll",
           }}>
-          {authorsList && topAuthors ? (
-            topAuthors.map((authorScorePair, index) => (
-              <div
-                className="list-group-item list-unstyled"
-                key={authorScorePair["email"]}>
-                <li>
-                  <small>{index + 1}.</small>
-                </li>
-                <li>
-                  <span className="small text-break text-wrap">
-                    <strong>{authorScorePair["email"]}</strong>
-                  </span>
-                </li>
-                <li>
-                  <span className="small">
-                    {formatPercentage(authorScorePair["relativeScore"])}
-                  </span>
-                </li>
-                {/* <li>
-                  <span className="small">
-                    ({formatSI(authorScorePair["authorship"])})
-                  </span>
-                </li> */}
-              </div>
-            ))
-          ) : (
-            <p className="small fw-bold">N/A</p>
-          )}
-        </ul>
+          <Table
+            striped
+            size="small">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Email</th>
+                <th>Contribution</th>
+              </tr>
+            </thead>
+            <tbody>
+              {authorsList && topAuthors ? (
+                topAuthors.map((authorScorePair, index) => (
+                  <tr key={authorScorePair["email"]}>
+                    <td>{index + 1}</td>
+                    <td>{authorScorePair["email"]}</td>
+                    <td>
+                      {formatPercentage(authorScorePair["relativeScore"])}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <p className="small fw-bold">N/A</p>
+              )}
+            </tbody>
+          </Table>
+        </div>
       </div>
     </div>
   );
