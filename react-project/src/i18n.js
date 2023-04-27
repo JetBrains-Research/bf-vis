@@ -30,7 +30,7 @@ const resources = {
         detail: ["The bus factor is recalculated for all of the files and folders in the project every time a filter is added or removed as well as whenever an author is added or removed. The calculations are based on the paper by Jabrayilzade, Evtikhiev, Tüzün, and Kovalenko accessible at:"],
         links:["https://arxiv.org/abs/2202.01523"]
       },
-      stats: ["This panel shows authors that have contributed to the currently visualized folder or currently selected file  along with their contribution scores and the bus factor for it."],
+      stats: ["This panel shows authors that have contributed to the currently visualized folder or currently selected file along with their contribution percentage and the bus factor for the node."],
     },
   },
   ru: {
