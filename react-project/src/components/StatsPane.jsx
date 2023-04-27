@@ -17,7 +17,7 @@ import { InfoPanel } from "./InfoPanel";
 function StatsPane(props) {
   const { t, i18n } = useTranslation();
   const formatPercentage = d3.format(",.2%");
-  const formatSI = d3.formatPrefix(".1s", 1e0);
+  const formatSI = d3.formatPrefix(".1s", 1);
 
   const isFirstRender = useRef(true);
   const [numOfAuthors, setNumOfAuthors] = useState(0);
@@ -193,7 +193,9 @@ function StatsPane(props) {
               <div
                 className="list-group-item list-unstyled"
                 key={authorScorePair["email"]}>
-                <li>Rank: {index}</li>
+                <li>
+                  <small>{index + 1}.</small>
+                </li>
                 <li>
                   <span className="small text-break text-wrap">
                     <strong>{authorScorePair["email"]}</strong>
@@ -204,11 +206,11 @@ function StatsPane(props) {
                     {formatPercentage(authorScorePair["relativeScore"])}
                   </span>
                 </li>
-                <li>
+                {/* <li>
                   <span className="small">
                     ({formatSI(authorScorePair["authorship"])})
                   </span>
-                </li>
+                </li> */}
               </div>
             ))
           ) : (
