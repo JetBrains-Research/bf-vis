@@ -25,7 +25,7 @@ function LegendSize(props) {
           data-bs-toggle="collapse"
           data-bs-target="#legendSizeCollapsible"
           role="button"
-          aria-expanded="false"
+          aria-expanded="true"
           aria-controls="legendSizeCollapsible">
           <i className="bi bi-plus-circle-fill"></i>
           <i className="bi bi-dash-circle-fill"></i>
@@ -33,7 +33,7 @@ function LegendSize(props) {
       </h4>
       <div
         id="legendSizeCollapsible"
-        className="collapse hide">
+        className="collapse show">
         {/* <p className="small">
           We have a log base 2 scale for size. Sizes are relative to other tiles
           on the same directory-level and represent file/folder size in bytes
