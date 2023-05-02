@@ -181,7 +181,7 @@ function StatsPane(props) {
 
         <div
           style={{
-            maxHeight: "50vh",
+            maxHeight: "60vh",
             maxWidth: "30vw",
             overflowY: "scroll",
           }}>
