@@ -128,8 +128,8 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
   }
 
   if (
-    oldDataRootNode.busFactorStatus.busFactor &&
-    newDataRootNodeCopy.busFactorStatus.busFactor
+    "busFactor" in oldDataRootNode.busFactorStatus &&
+    "busFactor" in newDataRootNodeCopy.busFactorStatus
   ) {
     let delta =
       newDataRootNodeCopy.busFactorStatus.busFactor -
@@ -139,9 +139,13 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
     newDataRootNodeCopy.busFactorStatus.nodeStatus =
       oldDataRootNode.busFactorStatus.busFactor + delta <= 0
         ? "lost"
-        : oldDataRootNode.busFactorStatus.busFactor + delta < 2
-          ? "danger"
-          : "ok";
+        : delta < 0
+          ? "decrease"
+          : "original";
+    
+    if (oldDataRootNode.busFactorStatus.busFactor === 0) {
+      newDataRootNodeCopy.busFactorStatus.nodeStatus = "original"
+    }
 
     if (
       oldDataRootNode.children &&

@@ -158,20 +158,32 @@ function chooseRectangleFillColor(d) {
 }
 
 function chooseRectangleFillColorMiniTreemap(d) {
-  if (d.data.busFactorStatus.busFactor === 0) {
-    if (d.data.busFactorStatus.old || d.data.busFactorStatus.ignored) {
-      return JETBRAINS_COLORS.gray;
-    } else {
-      return JETBRAINS_COLORS.brightRed;
-    }
+  if (d.data.busFactorStatus.nodeStatus === "original") {
+    return JETBRAINS_COLORS.gray;
   }
-  if ("delta" in d.data.busFactorStatus) {
-    if (d.data.busFactorStatus.delta < 0) {
-      return JETBRAINS_COLORS.golden;
-    } else if (d.data.busFactorStatus.delta > 0) {
-      return JETBRAINS_COLORS.brightGreen;
-    }
+
+  if (d.data.busFactorStatus.nodeStatus === "decrease") {
+    return JETBRAINS_COLORS.golden;
   }
+
+  if (d.data.busFactorStatus.nodeStatus === "lost") {
+    return JETBRAINS_COLORS.darkRed;
+  }
+
+  // if (d.data.busFactorStatus.busFactor === 0) {
+  //   if (d.data.busFactorStatus.old || d.data.busFactorStatus.ignored) {
+  //     return JETBRAINS_COLORS.gray;
+  //   } else if ("delta" in d.data.busFactorStatus) {
+  //     return JETBRAINS_COLORS.brightRed;
+  //   }
+  // }
+  // if ("delta" in d.data.busFactorStatus) {
+  //   if (d.data.busFactorStatus.delta < 0) {
+  //     return JETBRAINS_COLORS.golden;
+  //   } else if (d.data.busFactorStatus.delta > 0) {
+  //     return JETBRAINS_COLORS.brightGreen;
+  //   }
+  // }
 
   return UNAVAILABLE_BF_COLOR;
 }
@@ -258,7 +270,16 @@ export function drawMiniTreemapFromGeneratedLayout(
       .join("/")}
 bus factor: ${
       "busFactor" in d.data.busFactorStatus
-        ? d.data.busFactorStatus.busFactor
+        ? "[" +
+        (d.data.busFactorStatus.busFactor - d.data.busFactorStatus.delta) +
+        " -> " +
+        d.data.busFactorStatus.busFactor +
+        "]"
+        : "?"
+    }
+node status: ${
+      "nodeStatus" in d.data.busFactorStatus
+        ? d.data.busFactorStatus.nodeStatus
         : "?"
     }`
   );
@@ -305,7 +326,7 @@ bus factor: ${
     .text((d) => {
       return ` ${
         "delta" in d.data.busFactorStatus && d.data.busFactorStatus.delta !== 0
-          ? "[" + (d.data.busFactorStatus.busFactor - d.data.busFactorStatus.delta) + " -> " + d.data.busFactorStatus.busFactor + "]"
+          ? "[" + d.data.busFactorStatus.delta + "]"
           : ""
       } ${d.data.name}`;
     })
@@ -412,6 +433,12 @@ bus factor: ${
   textBox
     .append("xhtml:p")
     .text((d) => {
+      if (d.data.busFactorStatus) {
+        if (d.data.busFactorStatus.busFactor)
+          return (
+            "[" + d.data.busFactorStatus.busFactor + "]" + " " + d.data.name
+          );
+      }
       return d.data.name;
     })
     .attr("class", "text-truncate")
