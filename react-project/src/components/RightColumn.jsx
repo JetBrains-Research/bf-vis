@@ -13,7 +13,6 @@ function RightColumn(props) {
     <div className="col p-1">
       <StatsPane data={statsData}></StatsPane>
       <LegendColor></LegendColor>
-      <LegendSize></LegendSize>      
     </div>
   );
 }

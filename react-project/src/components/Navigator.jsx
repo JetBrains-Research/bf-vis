@@ -15,6 +15,7 @@ import {
 } from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 import SimulationModeModal from "./SimulationModeModal";
+import LegendSize from "./LegendSize";
 import { generateBreadcrumb } from "../utils/url.tsx";
 
 function Navigator(props) {
@@ -244,6 +245,8 @@ function Navigator(props) {
         simulationData={simulationData}
         simulationPath={simulationPath}
         reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
+      
+      <LegendSize></LegendSize>
     </div>
   );
 }
