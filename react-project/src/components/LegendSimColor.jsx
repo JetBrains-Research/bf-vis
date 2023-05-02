@@ -27,13 +27,14 @@ function LegendSimColor(props) {
   return (
     <>
       <div
-        id="legendColorCollapsible"
-        className="row mt-2">
+        id="legend-color-mini"
+        className="row mt-2 mx-2">
+          <h5> Color </h5>
         {scale.map((element) => {
           return (
             <div
               key={element.label}
-              className="col-auto mx-5 my-2">
+              className="col-auto mx-0 my-2">
               {generateSvgSquare("1.5rem", element.color)} <strong>{element.label}</strong>
             </div>
           );

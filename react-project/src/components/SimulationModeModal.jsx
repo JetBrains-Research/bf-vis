@@ -118,7 +118,7 @@ function SimulationModeModal(props) {
       id="simulation-mode-container"
       className="row panel-right mt-2 pt-2 pb-2">
       <h4>
-        Simulation Mode
+        Simulation Mode 
         <InfoPanel
           divName="simInfoPanel"
           header="How does the simulation mode work?"
@@ -142,14 +142,14 @@ function SimulationModeModal(props) {
         id="simulationModeCollapsible"
         className="collapse show">
         <p className="small">
-          Using this mode, we can highlight if the bus factor changes if a
-          certain author leaves
+          Using this mode, we can highlight if the bus factor changes when one or more
+           authors leave
         </p>
         <button
           type="button"
           className="btn btn-primary"
           onClick={handleShow}>
-          Configure Simulation
+          Use Simulation Mode
         </button>
       </div>
 
