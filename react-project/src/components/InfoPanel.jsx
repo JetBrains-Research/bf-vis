@@ -40,7 +40,7 @@ function OffCanvasSideBar(props) {
             className="fs-6 fw-normal">
             {props.body.map((text) => {
               if (text.startsWith("http")) {
-                return <a href={text}>{text + "\n"}</a>;
+                return <a key={text} href={text}>{text + "\n"}</a>;
               } else {
                 return text + "\n";
               }
