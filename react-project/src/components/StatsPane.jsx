@@ -111,9 +111,10 @@ function StatsPane(props) {
     //   setNumOfAuthors(nodeBusFactor);
     // } else
     if (totalNumOfAuthors) {
-      totalNumOfAuthors > 10
-        ? setNumOfAuthors(10)
-        : setNumOfAuthors(totalNumOfAuthors);
+      // totalNumOfAuthors > 10
+      //   ? setNumOfAuthors(10)
+      // :
+      setNumOfAuthors(totalNumOfAuthors);
     }
   }, [nodeBusFactor, totalNumOfAuthors]);
 
@@ -154,24 +155,25 @@ function StatsPane(props) {
 
         <h5>Author Contribution</h5>
         {authorsList && topAuthors ? (
-          <>
-            <label
-              htmlFor="authorNumberSelecter"
-              className="form-label small">
-              Showing top {numOfAuthors}
-              {" of "}
-              {totalNumOfAuthors}
-            </label>
-            <input
-              type="range"
-              className="form-range"
-              value={numOfAuthors}
-              onChange={(e) => setNumOfAuthors(e.target.value)}
-              min={0}
-              max={totalNumOfAuthors}
-              id="authorNumberSelecter"></input>
-          </>
+          <></>
         ) : (
+          // <>
+          //   <label
+          //     htmlFor="authorNumberSelecter"
+          //     className="form-label small">
+          //     Showing top {numOfAuthors}
+          //     {" of "}
+          //     {totalNumOfAuthors}
+          //   </label>
+          //   <input
+          //     type="range"
+          //     className="form-range"
+          //     value={numOfAuthors}
+          //     onChange={(e) => setNumOfAuthors(e.target.value)}
+          //     min={0}
+          //     max={totalNumOfAuthors}
+          //     id="authorNumberSelecter"></input>
+          // </>
           <>
             <p>No author info available</p>
           </>
@@ -183,6 +185,7 @@ function StatsPane(props) {
             maxWidth: "30vw",
             overflowY: "scroll",
           }}>
+          
           <Table
             striped
             size="small">
@@ -198,7 +201,13 @@ function StatsPane(props) {
                 topAuthors.map((authorScorePair, index) => (
                   <tr key={authorScorePair["email"]}>
                     <td>{index + 1}</td>
-                    <td>{authorScorePair["email"]}</td>
+                    <td
+                      className="text-start text-break"
+                      style={{
+                        width: "10em",
+                      }}>
+                      {authorScorePair["email"]}
+                    </td>
                     <td>
                       {formatPercentage(authorScorePair["relativeScore"])}
                     </td>
