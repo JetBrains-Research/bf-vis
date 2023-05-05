@@ -207,16 +207,6 @@ function Navigator(props) {
     </Island>
   }
 
-  // TODO: refactor must be a better way
-  const addMargin = (elem) => {
-    const margin = {
-      marginBottom: 20
-    }
-    return <div style={margin}>
-      {elem}
-    </div>
-  }
-
   return (
     <>
       {addMargin(pathIsland())}
@@ -234,3 +224,14 @@ function Navigator(props) {
 }
 
 export default Navigator;
+
+
+// TODO: refactor must be a better way
+export const addMargin = (elem) => {
+  const margin = {
+    marginBottom: 20
+  }
+  return <div style={margin}>
+    {elem}
+  </div>
+}
