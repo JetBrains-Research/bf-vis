@@ -1,22 +1,22 @@
 /** @format */
 
-import React, { useState } from "react";
-import { batch } from "react-redux";
+import React, {useState} from "react";
+import {batch} from "react-redux";
 
-import { InfoPanel } from "./InfoPanel";
-import { useTranslation } from "react-i18next";
+import {InfoPanel} from "./InfoPanel";
+import {useTranslation} from "react-i18next";
 
-import { CONFIG } from "../config";
-import {
-  addFilter,
-  removeAllFilters,
-  removeFilter,
-  selectAllFilters,
-} from "../reducers/treemapSlice";
+import {CONFIG} from "../config";
+import {addFilter, removeAllFilters, removeFilter, selectAllFilters,} from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 import SimulationModeModal from "./SimulationModeModal";
 import LegendSize from "./LegendSize";
-import { generateBreadcrumb } from "../utils/url.tsx";
+import {generateBreadcrumb} from "../utils/url.tsx";
+import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
+import Button from "@jetbrains/ring-ui/dist/button/button";
+import arrowUpIcon from '@jetbrains/icons/arrow-up';
+import archiveIcon from '@jetbrains/icons/archive';
+import Icon from "@jetbrains/ring-ui/dist/icon/icon";
 
 function Navigator(props) {
   const dispatch = props.dispatch;
@@ -30,7 +30,7 @@ function Navigator(props) {
   const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
   const [isBusFactorRecalcActive, setisBusFactorRecalcActive] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState();
-  const { t, i18n } = useTranslation();
+  const {t, i18n} = useTranslation();
 
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
@@ -118,36 +118,19 @@ function Navigator(props) {
             </ol>
           </nav>
 
-          <div
-            className="btn-group"
-            role="group">
-            <button
-              type="button"
-              className="btn"
-              style={{
-                backgroundColor: CONFIG.general.colors.jetbrains.blue,
-                color: "white",
-              }}
-              id="back"
+          <ButtonSet>
+            <Button
               onClick={() =>
                 currentPath.split("/").filter((r) => r !== "").length > 1
                   ? setPathFunc(currentPath.split("/").slice(0, -1).join("/"))
                   : setPathFunc(".")
-              }>
-              &uarr; Up
-            </button>
-            <button
-              type="button"
-              className="btn"
-              style={{
-                backgroundColor: CONFIG.general.colors.jetbrains.brightRed,
-                color: "white",
-              }}
-              id="reset"
+              }
+            ><Icon glyph={arrowUpIcon}/> Up</Button>
+            <Button
               onClick={() => setPathFunc(".")}>
-              <i className="bi bi-house"></i> Home
-            </button>
-          </div>
+              <Icon glyph={archiveIcon}/> Home</Button>
+          </ButtonSet>
+
         </div>
       </div>
 
@@ -205,7 +188,7 @@ function Navigator(props) {
             removeAllFunction={removeAllFilters}
             selector={selectAllFilters}
             dispatch={dispatch}
-            infoPanelDetails={[t("filters.regex"), t("filters.links") ]}></FilterWithInput>
+            infoPanelDetails={[t("filters.regex"), t("filters.links")]}></FilterWithInput>
 
           <h5>Filtering Templates</h5>
           <div className="dropdown open filtersCollapsible collapse show">
@@ -245,7 +228,7 @@ function Navigator(props) {
         simulationData={simulationData}
         simulationPath={simulationPath}
         reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
-      
+
       <LegendSize></LegendSize>
     </div>
   );
