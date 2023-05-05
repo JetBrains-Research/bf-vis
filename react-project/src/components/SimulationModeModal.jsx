@@ -125,7 +125,7 @@ function SimulationModeModal(props) {
     <>
       <Island>
         <Header border>
-          Simulation Mode
+          Simulation Mode{" "}
           <InfoPanel
             divName="simInfoPanel"
             header="How does the simulation mode work?"
