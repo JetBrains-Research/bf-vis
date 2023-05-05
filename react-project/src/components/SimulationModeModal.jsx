@@ -28,6 +28,7 @@ import Button from "@jetbrains/ring-ui/dist/button/button";
 import experimentIcon from '@jetbrains/icons/experiment-20px';
 import Icon from "@jetbrains/ring-ui/dist/icon/icon";
 import {ControlsHeight, ControlsHeightContext} from "@jetbrains/ring-ui/dist/global/controls-height";
+import List from "@jetbrains/ring-ui/dist/list/list";
 
 
 function SimulationModeModal(props) {
@@ -262,56 +263,31 @@ function SimulationModeModal(props) {
                   <i className="bi bi-house"></i> Home
                 </button>
               </div>
-              {/* </div> */}
 
-              <div
-                style={{
-                  maxHeight: "65vh",
-                  maxWidth: "30vw",
-                  overflowY: "scroll",
-                }}>
-                <Table striped bordered responsive size="sm">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Included?</th>
-                    <th>Email</th>
-                    <th>Relative Contribution (to current location)</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {authorsList && authorsListContributionPercentage
+              <List
+                maxHeight={600}
+                // compact={true}
+                shortcuts={true}
+                // onChange={(e) => handleAuthorCheckmark(e, authorScorePair)}
+                data={
+                  authorsList && authorsListContributionPercentage
                     ? authorsListContributionPercentage
                       .filter((element) =>
                         element["email"].includes(nameFilterValue)
                       )
+                      .sort((a, b) => b.relativeScore - a.relativeScore)
                       .map((authorScorePair, index) => (
-                        <tr key={authorScorePair["email"]}>
-                          <td>{index + 1}</td>
-                          <td>
-                            <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id={authorScorePair.email}
-                                checked={authorScorePair.included}
-                                onChange={(e) =>
-                                  handleAuthorCheckmark(e, authorScorePair)
-                                }></input>
-                            </div>
-                          </td>
-                          <td>{authorScorePair["email"]}</td>
-                          <td>
-                            {formatPercentage(
-                              authorScorePair["relativeScore"]
-                            )}
-                          </td>
-                        </tr>
+                        {
+                          label: authorScorePair.email,
+                          details: formatPercentage(authorScorePair.relativeScore),
+                          rgItemType: List.ListProps.Type.ITEM,
+                          checkbox: !authorScorePair.include,
+                        }
                       ))
-                    : null}
-                  </tbody>
-                </Table>
-              </div>
+                    : {}
+                }
+              />
+
             </div>
           </div>
           <LegendSimColor></LegendSimColor>
