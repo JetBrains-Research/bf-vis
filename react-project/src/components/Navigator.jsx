@@ -127,6 +127,7 @@ function Navigator(props) {
               }
             ><Icon glyph={arrowUpIcon}/> Up</Button>
             <Button
+              primary
               onClick={() => setPathFunc(".")}>
               <Icon glyph={archiveIcon}/> Home</Button>
           </ButtonSet>
