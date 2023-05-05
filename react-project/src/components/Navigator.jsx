@@ -207,19 +207,27 @@ function Navigator(props) {
     </Island>
   }
 
+  // TODO: refactor must be a better way
+  const addMargin = (elem) => {
+    const margin = {
+      marginBottom: 20
+    }
+    return <div style={margin}>
+      {elem}
+    </div>
+  }
+
   return (
     <>
-
-      {pathIsland()}
-      {filterIsland()}
-
-
-      <SimulationModeModal
-        statsData={statsData}
-        simulationData={simulationData}
-        simulationPath={simulationPath}
-        reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
-
+      {addMargin(pathIsland())}
+      {addMargin(filterIsland())}
+      {addMargin(
+        <SimulationModeModal
+          statsData={statsData}
+          simulationData={simulationData}
+          simulationPath={simulationPath}
+          reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
+      )}
       <LegendSize></LegendSize>
     </>
   );
