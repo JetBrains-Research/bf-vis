@@ -121,58 +121,28 @@ function Navigator(props) {
     </Island>
   }
 
-  return (
-    <div
-      className="col p-1"
-      id="controls">
+  const filterIsland = () => {
+    return <Island>
+      <Header border>
+        Filters{" "}
+        <InfoPanel
+          divName="filtersInfoPanel"
+          header="What are filters"
+          body={[t("filters.general")]}></InfoPanel>
+        <a
+          className=""
+          data-bs-toggle="collapse"
+          href=".filtersCollapsible"
+          role="button"
+          aria-expanded="true"
+          aria-controls="collapseExample">
+          <i className="bi bi-plus-circle-fill"></i>
+          <i className="bi bi-dash-circle-fill"></i>
+        </a>
+      </Header>
 
-      {pathIsland()}
-
-      <div className="row pt-2 pb-2 mb-3 panel-left">
-        <h4>
-          Filters{" "}
-          <InfoPanel
-            divName="filtersInfoPanel"
-            header="What are filters"
-            body={[t("filters.general")]}></InfoPanel>
-          <a
-            className=""
-            data-bs-toggle="collapse"
-            href=".filtersCollapsible"
-            role="button"
-            aria-expanded="true"
-            aria-controls="collapseExample">
-            <i className="bi bi-plus-circle-fill"></i>
-            <i className="bi bi-dash-circle-fill"></i>
-          </a>
-        </h4>
+      <Content>
         <div className="filtersCollapsible collapse show">
-          {/* <h6>
-            Bus Factor Recalculation{" "}
-            <InfoPanel
-              divName="recalculationInfoPanel"
-              header="How and when is bus factor recalculated?"
-              body={[t("busFactor.recalculation")]}></InfoPanel>
-          </h6> */}
-
-          {/* <input
-            className="btn-check"
-            type="checkbox"
-            role="switch"
-            id="recalculationSwitch"
-            checked={isBusFactorRecalcActive}
-            onChange={handleBusFactorRecalculationSwitch}></input>
-          <label
-            className="btn btn-sm"
-            style={{
-              backgroundColor: isBusFactorRecalcActive
-                ? CONFIG.general.colors.jetbrains.blue
-                : CONFIG.general.colors.jetbrains.brightRed,
-              color: "white",
-            }}
-            htmlFor="recalculationSwitch">
-            {isBusFactorRecalcActive ? "On" : "Off"}
-          </label> */}
 
           <FilterWithInput
             key="Regex"
@@ -216,7 +186,20 @@ function Navigator(props) {
             </div>
           </div>
         </div>
-      </div>
+      </Content>
+
+
+    </Island>
+  }
+
+  return (
+    <>
+
+      {pathIsland()}
+      {filterIsland()}
+
+
+
       <SimulationModeModal
         statsData={statsData}
         simulationData={simulationData}
@@ -224,7 +207,7 @@ function Navigator(props) {
         reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
 
       <LegendSize></LegendSize>
-    </div>
+    </>
   );
 }
 
