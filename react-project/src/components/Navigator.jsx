@@ -17,6 +17,9 @@ import Button from "@jetbrains/ring-ui/dist/button/button";
 import arrowUpIcon from '@jetbrains/icons/arrow-up';
 import archiveIcon from '@jetbrains/icons/archive';
 import Icon from "@jetbrains/ring-ui/dist/icon/icon";
+import Island from "@jetbrains/ring-ui/dist/island/island";
+import Header from "@jetbrains/ring-ui/dist/island/header";
+import Content from "@jetbrains/ring-ui/dist/island/content";
 
 function Navigator(props) {
   const dispatch = props.dispatch;
@@ -70,69 +73,60 @@ function Navigator(props) {
     });
   };
 
+  const pathIsland = () => {
+    return <Island>
+      <Header border>
+        Current Path{" "}
+        <InfoPanel
+          divName="currentPathInfoPanel"
+          header="What is the current path"
+          body={[
+            t("currentPath.general"),
+            t("currentPath.details"),
+          ]}></InfoPanel>
+      </Header>
+      <Content>
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb">
+            {currentPath.split("/").map((pathElement, i) => (
+              <li
+                className={
+                  i < currentPath.split("/").length - 1
+                    ? "btn btn-link breadcrumb-item p-1"
+                    : "btn btn-link breadcrumb-item active p-1"
+                }
+                key={pathElement}
+                onClick={() =>
+                  setPathFunc(generateBreadcrumb(i, currentPath))
+                }>
+                {pathElement}
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <ButtonSet>
+          <Button
+            onClick={() =>
+              currentPath.split("/").filter((r) => r !== "").length > 1
+                ? setPathFunc(currentPath.split("/").slice(0, -1).join("/"))
+                : setPathFunc(".")
+            }
+          ><Icon glyph={arrowUpIcon}/> Up</Button>
+          <Button
+            onClick={() => setPathFunc(".")}>
+            <Icon glyph={archiveIcon}/> Home</Button>
+        </ButtonSet>
+      </Content>
+    </Island>
+  }
+
   return (
     <div
       className="col p-1"
       id="controls">
-      <div className="row pt-2 pb-2 mb-3 panel-left">
-        <h4>
-          Current Path{" "}
-          <InfoPanel
-            divName="currentPathInfoPanel"
-            header="What is the current path"
-            body={[
-              t("currentPath.general"),
-              t("currentPath.details"),
-            ]}></InfoPanel>
-          <a
-            className=""
-            data-bs-toggle="collapse"
-            data-bs-target="#pathNavCollapsible"
-            role="button"
-            aria-expanded="true"
-            aria-controls="collapseExample">
-            <i className="bi bi-plus-circle-fill"></i>
-            <i className="bi bi-dash-circle-fill"></i>
-          </a>
-        </h4>
 
-        <div
-          id="pathNavCollapsible"
-          className="collapse show">
-          <nav aria-label="breadcrumb">
-            <ol className="breadcrumb">
-              {currentPath.split("/").map((pathElement, i) => (
-                <li
-                  className={
-                    i < currentPath.split("/").length - 1
-                      ? "btn btn-link breadcrumb-item p-1"
-                      : "btn btn-link breadcrumb-item active p-1"
-                  }
-                  key={pathElement}
-                  onClick={() =>
-                    setPathFunc(generateBreadcrumb(i, currentPath))
-                  }>
-                  {pathElement}
-                </li>
-              ))}
-            </ol>
-          </nav>
-
-          <ButtonSet>
-            <Button
-              onClick={() =>
-                currentPath.split("/").filter((r) => r !== "").length > 1
-                  ? setPathFunc(currentPath.split("/").slice(0, -1).join("/"))
-                  : setPathFunc(".")
-              }
-            ><Icon glyph={arrowUpIcon}/> Up</Button>
-            <Button
-              onClick={() => setPathFunc(".")}>
-              <Icon glyph={archiveIcon}/> Home</Button>
-          </ButtonSet>
-
-        </div>
-      </div>
+      {pathIsland()}
 
       <div className="row pt-2 pb-2 mb-3 panel-left">
         <h4>
