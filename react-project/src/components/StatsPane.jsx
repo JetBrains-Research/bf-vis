@@ -9,12 +9,12 @@ import {
   enableSimulationMode,
   undoAuthorRemoval,
 } from "../reducers/treemapSlice";
-import {Table} from "react-bootstrap";
 import {useTranslation} from "react-i18next";
 import {InfoPanel} from "./InfoPanel";
 import Island from "@jetbrains/ring-ui/dist/island/island";
 import Header from "@jetbrains/ring-ui/dist/island/header";
 import Content from "@jetbrains/ring-ui/dist/island/content";
+import List from "@jetbrains/ring-ui/dist/list/list";
 
 function StatsPane(props) {
   const {t, i18n} = useTranslation();
@@ -180,46 +180,20 @@ function StatsPane(props) {
             </>
           )}
 
-          <div
-            style={{
-              maxHeight: "60vh",
-              maxWidth: "30vw",
-              overflowY: "scroll",
-            }}>
+          <List
+            maxHeight={400}
+            compact={true}
+            shortcuts={true}
+            data={authorsList && topAuthors ? topAuthors.map((authorScorePair, index) => {
+                return {
+                  label: authorScorePair["email"],
+                  rgItemType: List.ListProps.Type.ITEM,
+                  details: formatPercentage(authorScorePair["relativeScore"])
+                }
+              }
+            ) : {}}
+          />
 
-            <Table
-              striped
-              size="small">
-              <thead>
-              <tr>
-                <th>#</th>
-                <th>Email</th>
-                <th>Contribution</th>
-              </tr>
-              </thead>
-              <tbody>
-              {authorsList && topAuthors ? (
-                topAuthors.map((authorScorePair, index) => (
-                  <tr key={authorScorePair["email"]}>
-                    <td>{index + 1}</td>
-                    <td
-                      className="text-start text-break"
-                      style={{
-                        width: "10em",
-                      }}>
-                      {authorScorePair["email"]}
-                    </td>
-                    <td>
-                      {formatPercentage(authorScorePair["relativeScore"])}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <p className="small fw-bold">N/A</p>
-              )}
-              </tbody>
-            </Table>
-          </div>
         </div>
       </Content>
     </Island>

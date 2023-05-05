@@ -157,9 +157,7 @@ function Visualization() {
           </center>
         </Col>
         <Col xs={3} sm={3} md={2} lg={2}>
-          <center>
             <RightColumn statsData={currentStatsData}></RightColumn>
-          </center>
         </Col>
       </Row>
     </Grid>
