@@ -84,39 +84,53 @@ function Navigator(props) {
             t("currentPath.general"),
             t("currentPath.details"),
           ]}></InfoPanel>
+        <a
+          className=""
+          data-bs-toggle="collapse"
+          data-bs-target="#pathNavCollapsible"
+          role="button"
+          aria-expanded="true"
+          aria-controls="collapseExample">
+          <i className="bi bi-plus-circle-fill"></i>
+          <i className="bi bi-dash-circle-fill"></i>
+        </a>
       </Header>
       <Content>
-        <nav aria-label="breadcrumb">
-          <ol className="breadcrumb">
-            {currentPath.split("/").map((pathElement, i) => (
-              <li
-                className={
-                  i < currentPath.split("/").length - 1
-                    ? "btn btn-link breadcrumb-item p-1"
-                    : "btn btn-link breadcrumb-item active p-1"
-                }
-                key={pathElement}
-                onClick={() =>
-                  setPathFunc(generateBreadcrumb(i, currentPath))
-                }>
-                {pathElement}
-              </li>
-            ))}
-          </ol>
-        </nav>
+        <div
+          id="pathNavCollapsible"
+          className="collapse show">
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              {currentPath.split("/").map((pathElement, i) => (
+                <li
+                  className={
+                    i < currentPath.split("/").length - 1
+                      ? "btn btn-link breadcrumb-item p-1"
+                      : "btn btn-link breadcrumb-item active p-1"
+                  }
+                  key={pathElement}
+                  onClick={() =>
+                    setPathFunc(generateBreadcrumb(i, currentPath))
+                  }>
+                  {pathElement}
+                </li>
+              ))}
+            </ol>
+          </nav>
 
-        <ButtonSet>
-          <Button
-            onClick={() =>
-              currentPath.split("/").filter((r) => r !== "").length > 1
-                ? setPathFunc(currentPath.split("/").slice(0, -1).join("/"))
-                : setPathFunc(".")
-            }
-          ><Icon glyph={arrowUpIcon}/> Up</Button>
-          <Button
-            onClick={() => setPathFunc(".")}>
-            <Icon glyph={archiveIcon}/> Home</Button>
-        </ButtonSet>
+          <ButtonSet>
+            <Button
+              onClick={() =>
+                currentPath.split("/").filter((r) => r !== "").length > 1
+                  ? setPathFunc(currentPath.split("/").slice(0, -1).join("/"))
+                  : setPathFunc(".")
+              }
+            ><Icon glyph={arrowUpIcon}/> Up</Button>
+            <Button
+              onClick={() => setPathFunc(".")}>
+              <Icon glyph={archiveIcon}/> Home</Button>
+          </ButtonSet>
+        </div>
       </Content>
     </Island>
   }
@@ -197,7 +211,6 @@ function Navigator(props) {
 
       {pathIsland()}
       {filterIsland()}
-
 
 
       <SimulationModeModal
