@@ -3,7 +3,8 @@
 import React from "react";
 import LegendColor from "./LegendColor";
 import StatsPane from "./StatsPane";
-import LegendSize from "./LegendSize";
+import ReactSlider from "react-slider";
+import { SliderPicker } from 'react-color';
 
 function RightColumn(props) {
   const statsData = props.statsData;

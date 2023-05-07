@@ -12,20 +12,20 @@ body {
   background: #ffffff;
 }
 
-a[aria-expanded=true] .bi-plus-circle-fill {
-  display: none
+a[aria-expanded="true"] .bi-plus-circle-fill {
+  display: none;
 }
 
-a[aria-expanded=true] .bi-dash-circle-fill {
-  display:inline
+a[aria-expanded="true"] .bi-dash-circle-fill {
+  display: inline;
 }
 
-a[aria-expanded=false] .bi-dash-circle-fill {
-  display: none
+a[aria-expanded="false"] .bi-dash-circle-fill {
+  display: none;
 }
 
-a[aria-expanded=false] .bi-plus-circle-fill {
-  display: inline
+a[aria-expanded="false"] .bi-plus-circle-fill {
+  display: inline;
 }
 
 .panel-left {
@@ -65,7 +65,35 @@ a[aria-expanded=false] .bi-plus-circle-fill {
 }
 
 td {
-  white-space: normal !important; 
+  white-space: normal !important;
   word-wrap: break-word;
-  font-size: small;  
+  font-size: small;
+}
+
+.horizontal-slider {
+  display: inline-block;
+  color: black;
+  text-align: center;
+  vertical-align: middle;
+  align-items: center;
+  padding: 1em;
+}
+
+.slider-track {
+  background-color: gainsboro;
+  height: 0.5em;
+  border-radius: 10%;
+  border: 1px solid black;
+}
+
+.slider-thumb {
+  background-color: darkgray;
+  border: 2px solid gray;
+  border-radius: 100%;
+  width: 2em;
+  height: 2em;
+}
+
+slider-thumb-active {
+  box-shadow: inset 5px 5px 10px 20px gainsboro;
 }

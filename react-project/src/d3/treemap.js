@@ -20,11 +20,8 @@ export const colorSequence = [
   JETBRAINS_COLORS.brightRed,
   JETBRAINS_COLORS.golden,
   JETBRAINS_COLORS.white,
-  // JETBRAINS_COLORS.green,
-  // JETBRAINS_COLORS.blue,
 ];
 
-export const color = d3.scaleThreshold().domain([2, 5]).range(colorSequence);
 export const formatSI = d3.format(".2s");
 
 export const treemap = d3.treemap;
@@ -127,9 +124,9 @@ function addDimensionsToTreemap(treemap) {
   return treemap;
 }
 
-function addColorsToTreemap(treemap) {
+function addColorsToTreemap(treemap, colorGenerator) {
   treemap.eachAfter((d) => {
-    const color = chooseRectangleFillColor(d);
+    const color = chooseRectangleFillColor(d, colorGenerator);
     d.bgColor = color;
     d.textColor = pickTextColorBasedOnBgColor(
       color,
@@ -151,9 +148,9 @@ function addColorsToMiniTreemap(treemap) {
   });
 }
 
-function chooseRectangleFillColor(d) {
+function chooseRectangleFillColor(d, colorGenerator) {
   if ("busFactor" in d.data.busFactorStatus) {
-    return color(d.data.busFactorStatus.busFactor);
+    return colorGenerator(d.data.busFactorStatus.busFactor);
   } else return UNAVAILABLE_BF_COLOR;
 }
 
@@ -271,10 +268,10 @@ export function drawMiniTreemapFromGeneratedLayout(
 bus factor: ${
       "busFactor" in d.data.busFactorStatus
         ? "[" +
-        (d.data.busFactorStatus.busFactor - d.data.busFactorStatus.delta) +
-        " -> " +
-        d.data.busFactorStatus.busFactor +
-        "]"
+          (d.data.busFactorStatus.busFactor - d.data.busFactorStatus.delta) +
+          " -> " +
+          d.data.busFactorStatus.busFactor +
+          "]"
         : "?"
     }
 node status: ${
@@ -337,12 +334,17 @@ node status: ${
     .style("font-size", CONFIG.treemap.children.p.miniFontSize);
 }
 
-export function drawTreemapFromGeneratedLayout(svg, root, setPathFunction) {
+export function drawTreemapFromGeneratedLayout(
+  svg,
+  root,
+  setPathFunction,
+  colorGenerator
+) {
   // Populate dimensions to prevent repeated calculation of the same values
   addDimensionsToTreemap(root);
 
   // Calculate color of background and text
-  addColorsToTreemap(root);
+  addColorsToTreemap(root, colorGenerator);
 
   // Start 'painting'
   const node = svg
@@ -397,7 +399,9 @@ bus factor: ${
   node
     .filter((d) => d.depth === 0)
     .append("rect")
-    .style("fill", (d) => chooseRectangleFillColor(d))
+    .style("fill", function (d) {
+      return d.bgColor
+    })
     .style("stroke", JETBRAINS_COLORS.black)
     .style("opacity", CONFIG.treemap.children.rect.parentOpacity)
     .style("rx", CONFIG.treemap.children.rect.rx)

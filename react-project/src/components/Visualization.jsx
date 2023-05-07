@@ -19,6 +19,8 @@ import {
   simulationVisualizationData,
   simulationVisualizationPath,
   selectAllFilters,
+  selectColorThresholds,
+  selectColorPalette,
 } from "../reducers/treemapSlice";
 
 import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
@@ -52,6 +54,8 @@ function Visualization() {
   const currentSimulationModePath = useDeferredValue(
     useSelector(simulationVisualizationPath)
   );
+  const currentColorThresholds = useDeferredValue(useSelector(selectColorThresholds));
+  const currentColorPalette = useDeferredValue(useSelector(selectColorPalette));
 
   const reduxNavFunctions = {
     dispatch,
@@ -136,6 +140,8 @@ function Visualization() {
         <div className="col-8">
           <TreeMap
             colorDefinitions={CONFIG.general.colors.jetbrains}
+            colorPalette={currentColorPalette}
+            colorThresholds={currentColorThresholds}
             containerId={CONFIG.treemap.ids.treemapContainerId}
             data={currentVisualizationData}
             dataNormalizationFunction={Math.log2}

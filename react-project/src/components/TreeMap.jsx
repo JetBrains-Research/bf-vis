@@ -3,9 +3,7 @@
 import React, { useLayoutEffect } from "react";
 import { useSelector } from "react-redux";
 
-import {
-  selectAllFilters,
-} from "../reducers/treemapSlice";
+import { selectAllFilters } from "../reducers/treemapSlice";
 
 import { createSVGInContainer, clearCanvas } from "../d3/svgCanvas.tsx";
 import {
@@ -23,19 +21,21 @@ import * as d3 from "d3";
 function TreeMap(props) {
   // assign these consts fallback values if prop is empty or throw errors;
   const currentDataPath = props.dataPath;
-  const setPathFunc = props.setPathFunc;
-  const treemapContainerId = props.containerId;
-  const treemapSvgId = props.svgId;
-  const initialHeight = props.initialHeight;
-  const initialWidth = props.initialWidth;
-  const padding = props.padding;
-  const topPadding = props.topPadding;
-  const type = props.type;
+  const currentColorPalette = props.colorPalette;
+  const currentColorThresholds = props.colorThresholds;
   const dataNormalizationFunction = props.dataNormalizationFunction
     ? props.dataNormalizationFunction
     : Math.sqrt;
-  const tilingFunction = props.tilingFunction ? props.tilingFunction : squarify;
+  const initialHeight = props.initialHeight;
+  const initialWidth = props.initialWidth;
+  const padding = props.padding;
   const reduxNavFunctions = props.reduxNavFunctions;
+  const setPathFunc = props.setPathFunc;
+  const topPadding = props.topPadding;
+  const treemapContainerId = props.containerId;
+  const treemapSvgId = props.svgId;
+  const type = props.type;
+  const tilingFunction = props.tilingFunction ? props.tilingFunction : squarify;
 
   // redux related vars
   const filters = useSelector(selectAllFilters);
@@ -85,9 +85,19 @@ function TreeMap(props) {
     const treemapLayout = treemapLayoutGenerator(rootHierarchyNode);
 
     // Drawing the treemap from the generated data
-    if (type === "main")
-      drawTreemapFromGeneratedLayout(svg, treemapLayout, setPathFunc);
-    else if (type === "mini")
+    if (type === "main") {
+      const colorGenerator = d3
+        .scaleThreshold()
+        .domain(currentColorThresholds)
+        .range(currentColorPalette);
+
+      drawTreemapFromGeneratedLayout(
+        svg,
+        treemapLayout,
+        setPathFunc,
+        colorGenerator
+      );
+    } else if (type === "mini")
       drawMiniTreemapFromGeneratedLayout(svg, treemapLayout, reduxNavFunctions);
 
     return () => {
@@ -95,6 +105,8 @@ function TreeMap(props) {
     };
   }, [
     props.data,
+    currentColorThresholds,
+    currentColorPalette,
     currentDataPath,
     dataNormalizationFunction,
     filters,
