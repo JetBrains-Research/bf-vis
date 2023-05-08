@@ -93,18 +93,16 @@ function SimulationModeModal(props) {
     }
   };
 
-  const handleAuthorCheckmark = (e, authorScorePair) => {
-    let email = authorScorePair.email;
-    console.log(email);
-    if (!e.target.checked) {
-      props.reduxNavFunctions.dispatch(addAuthorToRemovalList([email]));
+  const handleAuthorCheckmark = (authorEmail) => {
+    if (!removedAuthorsList.includes(authorEmail)) {
+      props.reduxNavFunctions.dispatch(addAuthorToRemovalList([authorEmail]));
       props.reduxNavFunctions.dispatch(
         scopeMiniTreemapIn(
           payloadGenerator("path", simulationVisualizationPath)
         )
       );
-    } else if (e.target.checked) {
-      props.reduxNavFunctions.dispatch(undoAuthorRemoval([email]));
+    } else {
+      props.reduxNavFunctions.dispatch(undoAuthorRemoval([authorEmail]));
       props.reduxNavFunctions.dispatch(
         scopeMiniTreemapIn(
           payloadGenerator("path", simulationVisualizationPath)
@@ -266,9 +264,10 @@ function SimulationModeModal(props) {
 
               <List
                 maxHeight={600}
-                // compact={true}
                 shortcuts={true}
-                // onChange={(e) => handleAuthorCheckmark(e, authorScorePair)}
+                onSelect={(item, e) => {
+                  handleAuthorCheckmark(item.label)
+                }}
                 data={
                   authorsList && authorsListContributionPercentage
                     ? authorsListContributionPercentage
@@ -281,7 +280,7 @@ function SimulationModeModal(props) {
                           label: authorScorePair.email,
                           details: formatPercentage(authorScorePair.relativeScore),
                           rgItemType: List.ListProps.Type.ITEM,
-                          checkbox: !authorScorePair.include,
+                          checkbox: !removedAuthorsList.includes(authorScorePair.email)
                         }
                       ))
                     : {}
