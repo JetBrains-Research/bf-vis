@@ -4,9 +4,7 @@ import React from "react";
 import {useSelector} from "react-redux";
 import {CONFIG} from "../config";
 import {InfoPanel} from "./InfoPanel";
-import {Input, Size} from "@jetbrains/ring-ui/dist/input/input";
 import Button from "@jetbrains/ring-ui/dist/button/button";
-import QueryAssist from "@jetbrains/ring-ui/dist/query-assist/query-assist";
 
 function FilterWithInput(props) {
   const dispatch = props.dispatch;
@@ -112,17 +110,10 @@ function FilterWithInput(props) {
       </div>
 
       {currentFilters.length > 0 ? (
-        <button
-          className="btn"
-          type="button"
-          id="button-filter-remove-all"
-          style={{
-            backgroundColor: CONFIG.general.colors.jetbrains.brightRed,
-            color: "white",
-          }}
+        <Button
+          danger={true}
           onClick={() => dispatch(props.removeAllFunction())}>
-          Remove All Filters
-        </button>
+          Remove All Filters</Button>
       ) : null}
     </div>
   );

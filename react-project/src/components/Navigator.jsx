@@ -169,6 +169,7 @@ function Navigator(props) {
             dispatch={dispatch}
             infoPanelDetails={[t("filters.regex"), t("filters.links")]}></FilterWithInput>
 
+          <h6>Filtering Templates</h6>
           <div className="dropdown open filtersCollapsible collapse show">
             <Button
               dropdown={true}
