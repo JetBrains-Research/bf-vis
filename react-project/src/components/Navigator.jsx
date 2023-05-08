@@ -169,17 +169,15 @@ function Navigator(props) {
             dispatch={dispatch}
             infoPanelDetails={[t("filters.regex"), t("filters.links")]}></FilterWithInput>
 
-          <h6>Filtering Templates</h6>
           <div className="dropdown open filtersCollapsible collapse show">
-            <button
-              className="btn btn-secondary dropdown-toggle"
-              type="button"
+            <Button
+              dropdown={true}
               id="triggerId"
               data-bs-toggle="dropdown"
               aria-haspopup="true"
-              aria-expanded="false">
-              Filter Templates
-            </button>
+              aria-expanded="false"
+            >Filter Templates</Button>
+            {/*TODO: there must be a way to replace bootstrap*/}
             <div
               className="dropdown-menu"
               aria-labelledby="triggerId">
@@ -199,6 +197,7 @@ function Navigator(props) {
                 );
               })}
             </div>
+
           </div>
         </div>
       </Content>
