@@ -19,7 +19,7 @@ import {
 } from "../reducers/treemapSlice.js";
 import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
 import {useSelector} from "react-redux";
-import {Modal, Table} from "react-bootstrap";
+import {Modal} from "react-bootstrap";
 import LegendSimColor from "./LegendSimColor.jsx";
 import Island from "@jetbrains/ring-ui/dist/island/island";
 import Header from "@jetbrains/ring-ui/dist/island/header";
@@ -29,7 +29,11 @@ import experimentIcon from '@jetbrains/icons/experiment-20px';
 import Icon from "@jetbrains/ring-ui/dist/icon/icon";
 import {ControlsHeight, ControlsHeightContext} from "@jetbrains/ring-ui/dist/global/controls-height";
 import List from "@jetbrains/ring-ui/dist/list/list";
-
+import {Input, Size} from "@jetbrains/ring-ui/dist/input/input";
+import arrowUpIcon from "@jetbrains/icons/arrow-up";
+import archiveIcon from "@jetbrains/icons/archive";
+import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
+import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
 
 function SimulationModeModal(props) {
   const {t, i18n} = useTranslation();
@@ -170,125 +174,112 @@ function SimulationModeModal(props) {
         </Modal.Header>
 
         <Modal.Body>
-          <div className="row">
-            <div className="col-8">
-              <center>
-                <TreeMap
-                  colorDefinitions={CONFIG.general.colors.jetbrains}
-                  containerId={CONFIG.simulation.ids.treemapContainerId}
-                  data={simulationVisualizationData}
-                  dataNormalizationFunction={Math.log2}
-                  dataPath={simulationVisualizationPath}
-                  initialHeight={CONFIG.simulation.layout.height}
-                  initialWidth={CONFIG.simulation.layout.width}
-                  padding={CONFIG.simulation.layout.overallPadding}
-                  svgId={CONFIG.simulation.ids.treemapSvgId}
-                  tilingFunction={tiling.squarify}
-                  topPadding={CONFIG.simulation.layout.topPadding}
-                  type="mini"
-                  reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
-              </center>
-            </div>
 
-            <div className="col-4">
-              <nav aria-label="breadcrumb">
-                <strong>Path:</strong>
-                <ol className="breadcrumb">
-                  {simulationVisualizationPath
-                    .split("/")
-                    .map((pathElement, i) => (
-                      <li
-                        className={
-                          i < simulationVisualizationPath.split("/").length - 1
-                            ? "btn btn-link breadcrumb-item p-1"
-                            : "btn btn-link breadcrumb-item active p-1"
-                        }
-                        key={pathElement}
+          <Grid>
+            <Row>
+              <Col xs={9} sm={9} md={9} lg={9}>
+                <center>
+                  <TreeMap
+                    colorDefinitions={CONFIG.general.colors.jetbrains}
+                    containerId={CONFIG.simulation.ids.treemapContainerId}
+                    data={simulationVisualizationData}
+                    dataNormalizationFunction={Math.log2}
+                    dataPath={simulationVisualizationPath}
+                    initialHeight={CONFIG.simulation.layout.height}
+                    initialWidth={CONFIG.simulation.layout.width}
+                    padding={CONFIG.simulation.layout.overallPadding}
+                    svgId={CONFIG.simulation.ids.treemapSvgId}
+                    tilingFunction={tiling.squarify}
+                    topPadding={CONFIG.simulation.layout.topPadding}
+                    type="mini"
+                    reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
+                </center>
+              </Col>
+              <Col xs={3} sm={3} md={3} lg={3}>
+                <div style={{marginBottom: 20}}>
+                  <nav aria-label="breadcrumb">
+                    <strong>Path:</strong>
+                    <ol className="breadcrumb">
+                      {simulationVisualizationPath
+                        .split("/")
+                        .map((pathElement, i) => (
+                          <li
+                            className={
+                              i < simulationVisualizationPath.split("/").length - 1
+                                ? "btn btn-link breadcrumb-item p-1"
+                                : "btn btn-link breadcrumb-item active p-1"
+                            }
+                            key={pathElement}
+                            onClick={() =>
+                              setTreemapPathOutFunc(
+                                generateBreadcrumb(i, simulationVisualizationPath)
+                              )
+                            }>
+                            {pathElement}
+                          </li>
+                        ))}
+                    </ol>
+                  </nav>
+
+                  <center>
+                    <ButtonSet>
+                      <Button
                         onClick={() =>
-                          setTreemapPathOutFunc(
-                            generateBreadcrumb(i, simulationVisualizationPath)
-                          )
-                        }>
-                        {pathElement}
-                      </li>
-                    ))}
-                </ol>
-              </nav>
-              <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
+                          simulationVisualizationPath
+                            .split("/")
+                            .filter((r) => r !== "").length > 1
+                            ? setTreemapPathOutFunc(
+                              simulationVisualizationPath
+                                .split("/")
+                                .slice(0, -1)
+                                .join("/")
+                            )
+                            : setTreemapPathOutFunc(".")}
+                      ><Icon glyph={arrowUpIcon}/> Up</Button>
+                      <Button
+                        primary
+                        onClick={() => returnTreeMapHome()}>
+                        <Icon glyph={archiveIcon}/> Home</Button>
+                    </ButtonSet>
+                  </center>
+                </div>
+
+
+                <Input
                   onChange={handleSearchTextChange}
-                  aria-describedby="input-file-extension"></input>
+                  size={Size.L}
+                ></Input>
 
-                <button
-                  className="btn btn-dark"
-                  type="button"
-                  id="button-filter-add">
-                  Search
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  style={{
-                    backgroundColor: CONFIG.general.colors.jetbrains.blue,
-                    color: "white",
+                <List
+                  maxHeight={600}
+                  shortcuts={true}
+                  onSelect={(item, e) => {
+                    handleAuthorCheckmark(item.label)
                   }}
-                  id="back"
-                  onClick={() =>
-                    simulationVisualizationPath
-                      .split("/")
-                      .filter((r) => r !== "").length > 1
-                      ? setTreemapPathOutFunc(
-                        simulationVisualizationPath
-                          .split("/")
-                          .slice(0, -1)
-                          .join("/")
-                      )
-                      : setTreemapPathOutFunc(".")
-                  }>
-                  &uarr; Up
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  style={{
-                    backgroundColor: CONFIG.general.colors.jetbrains.brightRed,
-                    color: "white",
-                  }}
-                  id="reset"
-                  onClick={() => returnTreeMapHome()}>
-                  <i className="bi bi-house"></i> Home
-                </button>
-              </div>
+                  data={
+                    authorsList && authorsListContributionPercentage
+                      ? authorsListContributionPercentage
+                        .filter((element) =>
+                          element["email"].includes(nameFilterValue)
+                        )
+                        .sort((a, b) => b.relativeScore - a.relativeScore)
+                        .map((authorScorePair, index) => (
+                          {
+                            label: authorScorePair.email,
+                            details: formatPercentage(authorScorePair.relativeScore),
+                            rgItemType: List.ListProps.Type.ITEM,
+                            checkbox: !removedAuthorsList.includes(authorScorePair.email)
+                          }
+                        ))
+                      : {}
+                  }
+                />
 
-              <List
-                maxHeight={600}
-                shortcuts={true}
-                onSelect={(item, e) => {
-                  handleAuthorCheckmark(item.label)
-                }}
-                data={
-                  authorsList && authorsListContributionPercentage
-                    ? authorsListContributionPercentage
-                      .filter((element) =>
-                        element["email"].includes(nameFilterValue)
-                      )
-                      .sort((a, b) => b.relativeScore - a.relativeScore)
-                      .map((authorScorePair, index) => (
-                        {
-                          label: authorScorePair.email,
-                          details: formatPercentage(authorScorePair.relativeScore),
-                          rgItemType: List.ListProps.Type.ITEM,
-                          checkbox: !removedAuthorsList.includes(authorScorePair.email)
-                        }
-                      ))
-                    : {}
-                }
-              />
 
-            </div>
-          </div>
+              </Col>
+            </Row>
+          </Grid>
+
           <LegendSimColor></LegendSimColor>
         </Modal.Body>
       </Modal>
