@@ -245,6 +245,7 @@ function SimulationModeModal(props) {
                 </div>
 
 
+                {/*TODO: add same width for input and list*/}
                 <Input
                   onChange={handleSearchTextChange}
                   size={Size.L}
