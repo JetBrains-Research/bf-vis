@@ -73,6 +73,7 @@ function FilterWithInput(props) {
         ) : null}
       </h6>
 
+      {/*TODO: replace with better looking ringui*/}
       <div className="input-group">
         <input
           type="text"
@@ -91,6 +92,7 @@ function FilterWithInput(props) {
         </button>
       </div>
 
+      {/*TODO: replace with tags ringui*/}
       <div className="container mb-3">
         {currentFilters.map((filterElement) => (
           <div
