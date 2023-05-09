@@ -157,23 +157,6 @@ function StatsPane(props) {
         {authorsList && topAuthors ? (
           <></>
         ) : (
-          // <>
-          //   <label
-          //     htmlFor="authorNumberSelecter"
-          //     className="form-label small">
-          //     Showing top {numOfAuthors}
-          //     {" of "}
-          //     {totalNumOfAuthors}
-          //   </label>
-          //   <input
-          //     type="range"
-          //     className="form-range"
-          //     value={numOfAuthors}
-          //     onChange={(e) => setNumOfAuthors(e.target.value)}
-          //     min={0}
-          //     max={totalNumOfAuthors}
-          //     id="authorNumberSelecter"></input>
-          // </>
           <>
             <p>No author info available</p>
           </>
@@ -185,10 +168,11 @@ function StatsPane(props) {
             maxWidth: "30vw",
             overflowY: "scroll",
           }}>
-          
           <Table
             striped
-            size="small">
+            hover
+            size="small"
+            className="w-auto">
             <thead>
               <tr>
                 <th>#</th>
@@ -201,14 +185,10 @@ function StatsPane(props) {
                 topAuthors.map((authorScorePair, index) => (
                   <tr key={authorScorePair["email"]}>
                     <td>{index + 1}</td>
-                    <td
-                      className="text-start text-break"
-                      style={{
-                        width: "10em",
-                      }}>
+                    <td className="text-start text-break w-100">
                       {authorScorePair["email"]}
                     </td>
-                    <td>
+                    <td className="text-nowrap w-25">
                       {formatPercentage(authorScorePair["relativeScore"])}
                     </td>
                   </tr>

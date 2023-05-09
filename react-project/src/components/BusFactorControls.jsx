@@ -4,12 +4,17 @@ import { React, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import ReactSlider from "react-slider";
-import { selectColorPalette, selectColorThresholds, setColorThresholds, setColors } from "../reducers/treemapSlice";
+import {
+  selectColorPalette,
+  selectColorThresholds,
+  setColorThresholds,
+  setColors,
+} from "../reducers/treemapSlice";
 
 export function BusFactorControls(props) {
   const [show, setShow] = useState(false);
-  const colorPalette = useSelector(selectColorPalette)
-  const colorThresholds = useSelector(selectColorThresholds)
+  const colorPalette = useSelector(selectColorPalette);
+  const colorThresholds = useSelector(selectColorThresholds);
   const dispatch = useDispatch();
 
   const handleClose = () => {
@@ -21,20 +26,19 @@ export function BusFactorControls(props) {
   };
 
   const handleSliderChange = (result, index) => {
-    console.log("handleSliderChange", result, index)
+    console.log("handleSliderChange", result, index);
     console.log("Thresholds in handle func", colorThresholds);
     let newColorThresholds = Array.from(colorThresholds);
 
-    newColorThresholds[index] = result[index];
-    console.log("newThresholds in handle func", newColorThresholds)
-    dispatch(setColorThresholds(newColorThresholds))
-  }
+    console.log("newThresholds in handle func", newColorThresholds);
+    dispatch(setColorThresholds(result));
+  };
 
   const handleColorChange = (color, index) => {
-    let newColors = colorPalette
+    let newColors = colorPalette;
     newColors[index] = color;
     dispatch(setColors(newColors));
-  }
+  };
 
   return (
     <div className="container mt-2">
@@ -62,17 +66,21 @@ export function BusFactorControls(props) {
                 withTracks={true}
                 trackClassName="slider-track m-2"
                 value={colorThresholds}
-                ariaLabel={[
+                ariaLabelledby={[
                   "Leftmost thumb",
                   "Middle thumb",
                   "Rightmost thumb",
                 ]}
                 renderThumb={(props, state) => (
-                  <div className="mb-5" {...props}>{state.valueNow}</div>
+                  <div
+                    className="mb-5"
+                    {...props}>
+                    {state.valueNow}
+                  </div>
                 )}
                 pearling={true}
                 minDistance={1}
-                min={0}
+                min={1}
                 max={20}
                 onAfterChange={handleSliderChange}
               />

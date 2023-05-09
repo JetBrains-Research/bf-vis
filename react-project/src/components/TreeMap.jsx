@@ -89,7 +89,7 @@ function TreeMap(props) {
       const colorGenerator = d3
         .scaleThreshold()
         .domain(currentColorThresholds)
-        .range(currentColorPalette);
+        .range(currentColorPalette.slice(1));
 
       drawTreemapFromGeneratedLayout(
         svg,

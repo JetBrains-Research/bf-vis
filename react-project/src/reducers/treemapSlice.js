@@ -40,6 +40,7 @@ function convertTreeToState(tree) {
       previousPathStack: [],
       thresholds: [2, 5],
       colors: [
+        CONFIG.general.colors.jetbrains.darkGray,
         CONFIG.general.colors.jetbrains.darkRed,
         CONFIG.general.colors.jetbrains.golden,
         CONFIG.general.colors.jetbrains.white,
