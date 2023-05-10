@@ -65,7 +65,7 @@ function StatsPane(props) {
       authorsList
         ? authorsList.map((authorContributionPair) => {
             return {
-              email: authorContributionPair.email,
+              email: authorContributionPair.email.replace(/([@\.])/g, `\n$1`),
               authorship: authorContributionPair.authorship,
               relativeScore:
                 authorContributionPair.authorship / cumulativeAuthorship,
@@ -163,33 +163,55 @@ function StatsPane(props) {
         )}
 
         <div
+          
           style={{
-            maxHeight: "60vh",
-            maxWidth: "30vw",
+            maxHeight: "50vh",
             overflowY: "scroll",
-          }}>
+            overflowX: "scroll",
+          }}
+          className="row">
           <Table
             striped
             hover
-            size="small"
-            className="w-auto">
+            size="small">
             <thead>
-              <tr>
-                <th>#</th>
-                <th>Email</th>
-                <th>Contribution</th>
+              <tr className="d-flex">
+                <th className="px-0 col-2">
+                  <small>#</small>
+                </th>
+                <th className="px-0 col-5 text-end">
+                  <small>Email</small>
+                </th>
+                <th className="px-0 col-5 text-break text-end">
+                  <small>Contribution</small>
+                </th>
               </tr>
             </thead>
             <tbody>
               {authorsList && topAuthors ? (
                 topAuthors.map((authorScorePair, index) => (
-                  <tr key={authorScorePair["email"]}>
-                    <td>{index + 1}</td>
-                    <td className="text-start text-break w-100">
-                      {authorScorePair["email"]}
+                  <tr
+                    key={authorScorePair["email"]}
+                    className="d-flex">
+                    <td className="px-0 col-2">
+                      <small>{index + 1}</small>
                     </td>
-                    <td className="text-nowrap w-25">
-                      {formatPercentage(authorScorePair["relativeScore"])}
+                    <td className="text-end px-1 col-7">
+                      <small>
+                        {authorScorePair["email"].split("\n").map((val) => {
+                          return (
+                            <>
+                              <wbr />
+                              {val}
+                            </>
+                          );
+                        })}
+                      </small>
+                    </td>
+                    <td className="px-0 col-3">
+                      <small>
+                        {formatPercentage(authorScorePair["relativeScore"])}
+                      </small>
                     </td>
                   </tr>
                 ))
