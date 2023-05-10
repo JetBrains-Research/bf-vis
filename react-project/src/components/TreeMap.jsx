@@ -95,7 +95,8 @@ function TreeMap(props) {
         svg,
         treemapLayout,
         setPathFunc,
-        colorGenerator
+        colorGenerator,
+        currentColorPalette[0]
       );
     } else if (type === "mini")
       drawMiniTreemapFromGeneratedLayout(svg, treemapLayout, reduxNavFunctions);

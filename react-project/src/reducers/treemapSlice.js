@@ -4,6 +4,15 @@ import { createSlice } from "@reduxjs/toolkit";
 import { calculateBusFactor } from "../utils/BusFactorUtil";
 import { CONFIG } from "../config";
 
+const defaultColors = [
+  CONFIG.general.colors.jetbrains.gray,
+  CONFIG.general.colors.jetbrains.darkRed,
+  CONFIG.general.colors.jetbrains.golden,
+  CONFIG.general.colors.jetbrains.white,
+];
+
+const defaultColorThresholds = [2, 5];
+
 const defaultTree = {
   name: "PlaceHolder",
   path: ".",
@@ -38,13 +47,8 @@ function convertTreeToState(tree) {
       ignored: [],
       isRecalculationEnabled: false,
       previousPathStack: [],
-      thresholds: [2, 5],
-      colors: [
-        CONFIG.general.colors.jetbrains.darkGray,
-        CONFIG.general.colors.jetbrains.darkRed,
-        CONFIG.general.colors.jetbrains.golden,
-        CONFIG.general.colors.jetbrains.white,
-      ],
+      thresholds: defaultColorThresholds,
+      colors: defaultColors,
     },
     simulation: {
       isSimulationMode: false,
@@ -448,6 +452,15 @@ const treemapSlice = createSlice({
         },
       };
     },
+    resetColorThresholdsToDefaults: (state) => {
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          thresholds: defaultColorThresholds,
+        },
+      };
+    },
     setColors: (state, action) => {
       const newColors = action.payload;
       return {
@@ -455,6 +468,15 @@ const treemapSlice = createSlice({
         mainTreemap: {
           ...state.mainTreemap,
           colors: newColors,
+        },
+      };
+    },
+    resetColorsToDefaults: (state) => {
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          colors: defaultColors,
         },
       };
     },
@@ -473,10 +495,12 @@ export const {
   addFilter,
   removeFilter,
   removeAllFilters,
-  // color threshold methods
+  // color and color threshold actions
   setColors,
+  resetColorsToDefaults,
   setColorThresholds,
-  // Simulation Mode Actions
+  resetColorThresholdsToDefaults,
+  // simulation mode actions
   enableSimulationMode,
   disableSimulationMode,
   returnMiniTreemapHome,
@@ -522,7 +546,8 @@ export const simulationVisualizationData = (state) => {
   );
 };
 
-export const selectColorThresholds = (state) => state.treemap.mainTreemap.thresholds;
+export const selectColorThresholds = (state) =>
+  state.treemap.mainTreemap.thresholds;
 export const selectColorPalette = (state) => state.treemap.mainTreemap.colors;
 
 export const simulationVisualizationPath = (state) =>
