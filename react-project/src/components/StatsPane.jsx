@@ -167,7 +167,7 @@ function StatsPane(props) {
           style={{
             maxHeight: "50vh",
             overflowY: "scroll",
-            overflowX: "scroll",
+            overflowX: "auto",
           }}
           className="row">
           <Table
