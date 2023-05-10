@@ -1,14 +1,12 @@
 /** @format */
 
 import { React, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import ReactSlider from "react-slider";
 import {
   selectColorPalette,
   selectColorThresholds,
   setColorThresholds,
-  setColors,
 } from "../reducers/treemapSlice";
 
 export function BusFactorControls(props) {
@@ -16,14 +14,6 @@ export function BusFactorControls(props) {
   const colorPalette = useSelector(selectColorPalette);
   const colorThresholds = useSelector(selectColorThresholds);
   const dispatch = useDispatch();
-
-  const handleClose = () => {
-    setShow(false);
-  };
-
-  const handleOpen = () => {
-    setShow(true);
-  };
 
   const handleSliderChange = (result, index) => {
     console.log("handleSliderChange", result, index);
@@ -34,66 +24,45 @@ export function BusFactorControls(props) {
     dispatch(setColorThresholds(result));
   };
 
-  const handleColorChange = (color, index) => {
-    let newColors = colorPalette;
-    newColors[index] = color;
-    dispatch(setColors(newColors));
-  };
-
   return (
     <div className="container mt-2">
-      <Button
-        variant="primary"
-        onClick={() => handleOpen()}>
-        Configure TreeMap
-      </Button>{" "}
-      <Modal
-        show={show}
-        onHide={handleClose}
-        size="large">
-        <Modal.Header>
-          <Modal.Title>Configure colors and range thresholds</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="container-fluid">
+      <div className="row mt-2">
+        <small>
+          Choose the values at which the
+          colors switchover
+        </small>
+      </div>
+      <div
+        className="row"
+        id="slider-row">
+        <div className="col-1">
+          <small>1</small>
+        </div>
+        <ReactSlider
+          className="horizontal-slider col-9"
+          thumbClassName="slider-thumb"
+          thumbActiveClassName="slider-thumb-active"
+          withTracks={true}
+          trackClassName="slider-track"
+          value={colorThresholds}
+          ariaLabelledby={["Leftmost thumb", "Middle thumb", "Rightmost thumb"]}
+          renderThumb={(props, state) => (
             <div
-              className="row mb-5"
-              id="slider-row">
-              <ReactSlider
-                className="horizontal-slider"
-                thumbClassName="slider-thumb"
-                thumbActiveClassName="slider-thumb-active"
-                withTracks={true}
-                trackClassName="slider-track m-2"
-                value={colorThresholds}
-                ariaLabelledby={[
-                  "Leftmost thumb",
-                  "Middle thumb",
-                  "Rightmost thumb",
-                ]}
-                renderThumb={(props, state) => (
-                  <div
-                    className="mb-5"
-                    {...props}>
-                    {state.valueNow}
-                  </div>
-                )}
-                pearling={true}
-                minDistance={1}
-                min={1}
-                max={20}
-                onAfterChange={handleSliderChange}
-              />
+              className="m-1"
+              {...props}>
+              {state.valueNow}
             </div>
-            <div className="row">
-              <p>
-                Choose the colors to paint the tiles with and the values at
-                which the colors switchover
-              </p>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
+          )}
+          pearling={true}
+          minDistance={1}
+          min={1}
+          max={20}
+          onAfterChange={handleSliderChange}
+        />
+        <div className="col-1">
+          <small>20</small>
+        </div>
+      </div>
     </div>
   );
 }
