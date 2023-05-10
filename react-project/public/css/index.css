@@ -94,10 +94,12 @@ td {
   height: 1.4rem;
   font-size: small;
   bottom: 0.3em;
+  cursor: grab
 }
 
 .slider-thumb:active {
   box-shadow: inset 5px 5px 10px 20px gainsboro;
+  cursor: grabbing;
 }
 
 .slider-marks {
