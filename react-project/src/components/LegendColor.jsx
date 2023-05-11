@@ -98,12 +98,19 @@ function LegendColor(props) {
       console.log(newPaletteColorRGB);
       setPaletteColor(newPaletteColorRGB);
       newColorPalette[paletteColorIndex] = newPaletteColorRGB;
-    }
-    else{
+    } else {
       newColorPalette[paletteColorIndex] = paletteColor;
     }
     dispatch(setColors(newColorPalette));
     handleClose();
+    updateSliderTrackColors(newColorPalette);
+  };
+
+  const updateSliderTrackColors = (colorPalette) => {
+    for (let count = 0; count < colorPalette.length - 1; count++) {
+      const element = document.querySelector(`.slider-track-${count}`);
+      element.style.backGroundColor = colorPalette[count + 1];
+    }
   };
 
   const handleChange = (color, event) => {

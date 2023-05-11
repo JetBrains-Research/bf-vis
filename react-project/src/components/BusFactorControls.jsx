@@ -3,6 +3,7 @@
 import { React, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactSlider from "react-slider";
+import {pickTextColorBasedOnBgColor} from "../utils/color.tsx"
 import {
   selectColorPalette,
   selectColorThresholds,
@@ -27,10 +28,7 @@ export function BusFactorControls(props) {
   return (
     <div className="container mt-2">
       <div className="row mt-2">
-        <small>
-          Choose the values at which the
-          colors switchover
-        </small>
+        <small>Choose the values at which the colors switchover</small>
       </div>
       <div
         className="row"
@@ -47,10 +45,15 @@ export function BusFactorControls(props) {
           value={colorThresholds}
           ariaLabelledby={["Leftmost thumb", "Middle thumb", "Rightmost thumb"]}
           renderThumb={(props, state) => (
-            <div
-              className="m-1"
-              {...props}>
-              {state.valueNow}
+            <div {...props}>
+              <div style={{
+                backgroundColor: colorPalette[state.index + 1],
+                borderRadius: "100%"
+              }}>
+                <strong style={{
+                  color: pickTextColorBasedOnBgColor(colorPalette[state.index + 1], "rgb(255,255,255)", "rgb(0,0,0)")
+                }}>{state.valueNow}</strong>
+              </div>
             </div>
           )}
           pearling={true}

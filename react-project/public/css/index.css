@@ -87,7 +87,7 @@ td {
 }
 
 .slider-thumb {
-  background-color: darkgray;
+  background-color: light;
   border: 2px solid gray;
   border-radius: 100%;
   width: 1.4rem;
