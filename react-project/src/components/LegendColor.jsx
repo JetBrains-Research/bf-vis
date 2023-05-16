@@ -122,7 +122,7 @@ function LegendColor(props) {
       <div
         id="legend-size-container"
         className="row panel-right mt-2 pt-2 pb-2">
-        <h4>
+        <h5>
           Bus Factor{" "}
           <InfoPanel
             divName="legendColorInfoPanel"
@@ -138,7 +138,7 @@ function LegendColor(props) {
             <i className="bi bi-plus-circle-fill"></i>
             <i className="bi bi-dash-circle-fill"></i>
           </a>
-        </h4>
+        </h5>
         <div
           id="legendColorCollapsible"
           className="collapse show">

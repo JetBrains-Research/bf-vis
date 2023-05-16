@@ -117,7 +117,7 @@ function SimulationModeModal(props) {
     <div
       id="simulation-mode-container"
       className="row panel-right mt-2 pt-2 pb-2">
-      <h4>
+      <h5>
         Simulation Mode 
         <InfoPanel
           divName="simInfoPanel"
@@ -137,14 +137,13 @@ function SimulationModeModal(props) {
           <i className="bi bi-plus-circle-fill"></i>
           <i className="bi bi-dash-circle-fill"></i>
         </a>
-      </h4>
+      </h5>
       <div
         id="simulationModeCollapsible"
         className="collapse show">
-        <p className="small">
-          Using this mode, we can highlight if the bus factor changes when one or more
-           authors leave
-        </p>
+        {/* <p className="small">
+          Simulate the effect of a developer leaving
+        </p> */}
         <button
           type="button"
           className="btn btn-primary"

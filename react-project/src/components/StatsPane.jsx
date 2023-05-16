@@ -107,13 +107,8 @@ function StatsPane(props) {
     if (isFirstRender.current) {
       isFirstRender.current = false;
     }
-    // if (nodeBusFactor && nodeBusFactor > 0) {
-    //   setNumOfAuthors(nodeBusFactor);
-    // } else
+
     if (totalNumOfAuthors) {
-      // totalNumOfAuthors > 10
-      //   ? setNumOfAuthors(10)
-      // :
       setNumOfAuthors(totalNumOfAuthors);
     }
   }, [nodeBusFactor, totalNumOfAuthors]);
@@ -122,7 +117,7 @@ function StatsPane(props) {
     <div
       id="details-container"
       className="row panel-right mt-2 pt-2 pb-2">
-      <h4>
+      <h5>
         Stats{" "}
         <InfoPanel
           divName="statsInfoPanel"
@@ -138,22 +133,22 @@ function StatsPane(props) {
           <i className="bi bi-plus-circle-fill"></i>
           <i className="bi bi-dash-circle-fill"></i>
         </a>
-      </h4>
+      </h5>
       <div className="col-12 statsPaneCollapsible collapse show">
         <ul className="list-unstyled">
           <li>
-            <span className="text-break text-wrap">
+            <small className="text-break text-wrap">
               Name: <strong>{nodeData.name}</strong>
-            </span>
+            </small>
           </li>
           <li>
-            <span className="text-break text-wrap">
+            <small className="text-break text-wrap">
               Bus Factor: <strong>{nodeBusFactor}</strong>
-            </span>
+            </small>
           </li>
         </ul>
 
-        <h5>Author Contribution</h5>
+        <h6>Author Contribution</h6>
         {authorsList && topAuthors ? (
           <></>
         ) : (
@@ -163,9 +158,8 @@ function StatsPane(props) {
         )}
 
         <div
-          
           style={{
-            maxHeight: "50vh",
+            maxHeight: "40vh",
             overflowY: "scroll",
             overflowX: "auto",
           }}

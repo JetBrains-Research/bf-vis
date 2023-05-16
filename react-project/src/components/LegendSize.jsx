@@ -14,7 +14,7 @@ function LegendSize(props) {
     <div
       id="legend-size-container"
       className="row panel-right mt-2 pt-2 pb-2">
-      <h4>
+      <h5>
         Size{" "}
         <InfoPanel
           divName="legendSizeInfoPanel"
@@ -30,7 +30,7 @@ function LegendSize(props) {
           <i className="bi bi-plus-circle-fill"></i>
           <i className="bi bi-dash-circle-fill"></i>
         </a>
-      </h4>
+      </h5>
       <div
         id="legendSizeCollapsible"
         className="collapse show">

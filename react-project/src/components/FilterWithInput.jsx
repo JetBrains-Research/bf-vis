@@ -62,7 +62,7 @@ function FilterWithInput(props) {
 
   return (
     <div className="mt-3 mb-3">
-      <h5>
+      <h6>
         {filterPropertyType}{" "}
         {props.infoPanelDetails !== null ? (
           <InfoPanel
@@ -70,7 +70,7 @@ function FilterWithInput(props) {
             header={"How does " + filterPropertyType + " work?"}
             body={props.infoPanelDetails}></InfoPanel>
         ) : null}
-      </h5>
+      </h6>
       <div className="input-group">
         <input
           type="text"
