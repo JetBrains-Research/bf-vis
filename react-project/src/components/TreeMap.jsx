@@ -3,7 +3,7 @@
 import React, { useLayoutEffect } from "react";
 import { useSelector } from "react-redux";
 
-import { selectAllFilters } from "../reducers/treemapSlice";
+import { selectAllFilters, selectExtensionFilters } from "../reducers/treemapSlice";
 
 import { createSVGInContainer, clearCanvas } from "../d3/svgCanvas.tsx";
 import {
@@ -12,6 +12,7 @@ import {
   drawMiniTreemapFromGeneratedLayout,
   applyNormalizationToD3Hierarchy,
   applyRegExFilters,
+  applyExtensionFilters,
 } from "../d3/treemap";
 
 import { sizeAscending } from "../d3/sort";
@@ -38,7 +39,8 @@ function TreeMap(props) {
   const tilingFunction = props.tilingFunction ? props.tilingFunction : squarify;
 
   // redux related vars
-  const filters = useSelector(selectAllFilters);
+  const regexFilters = useSelector(selectAllFilters);
+  const extensionFilters = useSelector(selectExtensionFilters);
 
   useLayoutEffect(() => {
     // set data source
@@ -66,8 +68,12 @@ function TreeMap(props) {
     let rootHierarchyNode = generateInitialD3Hierarchy(data);
 
     // Apply filters if present
-    if (filters) {
-      applyRegExFilters(rootHierarchyNode, filters);
+    if (regexFilters) {
+      applyRegExFilters(rootHierarchyNode, regexFilters);
+    }
+
+    if (extensionFilters) {
+      applyExtensionFilters(rootHierarchyNode, extensionFilters)
     }
 
     // Apply data normalization if applicable
@@ -110,7 +116,8 @@ function TreeMap(props) {
     currentColorPalette,
     currentDataPath,
     dataNormalizationFunction,
-    filters,
+    regexFilters,
+    extensionFilters,
     initialHeight,
     initialWidth,
     padding,

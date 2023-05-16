@@ -78,10 +78,10 @@ function Navigator(props) {
     console.log(event.target.checked);
 
     if (event.target.checked) {
-      dispatch(addExtensionFilter([extension]))
+      dispatch(removeExtensionFilter([extension]))
     }
     else {
-      dispatch(removeExtensionFilter([extension]))
+      dispatch(addExtensionFilter([extension]))
     }
   };
 
@@ -188,6 +188,7 @@ function Navigator(props) {
           <FilterWithInput
             key="Regex"
             filterPropertyType="RegEx"
+            summary={"Only pattern matches are shown"}
             addFunction={addFilter}
             removeFunction={removeFilter}
             removeAllFunction={removeAllFilters}
@@ -196,9 +197,10 @@ function Navigator(props) {
             infoPanelDetails={[
               t("filters.regex"),
               t("filters.links"),
-            ]}></FilterWithInput>
+            ]}>
+            </FilterWithInput>
 
-          <h6>Extensions</h6>
+          <h6>Suggested Filters</h6>
           <div
             className="dropdown open filtersCollapsible show row text-start"
             style={{
