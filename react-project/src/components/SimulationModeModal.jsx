@@ -118,7 +118,7 @@ function SimulationModeModal(props) {
       id="simulation-mode-container"
       className="row panel-right mt-2 pt-2 pb-2">
       <h5>
-        Simulation Mode 
+        Simulation Mode{" "}
         <InfoPanel
           divName="simInfoPanel"
           header="How does the simulation mode work?"
