@@ -4,6 +4,7 @@ import React from "react";
 import LegendColor from "./LegendColor";
 import StatsPane from "./StatsPane";
 import LegendSize from "./LegendSize";
+import {addMargin} from "./Navigator";
 
 function RightColumn(props) {
   const statsData = props.statsData;
@@ -11,8 +12,12 @@ function RightColumn(props) {
 
   return (
     <div className="col p-1">
-      <StatsPane data={statsData}></StatsPane>
-      <LegendColor></LegendColor>
+      {addMargin(
+        <StatsPane data={statsData}></StatsPane>
+      )}
+      <center>
+        <LegendColor></LegendColor>
+      </center>
     </div>
   );
 }
