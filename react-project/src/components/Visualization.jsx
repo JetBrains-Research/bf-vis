@@ -19,7 +19,6 @@ import {
   selectCurrentVisualizationPath,
   simulationVisualizationData,
   simulationVisualizationPath,
-  selectAllFilters,
   selectColorThresholds,
   selectColorPalette,
 } from "../reducers/treemapSlice";
