@@ -1,7 +1,7 @@
 /** @format */
 
-import React, { useState } from "react";
-import { batch } from "react-redux";
+import React, { useState, useMemo } from "react";
+import { batch, useSelector } from "react-redux";
 
 import { InfoPanel } from "./InfoPanel";
 import { useTranslation } from "react-i18next";
@@ -9,14 +9,18 @@ import { useTranslation } from "react-i18next";
 import { CONFIG } from "../config";
 import {
   addFilter,
+  addExtensionFilter,
   removeAllFilters,
+  removeExtensionFilter,
   removeFilter,
   selectAllFilters,
+  selectExtensionFilters,
 } from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 import SimulationModeModal from "./SimulationModeModal";
 import LegendSize from "./LegendSize";
-import { generateBreadcrumb } from "../utils/url.tsx";
+import { generateBreadcrumb, getFileExtension } from "../utils/url.tsx";
+import { Form } from "react-bootstrap";
 
 function Navigator(props) {
   const dispatch = props.dispatch;
@@ -28,9 +32,29 @@ function Navigator(props) {
 
   const filterTemplates = CONFIG.filters;
   const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
-  const [isBusFactorRecalcActive, setisBusFactorRecalcActive] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState();
   const { t, i18n } = useTranslation();
+
+  const currentExtensionsList = useMemo(() => {
+    if ("children" in simulationData) {
+      return Array.from(
+        new Set(
+          simulationData.children
+            .map((item, index) => {
+              const extension = getFileExtension(item.name);
+              if (extension !== undefined) return extension;
+            })
+            .filter((ext) => ext !== undefined)
+        )
+      ).sort();
+    } else {
+      return [];
+    }
+  });
+
+  const currentExtensionsFilteredList = useSelector(selectExtensionFilters);
+
+  console.log(currentExtensionsList);
 
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
@@ -42,32 +66,23 @@ function Navigator(props) {
     }
   };
 
-  const handleBusFactorRecalculationSwitch = (event) => {
-    setisBusFactorRecalcActive(!isBusFactorRecalcActive);
-
-    if (event.target.checked) {
-      // enable recalculation
-      // dispatch(addExclusionFilenamePrefixesFilter(['.',]));
-    } else if (!event.target.checked) {
-      // disable recalculation
-      // dispatch(removeExclusionFilenamePrefixesFilter(['.',]));
-    }
-  };
-
   const handleFilterDropdown = (event) => {
     const dropdownSelection = event.target.innerText;
     setCurrentTemplate(dropdownSelection);
     batch(() => {
       dispatch(addFilter(filterTemplates[dropdownSelection].extensions));
-      // dispatch(
-      //   addExclusionFilenameFilter(filterTemplates[dropdownSelection].fileNames)
-      // );
-      // dispatch(
-      //   addExclusionFilenamePrefixesFilter(
-      //     filterTemplates[dropdownSelection].fileNamePrefixes
-      //   )
-      // );
     });
+  };
+
+  const handleFilterCheck = (extension, event) => {
+    console.log(event.target.checked);
+
+    if (event.target.checked) {
+      dispatch(addExtensionFilter([extension]))
+    }
+    else {
+      dispatch(removeExtensionFilter([extension]))
+    }
   };
 
   return (
@@ -75,7 +90,7 @@ function Navigator(props) {
       className="col p-1"
       id="controls">
       <div className="row pt-2 pb-2 mb-3 panel-left">
-        <h4>
+        <h5>
           Current Path{" "}
           <InfoPanel
             divName="currentPathInfoPanel"
@@ -94,7 +109,7 @@ function Navigator(props) {
             <i className="bi bi-plus-circle-fill"></i>
             <i className="bi bi-dash-circle-fill"></i>
           </a>
-        </h4>
+        </h5>
 
         <div
           id="pathNavCollapsible"
@@ -152,7 +167,7 @@ function Navigator(props) {
       </div>
 
       <div className="row pt-2 pb-2 mb-3 panel-left">
-        <h4>
+        <h5>
           Filters{" "}
           <InfoPanel
             divName="filtersInfoPanel"
@@ -168,35 +183,8 @@ function Navigator(props) {
             <i className="bi bi-plus-circle-fill"></i>
             <i className="bi bi-dash-circle-fill"></i>
           </a>
-        </h4>
+        </h5>
         <div className="filtersCollapsible collapse show">
-          {/* <h6>
-            Bus Factor Recalculation{" "}
-            <InfoPanel
-              divName="recalculationInfoPanel"
-              header="How and when is bus factor recalculated?"
-              body={[t("busFactor.recalculation")]}></InfoPanel>
-          </h6> */}
-
-          {/* <input
-            className="btn-check"
-            type="checkbox"
-            role="switch"
-            id="recalculationSwitch"
-            checked={isBusFactorRecalcActive}
-            onChange={handleBusFactorRecalculationSwitch}></input>
-          <label
-            className="btn btn-sm"
-            style={{
-              backgroundColor: isBusFactorRecalcActive
-                ? CONFIG.general.colors.jetbrains.blue
-                : CONFIG.general.colors.jetbrains.brightRed,
-              color: "white",
-            }}
-            htmlFor="recalculationSwitch">
-            {isBusFactorRecalcActive ? "On" : "Off"}
-          </label> */}
-
           <FilterWithInput
             key="Regex"
             filterPropertyType="RegEx"
@@ -205,38 +193,37 @@ function Navigator(props) {
             removeAllFunction={removeAllFilters}
             selector={selectAllFilters}
             dispatch={dispatch}
-            infoPanelDetails={[t("filters.regex"), t("filters.links") ]}></FilterWithInput>
+            infoPanelDetails={[
+              t("filters.regex"),
+              t("filters.links"),
+            ]}></FilterWithInput>
 
-          <h5>Filtering Templates</h5>
-          <div className="dropdown open filtersCollapsible collapse show">
-            <button
-              className="btn btn-secondary dropdown-toggle"
-              type="button"
-              id="triggerId"
-              data-bs-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false">
-              Filter Templates
-            </button>
-            <div
-              className="dropdown-menu"
-              aria-labelledby="triggerId">
-              {Object.keys(filterTemplates).map((template) => {
+          <h6>Extensions</h6>
+          <div
+            className="dropdown open filtersCollapsible show row text-start"
+            style={{
+              maxHeight: "15vh",
+              overflowY: "scroll",
+            }}>
+            <Form>
+              {currentExtensionsList.map((extension, index) => {
                 return (
-                  <button
-                    className={
-                      template === currentTemplate
-                        ? "dropdown-item active"
-                        : "dropdown-item"
-                    }
-                    key={template}
-                    template={template}
-                    onClick={handleFilterDropdown}>
-                    {template}
-                  </button>
+                  <Form.Check key={extension}>
+                    <Form.Check.Input
+                      id={`${extension}-checkbox`}
+                      checked={
+                        !currentExtensionsFilteredList.includes(extension)
+                      }
+                      onChange={(event) =>
+                        handleFilterCheck(extension, event)
+                      }></Form.Check.Input>
+                    <Form.Check.Label>
+                      <small>{`.${extension}`}</small>
+                    </Form.Check.Label>
+                  </Form.Check>
                 );
               })}
-            </div>
+            </Form>
           </div>
         </div>
       </div>
@@ -245,7 +232,7 @@ function Navigator(props) {
         simulationData={simulationData}
         simulationPath={simulationPath}
         reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
-      
+
       <LegendSize></LegendSize>
     </div>
   );

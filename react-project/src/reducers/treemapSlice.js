@@ -60,7 +60,8 @@ function convertTreeToState(tree) {
       },
       removedAuthors: [],
     },
-    filters: [],
+    extensionFilters: [],
+    regexFilters: [],
   };
 }
 
@@ -365,7 +366,7 @@ const treemapSlice = createSlice({
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
         return {
           ...state,
-          filters: [...new Set(state.filters.concat(newFilterExps))],
+          regexFilters: [...new Set(state.regexFilters.concat(newFilterExps))],
         };
       }
     },
@@ -374,16 +375,37 @@ const treemapSlice = createSlice({
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
         return {
           ...state,
-          filters: state.filters.filter(
+          regexFilters: state.regexFilters.filter(
             (element) => !newFilterExps.includes(element)
           ),
         };
       }
     },
-    removeAllFilters: (state, action) => {
+    addExtensionFilter: (state, action) => {
+      const newFilterExps = action.payload;
+      if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
+        return {
+          ...state,
+          extensionFilters: [...new Set(state.extensionFilters.concat(newFilterExps))],
+        };
+      }
+    },
+    removeExtensionFilter: (state, action) => {
+      const newFilterExps = action.payload;
+      if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
+        return {
+          ...state,
+          extensionFilters: state.extensionFilters.filter(
+            (element) => !newFilterExps.includes(element)
+          ),
+        };
+      }
+    },
+    removeAllFilters: (state) => {
       return {
         ...state,
-        filters: [],
+        regexFilters: [],
+        extensionFilters: [],
       };
     },
     enableSimulationMode: (state, action) => {
@@ -493,7 +515,9 @@ export const {
   returnMainTreemapHome,
   // regex filter actions
   addFilter,
+  addExtensionFilter,
   removeFilter,
+  removeExtensionFilter,
   removeAllFilters,
   // color and color threshold actions
   setColors,
@@ -524,7 +548,8 @@ export const selectCurrentStatsData = (state) =>
 export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
-export const selectAllFilters = (state) => state.treemap.filters;
+export const selectAllFilters = (state) => state.treemap.regexFilters;
+export const selectExtensionFilters = (state) => state.treemap.extensionFilters;
 //simulation mode selectors
 export const isSimulationMode = (state) =>
   state.treemap.simulation.isSimulationMode;
