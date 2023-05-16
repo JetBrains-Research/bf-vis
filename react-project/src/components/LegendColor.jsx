@@ -142,6 +142,7 @@ function LegendColor(props) {
         <div
           id="legendColorCollapsible"
           className="collapse show">
+          {props.summary ? <small>{props.summary}</small> : null}
           {scale.reverse().map((element, index) => {
             return (
               <div

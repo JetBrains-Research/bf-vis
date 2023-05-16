@@ -13,7 +13,8 @@ function RightColumn(props) {
   return (
     <div className="col p-1">
       <StatsPane data={statsData}></StatsPane>
-      <LegendColor></LegendColor>
+      <LegendColor
+      summary={"Colors can be picked by clicking on the squares below"}></LegendColor>
     </div>
   );
 }

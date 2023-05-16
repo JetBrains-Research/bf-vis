@@ -71,6 +71,7 @@ function FilterWithInput(props) {
             body={props.infoPanelDetails}></InfoPanel>
         ) : null}
       </h6>
+      {props.summary ? <small>{props.summary}</small> : null}
       <div className="input-group">
         <input
           type="text"
