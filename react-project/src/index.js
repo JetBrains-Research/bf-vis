@@ -14,6 +14,7 @@ import './i18n';
 import "bootstrap/dist/js/bootstrap.bundle";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "@jetbrains/ring-ui/dist/style.css";
 import {setNewTree} from "./reducers/treemapSlice";
 import { gitRepoDirData } from "./data/project_data_recalculating";
 
