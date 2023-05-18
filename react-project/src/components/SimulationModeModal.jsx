@@ -272,7 +272,7 @@ function SimulationModeModal(props) {
                             checkbox: !removedAuthorsList.includes(authorScorePair.email)
                           }
                         ))
-                      : {}
+                      : []
                   }
                 />
 
