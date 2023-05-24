@@ -1,9 +1,10 @@
 /** @format */
 
 import React from "react";
-import { useSelector } from "react-redux";
-import { CONFIG } from "../config";
-import { InfoPanel } from "./InfoPanel";
+import {useSelector} from "react-redux";
+import {CONFIG} from "../config";
+import {InfoPanel} from "./InfoPanel";
+import Button from "@jetbrains/ring-ui/dist/button/button";
 
 function FilterWithInput(props) {
   const dispatch = props.dispatch;
@@ -71,7 +72,9 @@ function FilterWithInput(props) {
             body={props.infoPanelDetails}></InfoPanel>
         ) : null}
       </h6>
+
       {props.summary ? <small>{props.summary}</small> : null}
+
       <div className="input-group">
         <input
           type="text"
@@ -90,6 +93,7 @@ function FilterWithInput(props) {
         </button>
       </div>
 
+      {/*TODO: replace with tags ringui*/}
       <div className="container mb-3">
         {currentFilters.map((filterElement) => (
           <div
@@ -109,17 +113,10 @@ function FilterWithInput(props) {
       </div>
 
       {currentFilters.length > 0 ? (
-        <button
-          className="btn"
-          type="button"
-          id="button-filter-remove-all"
-          style={{
-            backgroundColor: CONFIG.general.colors.jetbrains.brightRed,
-            color: "white",
-          }}
+        <Button
+          danger={true}
           onClick={() => dispatch(props.removeAllFunction())}>
-          Remove All Filters
-        </button>
+          Remove All Filters</Button>
       ) : null}
     </div>
   );

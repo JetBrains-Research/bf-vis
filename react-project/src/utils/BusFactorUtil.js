@@ -49,9 +49,9 @@ function getMajorFileData(node, developersToRemove) {
       });
     }
 
-    fileMajorUsers = fileMajorUsers.filter( function( el ) {
-      return !developersToRemove.includes( el );
-    } );
+    fileMajorUsers = fileMajorUsers.filter(function (el) {
+      return !developersToRemove.includes(el);
+    });
 
     if (debug) {
       result.push({
@@ -93,9 +93,12 @@ function countOrphanAndRemove(majorFileData, mainAuthor) {
 
 function busFactorForFolder(folderData, developersToRemove) {
   if (debug) console.log(folderData.path)
+  if (!checkStatus(folderData)) {
+    return sliceNoChildren(folderData, 0);
+  }
 
   let majorFileData = getMajorFileData(folderData, developersToRemove);
-  const developers = sortContributors(majorFileData);
+  const developers = folderData.users
   let orphanFiles = countOrphan(majorFileData);
   const filesCount = majorFileData.length;
   let busFactor = 0;
@@ -113,7 +116,8 @@ function busFactorForFolder(folderData, developersToRemove) {
 
   // compareDevelopers(folderData, developers)
 
-  for (const mainAuthor of developers) {
+  for (const [key, mainAuthorData] of developers.entries()) {
+    const mainAuthor = mainAuthorData.email
     if (filesCount >= 2 * orphanFiles) {
       busFactor++
     } else {

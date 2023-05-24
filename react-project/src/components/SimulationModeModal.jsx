@@ -1,14 +1,14 @@
 /** @format */
 
-import { format } from "../d3/format.tsx";
+import {format} from "../d3/format.tsx";
 import * as tiling from "../d3/tiling.tsx";
-import React, { useState } from "react";
-import { CONFIG } from "../config";
+import React, {useState} from "react";
+import {CONFIG} from "../config";
 import TreeMap from "./TreeMap";
 
-import { generateBreadcrumb } from "../utils/url.tsx";
-import { useTranslation } from "react-i18next";
-import { InfoPanel } from "./InfoPanel";
+import {generateBreadcrumb} from "../utils/url.tsx";
+import {useTranslation} from "react-i18next";
+import {InfoPanel} from "./InfoPanel";
 import {
   addAuthorToRemovalList,
   disableSimulationMode,
@@ -17,13 +17,26 @@ import {
   selectRemovedAuthors,
   undoAuthorRemoval,
 } from "../reducers/treemapSlice.js";
-import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
-import { useSelector } from "react-redux";
-import { Modal, Table } from "react-bootstrap";
+import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
+import {useSelector} from "react-redux";
+import {Modal} from "react-bootstrap";
 import LegendSimColor from "./LegendSimColor.jsx";
+import Island from "@jetbrains/ring-ui/dist/island/island";
+import Header from "@jetbrains/ring-ui/dist/island/header";
+import Content from "@jetbrains/ring-ui/dist/island/content";
+import Button from "@jetbrains/ring-ui/dist/button/button";
+import experimentIcon from '@jetbrains/icons/experiment-20px';
+import Icon from "@jetbrains/ring-ui/dist/icon/icon";
+import {ControlsHeight, ControlsHeightContext} from "@jetbrains/ring-ui/dist/global/controls-height";
+import List from "@jetbrains/ring-ui/dist/list/list";
+import {Input, Size} from "@jetbrains/ring-ui/dist/input/input";
+import arrowUpIcon from "@jetbrains/icons/arrow-up";
+import archiveIcon from "@jetbrains/icons/archive";
+import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
+import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
 
 function SimulationModeModal(props) {
-  const { t, i18n } = useTranslation();
+  const {t, i18n} = useTranslation();
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
@@ -84,18 +97,16 @@ function SimulationModeModal(props) {
     }
   };
 
-  const handleAuthorCheckmark = (e, authorScorePair) => {
-    let email = authorScorePair.email;
-    console.log(email);
-    if (!e.target.checked) {
-      props.reduxNavFunctions.dispatch(addAuthorToRemovalList([email]));
+  const handleAuthorCheckmark = (authorEmail) => {
+    if (!removedAuthorsList.includes(authorEmail)) {
+      props.reduxNavFunctions.dispatch(addAuthorToRemovalList([authorEmail]));
       props.reduxNavFunctions.dispatch(
         scopeMiniTreemapIn(
           payloadGenerator("path", simulationVisualizationPath)
         )
       );
-    } else if (e.target.checked) {
-      props.reduxNavFunctions.dispatch(undoAuthorRemoval([email]));
+    } else {
+      props.reduxNavFunctions.dispatch(undoAuthorRemoval([authorEmail]));
       props.reduxNavFunctions.dispatch(
         scopeMiniTreemapIn(
           payloadGenerator("path", simulationVisualizationPath)
@@ -114,43 +125,45 @@ function SimulationModeModal(props) {
   };
 
   return (
-    <div
-      id="simulation-mode-container"
-      className="row panel-right mt-2 pt-2 pb-2">
-      <h5>
-        Simulation Mode{" "}
-        <InfoPanel
-          divName="simInfoPanel"
-          header="How does the simulation mode work?"
-          body={[
-            t("simMode.general"),
-            t("simMode.detail"),
-            t("simMode.links"),
-          ]}></InfoPanel>
-        <a
-          className=""
-          data-bs-toggle="collapse"
-          href="#simulationModeCollapsible"
-          role="button"
-          aria-expanded="true"
-          aria-controls="simulationModeCollapsible">
-          <i className="bi bi-plus-circle-fill"></i>
-          <i className="bi bi-dash-circle-fill"></i>
-        </a>
-      </h5>
-      <div
-        id="simulationModeCollapsible"
-        className="collapse show">
-        {/* <p className="small">
-          Simulate the effect of a developer leaving
-        </p> */}
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={handleShow}>
-          Use Simulation Mode
-        </button>
-      </div>
+
+    <>
+      <Island>
+        <Header border>
+          Simulation Mode{" "}
+          <InfoPanel
+            divName="simInfoPanel"
+            header="How does the simulation mode work?"
+            body={[
+              t("simMode.general"),
+              t("simMode.detail"),
+              t("simMode.links"),
+            ]}></InfoPanel>
+          <a
+            className=""
+            data-bs-toggle="collapse"
+            href="#simulationModeCollapsible"
+            role="button"
+            aria-expanded="true"
+            aria-controls="simulationModeCollapsible">
+            <i className="bi bi-plus-circle-fill"></i>
+            <i className="bi bi-dash-circle-fill"></i>
+          </a>
+        </Header>
+        <Content>
+          <div
+            id="simulationModeCollapsible"
+            className="collapse show">
+            <p className="small">
+              Using this mode, we can highlight if the bus factor changes when one or more
+              authors leave
+            </p>
+            <ControlsHeightContext.Provider value={ControlsHeight.L}>
+              <Button primary onClick={handleShow}><Icon glyph={experimentIcon}/> Use Simulation Mode</Button>
+            </ControlsHeightContext.Provider>
+          </div>
+
+        </Content>
+      </Island>
 
       {/* Modal */}
       <Modal
@@ -162,153 +175,117 @@ function SimulationModeModal(props) {
         </Modal.Header>
 
         <Modal.Body>
-          <div className="row">
-            <div className="col-8">
-              <center>
-                <TreeMap
-                  colorDefinitions={CONFIG.general.colors.jetbrains}
-                  containerId={CONFIG.simulation.ids.treemapContainerId}
-                  data={simulationVisualizationData}
-                  dataNormalizationFunction={Math.log2}
-                  dataPath={simulationVisualizationPath}
-                  initialHeight={CONFIG.simulation.layout.height}
-                  initialWidth={CONFIG.simulation.layout.width}
-                  padding={CONFIG.simulation.layout.overallPadding}
-                  svgId={CONFIG.simulation.ids.treemapSvgId}
-                  tilingFunction={tiling.squarify}
-                  topPadding={CONFIG.simulation.layout.topPadding}
-                  type="mini"
-                  reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
-              </center>
-            </div>
 
-            <div className="col-4">
-              <nav aria-label="breadcrumb">
-                <strong>Path:</strong>
-                <ol className="breadcrumb">
-                  {simulationVisualizationPath
-                    .split("/")
-                    .map((pathElement, i) => (
-                      <li
-                        className={
-                          i < simulationVisualizationPath.split("/").length - 1
-                            ? "btn btn-link breadcrumb-item p-1"
-                            : "btn btn-link breadcrumb-item active p-1"
-                        }
-                        key={pathElement}
+          <Grid>
+            <Row>
+              <Col xs={9} sm={9} md={9} lg={9}>
+                <center>
+                  <TreeMap
+                    colorDefinitions={CONFIG.general.colors.jetbrains}
+                    containerId={CONFIG.simulation.ids.treemapContainerId}
+                    data={simulationVisualizationData}
+                    dataNormalizationFunction={Math.log2}
+                    dataPath={simulationVisualizationPath}
+                    initialHeight={CONFIG.simulation.layout.height}
+                    initialWidth={CONFIG.simulation.layout.width}
+                    padding={CONFIG.simulation.layout.overallPadding}
+                    svgId={CONFIG.simulation.ids.treemapSvgId}
+                    tilingFunction={tiling.squarify}
+                    topPadding={CONFIG.simulation.layout.topPadding}
+                    type="mini"
+                    reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
+                </center>
+              </Col>
+              <Col xs={3} sm={3} md={3} lg={3}>
+                <div style={{marginBottom: 20}}>
+                  <nav aria-label="breadcrumb">
+                    <strong>Path:</strong>
+                    <ol className="breadcrumb">
+                      {simulationVisualizationPath
+                        .split("/")
+                        .map((pathElement, i) => (
+                          <li
+                            className={
+                              i < simulationVisualizationPath.split("/").length - 1
+                                ? "btn btn-link breadcrumb-item p-1"
+                                : "btn btn-link breadcrumb-item active p-1"
+                            }
+                            key={pathElement}
+                            onClick={() =>
+                              setTreemapPathOutFunc(
+                                generateBreadcrumb(i, simulationVisualizationPath)
+                              )
+                            }>
+                            {pathElement}
+                          </li>
+                        ))}
+                    </ol>
+                  </nav>
+
+                  <center>
+                    <ButtonSet>
+                      <Button
                         onClick={() =>
-                          setTreemapPathOutFunc(
-                            generateBreadcrumb(i, simulationVisualizationPath)
-                          )
-                        }>
-                        {pathElement}
-                      </li>
-                    ))}
-                </ol>
-              </nav>
-              <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  onChange={handleSearchTextChange}
-                  aria-describedby="input-file-extension"></input>
-
-                <button
-                  className="btn btn-dark"
-                  type="button"
-                  id="button-filter-add">
-                  Search
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  style={{
-                    backgroundColor: CONFIG.general.colors.jetbrains.blue,
-                    color: "white",
-                  }}
-                  id="back"
-                  onClick={() =>
-                    simulationVisualizationPath
-                      .split("/")
-                      .filter((r) => r !== "").length > 1
-                      ? setTreemapPathOutFunc(
                           simulationVisualizationPath
                             .split("/")
-                            .slice(0, -1)
-                            .join("/")
-                        )
-                      : setTreemapPathOutFunc(".")
-                  }>
-                  &uarr; Up
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  style={{
-                    backgroundColor: CONFIG.general.colors.jetbrains.brightRed,
-                    color: "white",
-                  }}
-                  id="reset"
-                  onClick={() => returnTreeMapHome()}>
-                  <i className="bi bi-house"></i> Home
-                </button>
-              </div>
-              {/* </div> */}
+                            .filter((r) => r !== "").length > 1
+                            ? setTreemapPathOutFunc(
+                              simulationVisualizationPath
+                                .split("/")
+                                .slice(0, -1)
+                                .join("/")
+                            )
+                            : setTreemapPathOutFunc(".")}
+                      ><Icon glyph={arrowUpIcon}/> Up</Button>
+                      <Button
+                        primary
+                        onClick={() => returnTreeMapHome()}>
+                        <Icon glyph={archiveIcon}/> Home</Button>
+                    </ButtonSet>
+                  </center>
+                </div>
 
-              <div
-                style={{
-                  maxHeight: "65vh",
-                  maxWidth: "30vw",
-                  overflowY: "scroll",
-                }}>
-                <Table striped bordered responsive size="sm">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Included?</th>
-                      <th>Email</th>
-                      <th>Relative Contribution (to current location)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {authorsList && authorsListContributionPercentage
+
+                {/*TODO: add same width for input and list*/}
+                <Input
+                  onChange={handleSearchTextChange}
+                  size={Size.L}
+                ></Input>
+
+                <List
+                  maxHeight={600}
+                  shortcuts={true}
+                  onSelect={(item, e) => {
+                    handleAuthorCheckmark(item.label)
+                  }}
+                  data={
+                    authorsList && authorsListContributionPercentage
                       ? authorsListContributionPercentage
-                          .filter((element) =>
-                            element["email"].includes(nameFilterValue)
-                          )
-                          .map((authorScorePair, index) => (
-                            <tr key={authorScorePair["email"]}>
-                              <td>{index + 1}</td>
-                              <td>
-                                <div className="form-check form-check-inline">
-                                  <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id={authorScorePair.email}
-                                    checked={authorScorePair.included}
-                                    onChange={(e) =>
-                                      handleAuthorCheckmark(e, authorScorePair)
-                                    }></input>
-                                </div>
-                              </td>
-                              <td>{authorScorePair["email"]}</td>
-                              <td>
-                                {formatPercentage(
-                                  authorScorePair["relativeScore"]
-                                )}
-                              </td>
-                            </tr>
-                          ))
-                      : null}
-                  </tbody>
-                </Table>
-              </div>
-            </div>
-          </div>
+                        .filter((element) =>
+                          element["email"].includes(nameFilterValue)
+                        )
+                        .sort((a, b) => b.relativeScore - a.relativeScore)
+                        .map((authorScorePair, index) => (
+                          {
+                            label: authorScorePair.email,
+                            details: formatPercentage(authorScorePair.relativeScore),
+                            rgItemType: List.ListProps.Type.ITEM,
+                            checkbox: !removedAuthorsList.includes(authorScorePair.email)
+                          }
+                        ))
+                      : {}
+                  }
+                />
+
+
+              </Col>
+            </Row>
+          </Grid>
+
           <LegendSimColor></LegendSimColor>
         </Modal.Body>
       </Modal>
-    </div>
+    </>
   );
 }
 

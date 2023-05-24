@@ -1,35 +1,36 @@
 /** @format */
 
-import { useCallback, useDeferredValue, useLayoutEffect } from "react";
-import { useDispatch, useSelector, batch } from "react-redux";
-import { useSearchParams } from "react-router-dom";
-import { CONFIG } from "../config";
+import {useCallback, useDeferredValue, useLayoutEffect} from "react";
+import {batch, useDispatch, useSelector} from "react-redux";
+import {useSearchParams} from "react-router-dom";
+import {CONFIG} from "../config";
 
 import {
   returnMainTreemapHome,
   returnMiniTreemapHome,
-  scopeStatsIn,
   scopeMainTreemapIn,
+  scopeMiniTreemapIn,
+  scopeMiniTreemapOut,
+  scopeStatsIn,
+  selectAllFilters,
   selectCurrentStatsData,
   selectCurrentStatsPath,
   selectCurrentVisualizationData,
   selectCurrentVisualizationPath,
-  scopeMiniTreemapIn,
-  scopeMiniTreemapOut,
   simulationVisualizationData,
   simulationVisualizationPath,
-  selectAllFilters,
   selectColorThresholds,
   selectColorPalette,
 } from "../reducers/treemapSlice";
 
-import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
+import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
 
 import * as tiling from "../d3/tiling";
 
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
+import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
 
 function Visualization() {
   const dispatch = useDispatch();
@@ -97,7 +98,7 @@ function Visualization() {
         if (urlDataPath === ".") {
           batch(() => {
             dispatch(returnMainTreemapHome());
-            dispatch(returnMiniTreemapHome());  
+            dispatch(returnMiniTreemapHome());
           })
           dispatch(scopeStatsIn(payloadGenerator("path", ".")));
         }
@@ -123,44 +124,49 @@ function Visualization() {
   ]);
 
   return (
-    <div className="App container-fluid text-center">
-      <div className="row justify-content-evenly">
-        <div className="col-2">
-          <h1>BFViz</h1>
-          <Navigator
-            dispatch={dispatch}
-            filters={filters}
-            path={currentVisualizationPath}
-            reduxNavFunctions={reduxNavFunctions}
-            setPathFunc={setURLPath}
-            simulationPath={currentSimulationModePath}
-            simulationData={currentSimulationModeData}
-            statsData={currentStatsData}></Navigator>
-        </div>
-        <div className="col-8">
-          <TreeMap
-            colorDefinitions={CONFIG.general.colors.jetbrains}
-            colorPalette={currentColorPalette}
+
+    <Grid>
+      <Row>
+        <Col xs={3} sm={3} md={2} lg={2}>
+          <center>
+            <h1>BFViz</h1>
+            <Navigator
+              dispatch={dispatch}
+              filters={filters}
+              path={currentVisualizationPath}
+              reduxNavFunctions={reduxNavFunctions}
+              setPathFunc={setURLPath}
+              simulationPath={currentSimulationModePath}
+              simulationData={currentSimulationModeData}
+              statsData={currentStatsData}></Navigator>
+          </center>
+        </Col>
+        <Col xs={6} sm={6} md={8} lg={8}>
+          <center>
+            <TreeMap
+              colorDefinitions={CONFIG.general.colors.jetbrains}
+              colorPalette={currentColorPalette}
             colorThresholds={currentColorThresholds}
             containerId={CONFIG.treemap.ids.treemapContainerId}
-            data={currentVisualizationData}
-            dataNormalizationFunction={Math.log2}
-            dataPath={currentVisualizationPath}
-            filters={filters}
-            initialHeight={window.innerHeight}
-            initialWidth={window.innerWidth * 0.65}
-            padding={CONFIG.treemap.layout.overallPadding}
-            setPathFunc={setURLPath}
-            svgId={CONFIG.treemap.ids.treemapSvgId}
-            tilingFunction={tiling.squarify}
-            topPadding={CONFIG.treemap.layout.topPadding}
-            type="main"></TreeMap>
-        </div>
-        <div className="col-2">
-          <RightColumn statsData={currentStatsData}></RightColumn>
-        </div>
-      </div>
-    </div>
+              data={currentVisualizationData}
+              dataNormalizationFunction={Math.log2}
+              dataPath={currentVisualizationPath}
+              filters={filters}
+              initialHeight={window.innerHeight}
+              initialWidth={window.innerWidth * 0.65}
+              padding={CONFIG.treemap.layout.overallPadding}
+              setPathFunc={setURLPath}
+              svgId={CONFIG.treemap.ids.treemapSvgId}
+              tilingFunction={tiling.squarify}
+              topPadding={CONFIG.treemap.layout.topPadding}
+              type="main"></TreeMap>
+          </center>
+        </Col>
+        <Col xs={3} sm={3} md={2} lg={2}>
+            <RightColumn statsData={currentStatsData}></RightColumn>
+        </Col>
+      </Row>
+    </Grid>
   );
 }
 
