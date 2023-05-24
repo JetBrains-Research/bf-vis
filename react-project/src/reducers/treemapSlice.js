@@ -4,6 +4,15 @@ import { createSlice } from "@reduxjs/toolkit";
 import { calculateBusFactor } from "../utils/BusFactorUtil";
 import { CONFIG } from "../config";
 
+const defaultColors = [
+  CONFIG.general.colors.jetbrains.gray,
+  CONFIG.general.colors.jetbrains.darkRed,
+  CONFIG.general.colors.jetbrains.golden,
+  CONFIG.general.colors.jetbrains.white,
+];
+
+const defaultColorThresholds = [2, 5];
+
 const defaultTree = {
   name: "PlaceHolder",
   path: ".",
@@ -38,12 +47,8 @@ function convertTreeToState(tree) {
       ignored: [],
       isRecalculationEnabled: false,
       previousPathStack: [],
-      thresholds: [2, 5],
-      colors: [
-        CONFIG.general.colors.jetbrains.darkRed,
-        CONFIG.general.colors.jetbrains.golden,
-        CONFIG.general.colors.jetbrains.white,
-      ],
+      thresholds: defaultColorThresholds,
+      colors: defaultColors,
     },
     simulation: {
       isSimulationMode: false,
@@ -55,7 +60,8 @@ function convertTreeToState(tree) {
       },
       removedAuthors: [],
     },
-    filters: [],
+    extensionFilters: [],
+    regexFilters: [],
   };
 }
 
@@ -360,7 +366,7 @@ const treemapSlice = createSlice({
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
         return {
           ...state,
-          filters: [...new Set(state.filters.concat(newFilterExps))],
+          regexFilters: [...new Set(state.regexFilters.concat(newFilterExps))],
         };
       }
     },
@@ -369,16 +375,37 @@ const treemapSlice = createSlice({
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
         return {
           ...state,
-          filters: state.filters.filter(
+          regexFilters: state.regexFilters.filter(
             (element) => !newFilterExps.includes(element)
           ),
         };
       }
     },
-    removeAllFilters: (state, action) => {
+    addExtensionFilter: (state, action) => {
+      const newFilterExps = action.payload;
+      if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
+        return {
+          ...state,
+          extensionFilters: [...new Set(state.extensionFilters.concat(newFilterExps))],
+        };
+      }
+    },
+    removeExtensionFilter: (state, action) => {
+      const newFilterExps = action.payload;
+      if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
+        return {
+          ...state,
+          extensionFilters: state.extensionFilters.filter(
+            (element) => !newFilterExps.includes(element)
+          ),
+        };
+      }
+    },
+    removeAllFilters: (state) => {
       return {
         ...state,
-        filters: [],
+        regexFilters: [],
+        extensionFilters: [],
       };
     },
     enableSimulationMode: (state, action) => {
@@ -447,6 +474,15 @@ const treemapSlice = createSlice({
         },
       };
     },
+    resetColorThresholdsToDefaults: (state) => {
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          thresholds: defaultColorThresholds,
+        },
+      };
+    },
     setColors: (state, action) => {
       const newColors = action.payload;
       return {
@@ -454,6 +490,15 @@ const treemapSlice = createSlice({
         mainTreemap: {
           ...state.mainTreemap,
           colors: newColors,
+        },
+      };
+    },
+    resetColorsToDefaults: (state) => {
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          colors: defaultColors,
         },
       };
     },
@@ -470,12 +515,16 @@ export const {
   returnMainTreemapHome,
   // regex filter actions
   addFilter,
+  addExtensionFilter,
   removeFilter,
+  removeExtensionFilter,
   removeAllFilters,
-  // color threshold methods
+  // color and color threshold actions
   setColors,
+  resetColorsToDefaults,
   setColorThresholds,
-  // Simulation Mode Actions
+  resetColorThresholdsToDefaults,
+  // simulation mode actions
   enableSimulationMode,
   disableSimulationMode,
   returnMiniTreemapHome,
@@ -499,7 +548,8 @@ export const selectCurrentStatsData = (state) =>
 export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
-export const selectAllFilters = (state) => state.treemap.filters;
+export const selectAllFilters = (state) => state.treemap.regexFilters;
+export const selectExtensionFilters = (state) => state.treemap.extensionFilters;
 //simulation mode selectors
 export const isSimulationMode = (state) =>
   state.treemap.simulation.isSimulationMode;
@@ -521,7 +571,8 @@ export const simulationVisualizationData = (state) => {
   );
 };
 
-export const selectColorThresholds = (state) => state.treemap.mainTreemap.thresholds;
+export const selectColorThresholds = (state) =>
+  state.treemap.mainTreemap.thresholds;
 export const selectColorPalette = (state) => state.treemap.mainTreemap.colors;
 
 export const simulationVisualizationPath = (state) =>

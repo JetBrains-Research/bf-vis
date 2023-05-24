@@ -7,6 +7,7 @@ import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 import { CONFIG } from "../config";
 import uid from "./uid.tsx";
 import { filter } from "d3";
+import { getFileExtension } from "../utils/url.tsx";
 
 /*
     This file has all the methods related to the d3 treemap including calculation and rendering
@@ -84,35 +85,24 @@ export function applyRegExFilters(hierarchy, filters) {
   }
 }
 
-export function applyFilters(hierarchy, filters) {
+export function applyExtensionFilters(hierarchy, filters) {
   if (hierarchy) {
-    hierarchy.eachAfter((d) => {
-      if (filters) {
-        if (filters.exclusion.fileNamePrefixes) {
-          if (filters.exclusion.fileNamePrefixes) {
-            filters.exclusion.fileNamePrefixes.forEach((prefix) => {
-              if (d.data.name.startsWith(prefix)) {
-                d.value = 0;
-              }
-            });
-          }
-          if (filters.exclusion.extensions) {
-            if (filters.exclusion.extensions.includes(d.data.extension)) {
+    if (filters) {
+      filters.forEach((filterExtension, filterExtensionIndex) => {
+        hierarchy.eachAfter((d) => {
+          if (d.value > 0) {
+            const filePathSplit = d.data.name.split("/");
+            const fileName = filePathSplit[filePathSplit.length - 1];
+            const fileExtension = getFileExtension(fileName)
+
+            if (fileExtension === filterExtension) {
               d.value = 0;
             }
           }
-          if (filters.exclusion.fileNames) {
-            filters.exclusion.fileNames.forEach((element) => {
-              if (d.data.name === element) {
-                d.value = 0;
-              }
-            });
-          }
-        }
-      }
-    });
+        });
+      });
+    }
   }
-  return hierarchy;
 }
 
 function addDimensionsToTreemap(treemap) {
@@ -124,9 +114,17 @@ function addDimensionsToTreemap(treemap) {
   return treemap;
 }
 
-function addColorsToTreemap(treemap, colorGenerator) {
+function addColorsToTreemap(
+  treemap,
+  colorGenerator,
+  unavailableBusFactorColor
+) {
   treemap.eachAfter((d) => {
-    const color = chooseRectangleFillColor(d, colorGenerator);
+    const color = chooseRectangleFillColor(
+      d,
+      colorGenerator,
+      unavailableBusFactorColor
+    );
     d.bgColor = color;
     d.textColor = pickTextColorBasedOnBgColor(
       color,
@@ -148,10 +146,14 @@ function addColorsToMiniTreemap(treemap) {
   });
 }
 
-function chooseRectangleFillColor(d, colorGenerator) {
+function chooseRectangleFillColor(
+  d,
+  colorGenerator,
+  unavailableBusFactorColor
+) {
   if ("busFactor" in d.data.busFactorStatus) {
     return colorGenerator(d.data.busFactorStatus.busFactor);
-  } else return UNAVAILABLE_BF_COLOR;
+  } else return unavailableBusFactorColor;
 }
 
 function chooseRectangleFillColorMiniTreemap(d) {
@@ -166,21 +168,6 @@ function chooseRectangleFillColorMiniTreemap(d) {
   if (d.data.busFactorStatus.nodeStatus === "lost") {
     return JETBRAINS_COLORS.darkRed;
   }
-
-  // if (d.data.busFactorStatus.busFactor === 0) {
-  //   if (d.data.busFactorStatus.old || d.data.busFactorStatus.ignored) {
-  //     return JETBRAINS_COLORS.gray;
-  //   } else if ("delta" in d.data.busFactorStatus) {
-  //     return JETBRAINS_COLORS.brightRed;
-  //   }
-  // }
-  // if ("delta" in d.data.busFactorStatus) {
-  //   if (d.data.busFactorStatus.delta < 0) {
-  //     return JETBRAINS_COLORS.golden;
-  //   } else if (d.data.busFactorStatus.delta > 0) {
-  //     return JETBRAINS_COLORS.brightGreen;
-  //   }
-  // }
 
   return UNAVAILABLE_BF_COLOR;
 }
@@ -338,13 +325,14 @@ export function drawTreemapFromGeneratedLayout(
   svg,
   root,
   setPathFunction,
-  colorGenerator
+  colorGenerator,
+  unavailableBusFactorColor
 ) {
   // Populate dimensions to prevent repeated calculation of the same values
   addDimensionsToTreemap(root);
 
   // Calculate color of background and text
-  addColorsToTreemap(root, colorGenerator);
+  addColorsToTreemap(root, colorGenerator, unavailableBusFactorColor);
 
   // Start 'painting'
   const node = svg
@@ -400,7 +388,7 @@ bus factor: ${
     .filter((d) => d.depth === 0)
     .append("rect")
     .style("fill", function (d) {
-      return d.bgColor
+      return d.bgColor;
     })
     .style("stroke", JETBRAINS_COLORS.black)
     .style("opacity", CONFIG.treemap.children.rect.parentOpacity)
@@ -438,9 +426,9 @@ bus factor: ${
     .append("xhtml:p")
     .text((d) => {
       if (d.data.busFactorStatus) {
-        if (d.data.busFactorStatus.busFactor)
+        if ("busFactor" in d.data.busFactorStatus)
           return (
-            "[" + d.data.busFactorStatus.busFactor + "]" + " " + d.data.name
+            `[${d.data.busFactorStatus.busFactor}] ${d.data.name}`
           );
       }
       return d.data.name;

@@ -73,7 +73,8 @@ function FilterWithInput(props) {
         ) : null}
       </h6>
 
-      {/*TODO: replace with better looking ringui*/}
+      {props.summary ? <small>{props.summary}</small> : null}
+
       <div className="input-group">
         <input
           type="text"

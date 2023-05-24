@@ -1,17 +1,26 @@
 /** @format */
 
-import React, {useState} from "react";
-import {batch} from "react-redux";
+import React, { useState, useMemo } from "react";
+import { batch, useSelector } from "react-redux";
 
 import {InfoPanel} from "./InfoPanel";
 import {useTranslation} from "react-i18next";
 
 import {CONFIG} from "../config";
-import {addFilter, removeAllFilters, removeFilter, selectAllFilters,} from "../reducers/treemapSlice";
+import {
+  addFilter,
+  addExtensionFilter,
+  removeAllFilters,
+  removeExtensionFilter,
+  removeFilter,
+  selectAllFilters,
+  selectExtensionFilters,
+} from "../reducers/treemapSlice"
 import FilterWithInput from "./FilterWithInput";
 import SimulationModeModal from "./SimulationModeModal";
 import LegendSize from "./LegendSize";
-import {generateBreadcrumb} from "../utils/url.tsx";
+import { generateBreadcrumb, getFileExtension } from "../utils/url.tsx";
+import { Form } from "react-bootstrap";
 import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
 import Button from "@jetbrains/ring-ui/dist/button/button";
 import arrowUpIcon from '@jetbrains/icons/arrow-up';
@@ -20,6 +29,7 @@ import Icon from "@jetbrains/ring-ui/dist/icon/icon";
 import Island from "@jetbrains/ring-ui/dist/island/island";
 import Header from "@jetbrains/ring-ui/dist/island/header";
 import Content from "@jetbrains/ring-ui/dist/island/content";
+
 
 function Navigator(props) {
   const dispatch = props.dispatch;
@@ -31,9 +41,29 @@ function Navigator(props) {
 
   const filterTemplates = CONFIG.filters;
   const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
-  const [isBusFactorRecalcActive, setisBusFactorRecalcActive] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState();
   const {t, i18n} = useTranslation();
+
+  const currentExtensionsList = useMemo(() => {
+    if ("children" in simulationData) {
+      return Array.from(
+        new Set(
+          simulationData.children
+            .map((item, index) => {
+              const extension = getFileExtension(item.name);
+              if (extension !== undefined) return extension;
+            })
+            .filter((ext) => ext !== undefined)
+        )
+      ).sort();
+    } else {
+      return [];
+    }
+  });
+
+  const currentExtensionsFilteredList = useSelector(selectExtensionFilters);
+
+  console.log(currentExtensionsList);
 
   const handleDotFilterSwitch = (event) => {
     setIsDotFilterApplied(!isDotFilterApplied);
@@ -45,33 +75,26 @@ function Navigator(props) {
     }
   };
 
-  const handleBusFactorRecalculationSwitch = (event) => {
-    setisBusFactorRecalcActive(!isBusFactorRecalcActive);
-
-    if (event.target.checked) {
-      // enable recalculation
-      // dispatch(addExclusionFilenamePrefixesFilter(['.',]));
-    } else if (!event.target.checked) {
-      // disable recalculation
-      // dispatch(removeExclusionFilenamePrefixesFilter(['.',]));
-    }
-  };
-
   const handleFilterDropdown = (event) => {
     const dropdownSelection = event.target.innerText;
     setCurrentTemplate(dropdownSelection);
     batch(() => {
       dispatch(addFilter(filterTemplates[dropdownSelection].extensions));
-      // dispatch(
-      //   addExclusionFilenameFilter(filterTemplates[dropdownSelection].fileNames)
-      // );
-      // dispatch(
-      //   addExclusionFilenamePrefixesFilter(
-      //     filterTemplates[dropdownSelection].fileNamePrefixes
-      //   )
-      // );
     });
   };
+
+
+  const handleFilterCheck = (extension, event) => {
+    console.log(event.target.checked);
+
+    if (event.target.checked) {
+      dispatch(removeExtensionFilter([extension]))
+    }
+    else {
+      dispatch(addExtensionFilter([extension]))
+    }
+  };
+
 
   const pathIsland = () => {
     return <Island>
@@ -158,47 +181,48 @@ function Navigator(props) {
 
       <Content>
         <div className="filtersCollapsible collapse show">
-
           <FilterWithInput
             key="Regex"
             filterPropertyType="RegEx"
+            summary={"Only pattern matches are shown"}
             addFunction={addFilter}
             removeFunction={removeFilter}
             removeAllFunction={removeAllFilters}
             selector={selectAllFilters}
             dispatch={dispatch}
-            infoPanelDetails={[t("filters.regex"), t("filters.links")]}></FilterWithInput>
+            infoPanelDetails={[
+              t("filters.regex"),
+              t("filters.links"),
+            ]}>
+            </FilterWithInput>
 
-          <h6>Filtering Templates</h6>
-          <div className="dropdown open filtersCollapsible collapse show">
-            <Button
-              dropdown={true}
-              id="triggerId"
-              data-bs-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >Filter Templates</Button>
-            {/*TODO: there must be a way to replace bootstrap*/}
-            <div
-              className="dropdown-menu"
-              aria-labelledby="triggerId">
-              {Object.keys(filterTemplates).map((template) => {
+          <h6>Suggested Filters</h6>
+          <div
+            className="dropdown open filtersCollapsible show row text-start"
+            style={{
+              maxHeight: "15vh",
+              overflowY: "scroll",
+            }}>
+            <Form>
+              {currentExtensionsList.map((extension, index) => {
                 return (
-                  <button
-                    className={
-                      template === currentTemplate
-                        ? "dropdown-item active"
-                        : "dropdown-item"
-                    }
-                    key={template}
-                    template={template}
-                    onClick={handleFilterDropdown}>
-                    {template}
-                  </button>
+                  <Form.Check key={extension}>
+                    <Form.Check.Input
+                      id={`${extension}-checkbox`}
+                      checked={
+                        !currentExtensionsFilteredList.includes(extension)
+                      }
+                      onChange={(event) =>
+                        handleFilterCheck(extension, event)
+                      }></Form.Check.Input>
+                    <Form.Check.Label>
+                      <small>{`.${extension}`}</small>
+                    </Form.Check.Label>
+                  </Form.Check>
                 );
               })}
+              </Form>
             </div>
-
           </div>
         </div>
       </Content>
