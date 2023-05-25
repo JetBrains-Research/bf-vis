@@ -40,7 +40,7 @@ function LegendSize(props) {
           <div className="row justify-content-start align-items-center g-2 m-2">
             <div className="col">
               {generateSvgSquare(
-                "2rem",
+                "2.828rem",
                 CONFIG.general.colors.jetbrains.black
               )}
             </div>
