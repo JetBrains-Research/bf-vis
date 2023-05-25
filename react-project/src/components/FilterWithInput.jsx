@@ -62,7 +62,7 @@ function FilterWithInput(props) {
   };
 
   return (
-    <div className="mt-3 mb-3">
+    <div className="mb-3">
       <h6>
         {filterPropertyType}{" "}
         {props.infoPanelDetails !== null ? (

@@ -37,7 +37,7 @@ export function BusFactorControls(props) {
           <small>1</small>
         </div>
         <ReactSlider
-          className="horizontal-slider col-9"
+          className="horizontal-slider col-8"
           thumbClassName="slider-thumb"
           thumbActiveClassName="slider-thumb-active"
           withTracks={true}

@@ -139,32 +139,26 @@ function LegendColor(props) {
             <i className="bi bi-plus-circle-fill"></i>
             <i className="bi bi-dash-circle-fill"></i>
           </a>
-
         </Header>
         <Content>
-        <div
-          id="legendColorCollapsible"
-          className="collapse show">
-          {props.summary ? <small>{props.summary}</small> : null}
-          {scale.reverse().map((element, index) => {
-            return (
-              <div
-                key={element.label}
-                className="row justify-content-center align-items-center g-1">
-                <div
-                  className="col-1"
-                  onClick={(e) => handleClick(index)}>
-                  {generateSvgSquare("1.5rem", element.color)}
-                  <div className="col-9">{element.label}</div>
+          <div
+            id="legendColorCollapsible"
+            className="collapse show">
+            {props.summary ? <small>{props.summary}</small> : null}
+            {scale.reverse().map((element, index) => {
+              return (
+                <div key={element.label}>
+                  <div onClick={(e) => handleClick(index)}>
+                    {generateSvgSquare("1.5rem", element.color)}
+                    <div><small>{element.label}</small></div>
+                  </div>
                 </div>
               );
             })}
           </div>
+          <BusFactorControls></BusFactorControls>
         </Content>
       </Island>
-
-      <BusFactorControls></BusFactorControls>
-
       <div
         className="offcanvas offcanvas-start"
         data-bs-scroll="true"

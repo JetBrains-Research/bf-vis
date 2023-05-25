@@ -150,7 +150,7 @@ function StatsPane(props) {
             </li>
           </ul>
 
-          <h5>Author Contribution</h5>
+          <h6>Author Contribution</h6>
           {authorsList && topAuthors ? (
             <></>
           ) : (

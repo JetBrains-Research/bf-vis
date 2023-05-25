@@ -224,10 +224,7 @@ function Navigator(props) {
               </Form>
             </div>
           </div>
-        </div>
-      </Content>
-
-
+        </Content>
     </Island>
   }
 
