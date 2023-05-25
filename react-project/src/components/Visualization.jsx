@@ -1,9 +1,9 @@
 /** @format */
 
-import {useCallback, useDeferredValue, useLayoutEffect} from "react";
-import {batch, useDispatch, useSelector} from "react-redux";
-import {useSearchParams} from "react-router-dom";
-import {CONFIG} from "../config";
+import { useCallback, useDeferredValue, useLayoutEffect } from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import { CONFIG } from "../config";
 
 import {
   returnMainTreemapHome,
@@ -23,14 +23,14 @@ import {
   selectColorPalette,
 } from "../reducers/treemapSlice";
 
-import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 
 import * as tiling from "../d3/tiling";
 
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
-import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
+import { Col, Grid, Row } from "@jetbrains/ring-ui/dist/grid/grid";
 
 function Visualization() {
   const dispatch = useDispatch();
@@ -55,14 +55,16 @@ function Visualization() {
   const currentSimulationModePath = useDeferredValue(
     useSelector(simulationVisualizationPath)
   );
-  const currentColorThresholds = useDeferredValue(useSelector(selectColorThresholds));
+  const currentColorThresholds = useDeferredValue(
+    useSelector(selectColorThresholds)
+  );
   const currentColorPalette = useDeferredValue(useSelector(selectColorPalette));
 
   const reduxNavFunctions = {
     dispatch,
     scopeMiniTreemapIn,
     scopeMiniTreemapOut,
-    returnMiniTreemapHome
+    returnMiniTreemapHome,
   };
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -99,7 +101,7 @@ function Visualization() {
           batch(() => {
             dispatch(returnMainTreemapHome());
             dispatch(returnMiniTreemapHome());
-          })
+          });
           dispatch(scopeStatsIn(payloadGenerator("path", ".")));
         }
         batch(() => {
@@ -124,10 +126,13 @@ function Visualization() {
   ]);
 
   return (
-
     <Grid>
       <Row>
-        <Col xs={3} sm={3} md={2} lg={2}>
+        <Col
+          xs={3}
+          sm={3}
+          md={2}
+          lg={2}>
           <center>
             <h1>BFViz</h1>
             <Navigator
@@ -141,13 +146,17 @@ function Visualization() {
               statsData={currentStatsData}></Navigator>
           </center>
         </Col>
-        <Col xs={6} sm={6} md={8} lg={8}>
+        <Col
+          xs={6}
+          sm={6}
+          md={8}
+          lg={8}>
           <center>
             <TreeMap
               colorDefinitions={CONFIG.general.colors.jetbrains}
               colorPalette={currentColorPalette}
-            colorThresholds={currentColorThresholds}
-            containerId={CONFIG.treemap.ids.treemapContainerId}
+              colorThresholds={currentColorThresholds}
+              containerId={CONFIG.treemap.ids.treemapContainerId}
               data={currentVisualizationData}
               dataNormalizationFunction={Math.log2}
               dataPath={currentVisualizationPath}
@@ -162,8 +171,12 @@ function Visualization() {
               type="main"></TreeMap>
           </center>
         </Col>
-        <Col xs={3} sm={3} md={2} lg={2}>
-            <RightColumn statsData={currentStatsData}></RightColumn>
+        <Col
+          xs={3}
+          sm={3}
+          md={2}
+          lg={2}>
+          <RightColumn statsData={currentStatsData}></RightColumn>
         </Col>
       </Row>
     </Grid>
