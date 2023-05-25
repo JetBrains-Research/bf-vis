@@ -26,7 +26,7 @@ function TreeMap(props) {
   const currentColorThresholds = props.colorThresholds;
   const dataNormalizationFunction = props.dataNormalizationFunction
     ? props.dataNormalizationFunction
-    : Math.sqrt;
+    : Math.log2;
   const initialHeight = props.initialHeight;
   const initialWidth = props.initialWidth;
   const padding = props.padding;
