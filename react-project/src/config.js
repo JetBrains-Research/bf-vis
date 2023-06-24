@@ -53,11 +53,11 @@ export const CONFIG = {
       },
       textBox: {},
       icon: {
-        fontSize: "1.5em",
+        fontSize: "1em",
         miniFontSize: "1em"
       },
       p: {
-        fontSize: "0.8em",
+        fontSize: "0.7em",
         miniFontSize: "0.6em"
       },
     },

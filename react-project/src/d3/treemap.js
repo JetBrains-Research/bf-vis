@@ -27,20 +27,6 @@ export const formatSI = d3.format(".2s");
 
 export const treemap = d3.treemap;
 
-export function normalizeD3DataValues(node) {
-  if (node.children) {
-    node.children.forEach((element) => {
-      normalizeD3DataValues(element);
-    });
-  }
-
-  if (node.value >= 0) {
-    node.size = node.value;
-    node.value = Math.sqrt(node.value);
-  }
-
-  return node;
-}
 
 export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
   if (hierarchy) {
@@ -93,7 +79,7 @@ export function applyExtensionFilters(hierarchy, filters) {
           if (d.value > 0) {
             const filePathSplit = d.data.name.split("/");
             const fileName = filePathSplit[filePathSplit.length - 1];
-            const fileExtension = getFileExtension(fileName)
+            const fileExtension = getFileExtension(fileName);
 
             if (fileExtension === filterExtension) {
               d.value = 0;
@@ -193,7 +179,7 @@ function rectangleOnMouseOverHandler(d) {
 
     const rects = d3.select(d.nodeUid.href);
     rects
-      .transition()
+      .transition(CONFIG.treemap.children.rect.transitionDuration)
       .duration(500)
       .ease(d3.easeExpOut)
       .style("stroke-width", "0.3rem");
@@ -321,6 +307,18 @@ node status: ${
     .style("font-size", CONFIG.treemap.children.p.miniFontSize);
 }
 
+function handleZoom(e) {
+  d3.selectAll("svg g g").filter(d => d.depth > 0).attr("transform", (d) => {
+    return "translate(" + ((d.x0 * e.transform.k) + e.transform.x) + "," + ((d.y0 * e.transform.k) + e.transform.y) + ") scale(" + e.transform.k + ")"
+  });
+
+  d3.selectAll("svg g g foreignObject div div p").style("transform", (d) => {
+    return "scale(" + 1/e.transform.k + ")"
+  })
+
+  d3.selectAll("svg g g foreignObject div div p").style("transform-origin", "0 0")
+}
+
 export function drawTreemapFromGeneratedLayout(
   svg,
   root,
@@ -328,6 +326,11 @@ export function drawTreemapFromGeneratedLayout(
   colorGenerator,
   unavailableBusFactorColor
 ) {
+  const zoom = d3
+    .zoom()
+    .scaleExtent([1, 2])
+    .on("zoom", handleZoom);
+  svg.call(zoom);
   // Populate dimensions to prevent repeated calculation of the same values
   addDimensionsToTreemap(root);
 
@@ -427,9 +430,7 @@ bus factor: ${
     .text((d) => {
       if (d.data.busFactorStatus) {
         if ("busFactor" in d.data.busFactorStatus)
-          return (
-            `[${d.data.busFactorStatus.busFactor}] ${d.data.name}`
-          );
+          return `[${d.data.busFactorStatus.busFactor}] ${d.data.name}`;
       }
       return d.data.name;
     })
