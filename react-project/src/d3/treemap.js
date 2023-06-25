@@ -27,7 +27,6 @@ export const formatSI = d3.format(".2s");
 
 export const treemap = d3.treemap;
 
-
 export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
   if (hierarchy) {
     hierarchy.eachAfter((d) => {
@@ -307,33 +306,16 @@ node status: ${
     .style("font-size", CONFIG.treemap.children.p.miniFontSize);
 }
 
-function handleZoom(e) {
-  d3.selectAll("svg g g").filter(d => d.depth > 0).attr("transform", (d) => {
-    return "translate(" + ((d.x0 * e.transform.k) + e.transform.x) + "," + ((d.y0 * e.transform.k) + e.transform.y) + ") scale(" + e.transform.k + ")"
-  });
 
-  d3.selectAll("svg g g foreignObject div div p").style("transform", (d) => {
-    return "scale(" + 1/(0.9 * e.transform.k) + ")"
-  })
-
-  d3.selectAll("svg g g foreignObject div div p").style("transform-origin", (d) => "0 0")
-
-  d3.selectAll("svg g g foreignObject div div p").style("width", (d) => 0.9 * (d.x1 - d.x0) * e.transform.k + "px");
-
-}
 
 export function drawTreemapFromGeneratedLayout(
   svg,
   root,
   setPathFunction,
   colorGenerator,
-  unavailableBusFactorColor
+  unavailableBusFactorColor,
 ) {
-  const zoom = d3
-    .zoom()
-    .scaleExtent([1, 5])
-    .on("zoom", handleZoom);
-  svg.call(zoom);
+  
   // Populate dimensions to prevent repeated calculation of the same values
   addDimensionsToTreemap(root);
 
@@ -420,15 +402,18 @@ bus factor: ${
     .on("mouseover", (_e, d) => rectangleOnMouseOverHandler(d))
     .on("mouseout", (_e, d) => rectangleOnMouseOutHandler(d))
     .append("div")
-    .attr("class", "p-0");
+    .attr("class", "p-0")
+    .style("display", "d-inline-block")
+    .style("align-items", "center")
+    .style("justify-content", "center");
 
   textBox
     .filter((d) => d.data.children && d.depth > 0)
     .append("xhtml:i")
     .attr("class", CONFIG.treemap.classes.folderIcon)
     .style("color", (d) => d.textColor)
-    .style("font-size", (d) => (0.5 + 1/(d.data.name.length) + "em"));
-    // .style("font-size", CONFIG.treemap.children.icon.fontSize);
+    .style("font-size", (d) => 0.5 + 1 / d.data.name.length + "em");
+  // .style("font-size", CONFIG.treemap.children.icon.fontSize);
 
   textBox
     .append("xhtml:p")
@@ -443,6 +428,6 @@ bus factor: ${
     .attr("id", (d) => `p-${d.nodeUid.id}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
-    .style("font-size", (d) => 0.5 + "em")
+    .style("font-size", (d) => 0.7 + "em")
     .style("text-align", "center");
 }

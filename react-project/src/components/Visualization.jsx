@@ -26,6 +26,7 @@ import {
 import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 
 import * as tiling from "../d3/tiling";
+import * as sorting from "../d3/sort";
 
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
@@ -167,6 +168,7 @@ function Visualization() {
               setPathFunc={setURLPath}
               svgId={CONFIG.treemap.ids.treemapSvgId}
               tilingFunction={tiling.squarify}
+              sortingOrder={sorting.sizeAscending}
               topPadding={CONFIG.treemap.layout.topPadding}
               type="main"></TreeMap>
           </center>

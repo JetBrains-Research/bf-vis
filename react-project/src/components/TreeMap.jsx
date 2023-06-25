@@ -3,7 +3,10 @@
 import React, { useLayoutEffect } from "react";
 import { useSelector } from "react-redux";
 
-import { selectAllFilters, selectExtensionFilters } from "../reducers/treemapSlice";
+import {
+  selectAllFilters,
+  selectExtensionFilters,
+} from "../reducers/treemapSlice";
 
 import { createSVGInContainer, clearCanvas } from "../d3/svgCanvas.tsx";
 import {
@@ -17,7 +20,9 @@ import {
 
 import { sizeAscending } from "../d3/sort";
 import { squarify } from "../d3/tiling";
+import { handleZoom, resetZoom } from "../d3/zoom";
 import * as d3 from "d3";
+import Button from "@jetbrains/ring-ui/dist/button/button";
 
 function TreeMap(props) {
   // assign these consts fallback values if prop is empty or throw errors;
@@ -37,6 +42,7 @@ function TreeMap(props) {
   const treemapSvgId = props.svgId;
   const type = props.type;
   const tilingFunction = props.tilingFunction ? props.tilingFunction : squarify;
+  const zoom = d3.zoom().scaleExtent([1, 5]).translateExtent([[0, 0], [initialWidth, initialHeight]]).on("zoom", handleZoom);
 
   // redux related vars
   const regexFilters = useSelector(selectAllFilters);
@@ -63,6 +69,9 @@ function TreeMap(props) {
       initialHeight,
       initialWidth
     );
+    
+    // Attach D3 zoom object to the new create svg canvas
+    svg.call(zoom);
 
     // Loading and generating initial data
     let rootHierarchyNode = generateInitialD3Hierarchy(data);
@@ -73,7 +82,7 @@ function TreeMap(props) {
     }
 
     if (extensionFilters) {
-      applyExtensionFilters(rootHierarchyNode, extensionFilters)
+      applyExtensionFilters(rootHierarchyNode, extensionFilters);
     }
 
     // Apply data normalization if applicable
@@ -128,12 +137,15 @@ function TreeMap(props) {
     treemapContainerId,
     treemapSvgId,
     type,
+    zoom,
   ]);
 
   return (
     <div
       id={treemapContainerId}
-      className="container-fluid"></div>
+      className="container-fluid">
+      <Button onClick={() => resetZoom(zoom)}>Reset Zoom</Button>
+    </div>
   );
 }
 
