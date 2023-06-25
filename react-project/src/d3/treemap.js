@@ -313,7 +313,7 @@ function handleZoom(e) {
   });
 
   d3.selectAll("svg g g foreignObject div div p").style("transform", (d) => {
-    return "scale(" + 1/e.transform.k + ")"
+    return "scale(" + 1/(0.9 * e.transform.k) + ")"
   })
 
   d3.selectAll("svg g g foreignObject div div p").style("transform-origin", (d) => "0 0")
@@ -331,7 +331,7 @@ export function drawTreemapFromGeneratedLayout(
 ) {
   const zoom = d3
     .zoom()
-    .scaleExtent([1, 3])
+    .scaleExtent([1, 5])
     .on("zoom", handleZoom);
   svg.call(zoom);
   // Populate dimensions to prevent repeated calculation of the same values
@@ -420,7 +420,7 @@ bus factor: ${
     .on("mouseover", (_e, d) => rectangleOnMouseOverHandler(d))
     .on("mouseout", (_e, d) => rectangleOnMouseOutHandler(d))
     .append("div")
-    .attr("class", "p-1");
+    .attr("class", "p-0");
 
   textBox
     .filter((d) => d.data.children && d.depth > 0)
@@ -443,6 +443,6 @@ bus factor: ${
     .attr("id", (d) => `p-${d.nodeUid.id}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
-    .style("font-size", (d) => 0.5 + "em");
-    // .style("font-size", (d) => ((d.tileWidth/d.tileHeight) * (5/d.data.name.length) + "em"));
+    .style("font-size", (d) => 0.5 + "em")
+    .style("text-align", "center");
 }
