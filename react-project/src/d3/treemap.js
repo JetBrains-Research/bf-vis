@@ -182,7 +182,7 @@ function rectangleOnMouseOverHandler(d) {
       .transition(CONFIG.treemap.children.rect.transitionDuration)
       .duration(500)
       .ease(d3.easeExpOut)
-      .style("stroke-width", "0.3rem");
+      .style("stroke-width", "0.15rem");
   }
 }
 
@@ -316,7 +316,10 @@ function handleZoom(e) {
     return "scale(" + 1/e.transform.k + ")"
   })
 
-  d3.selectAll("svg g g foreignObject div div p").style("transform-origin", "0 0")
+  d3.selectAll("svg g g foreignObject div div p").style("transform-origin", (d) => "0 0")
+
+  d3.selectAll("svg g g foreignObject div div p").style("width", (d) => 0.9 * (d.x1 - d.x0) * e.transform.k + "px");
+
 }
 
 export function drawTreemapFromGeneratedLayout(
@@ -328,7 +331,7 @@ export function drawTreemapFromGeneratedLayout(
 ) {
   const zoom = d3
     .zoom()
-    .scaleExtent([1, 2])
+    .scaleExtent([1, 3])
     .on("zoom", handleZoom);
   svg.call(zoom);
   // Populate dimensions to prevent repeated calculation of the same values
@@ -416,14 +419,16 @@ bus factor: ${
     )
     .on("mouseover", (_e, d) => rectangleOnMouseOverHandler(d))
     .on("mouseout", (_e, d) => rectangleOnMouseOutHandler(d))
-    .append("div");
+    .append("div")
+    .attr("class", "p-1");
 
   textBox
     .filter((d) => d.data.children && d.depth > 0)
     .append("xhtml:i")
     .attr("class", CONFIG.treemap.classes.folderIcon)
     .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.icon.fontSize);
+    .style("font-size", (d) => (0.5 + 1/(d.data.name.length) + "em"));
+    // .style("font-size", CONFIG.treemap.children.icon.fontSize);
 
   textBox
     .append("xhtml:p")
@@ -438,5 +443,6 @@ bus factor: ${
     .attr("id", (d) => `p-${d.nodeUid.id}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.p.fontSize);
+    .style("font-size", (d) => 0.5 + "em");
+    // .style("font-size", (d) => ((d.tileWidth/d.tileHeight) * (5/d.data.name.length) + "em"));
 }
