@@ -24,15 +24,36 @@ export function handleZoom(e) {
 
   d3.selectAll("svg g g foreignObject div div p").style(
     "transform-origin",
-    (d) => "0 0"
+    (d) => "50 0"
   );
 
   d3.selectAll("svg g g foreignObject div div p").style(
-    "width",
-    (d) => (d.x1 - d.x0) * e.transform.k + "px"
+    "min-width",
+    (d) => (d.x1 - d.x0) * e.transform.k - 4 + "px"
   );
+
+  // d3.selectAll("svg g g foreignObject div div i").style("transform", (d) => {
+  //   return "scale(" + 1 / e.transform.k + ")";
+  // });
+
+  // d3.selectAll("svg g g foreignObject div div i").style(
+  //   "transform-origin",
+  //   (d) => "50 0"
+  // );
+
 }
 
 export function resetZoom(zoom) {
   d3.selectAll("svg g g").transition(750).call(zoom.scaleTo, 1);
+}
+
+export function createZoom(minScale, maxScale, width, height) {
+  return d3
+    .zoom()
+    .scaleExtent([minScale, maxScale])
+    .translateExtent([
+      [0, 0],
+      [width, height],
+    ])
+    .on("zoom", handleZoom);
 }

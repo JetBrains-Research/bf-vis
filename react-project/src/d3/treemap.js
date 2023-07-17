@@ -8,6 +8,7 @@ import { CONFIG } from "../config";
 import uid from "./uid.tsx";
 import { filter } from "d3";
 import { getFileExtension } from "../utils/url.tsx";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /*
     This file has all the methods related to the d3 treemap including calculation and rendering
@@ -30,6 +31,7 @@ export const treemap = d3.treemap;
 export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
   if (hierarchy) {
     hierarchy.eachAfter((d) => {
+      d.name = String(d.name);
       if (d.depth <= 1) {
         d.size = d.value;
 
@@ -299,28 +301,27 @@ node status: ${
           : ""
       } ${d.data.name}`;
     })
-    .attr("class", "text-truncate")
+    .attr("class", "text-truncate d-flex")
     .attr("id", (d) => `p-${d.nodeUid}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
     .style("font-size", CONFIG.treemap.children.p.miniFontSize);
 }
 
-
-
 export function drawTreemapFromGeneratedLayout(
   svg,
   root,
   setPathFunction,
   colorGenerator,
-  unavailableBusFactorColor,
+  unavailableBusFactorColor
 ) {
-  
   // Populate dimensions to prevent repeated calculation of the same values
   addDimensionsToTreemap(root);
 
   // Calculate color of background and text
   addColorsToTreemap(root, colorGenerator, unavailableBusFactorColor);
+
+  svg.style("cursor", "grab");
 
   // Start 'painting'
   const node = svg
@@ -401,33 +402,50 @@ bus factor: ${
     )
     .on("mouseover", (_e, d) => rectangleOnMouseOverHandler(d))
     .on("mouseout", (_e, d) => rectangleOnMouseOutHandler(d))
+    .style("cursor", "pointer")
     .append("div")
-    .attr("class", "p-0")
-    .style("display", "d-inline-block")
+    .attr("class", "p-1")
+    .style("display", "flex")
+    .style("min-width", "0px")
     .style("align-items", "center")
     .style("justify-content", "center");
 
-  textBox
-    .filter((d) => d.data.children && d.depth > 0)
-    .append("xhtml:i")
-    .attr("class", CONFIG.treemap.classes.folderIcon)
-    .style("color", (d) => d.textColor)
-    .style("font-size", (d) => 0.5 + 1 / d.data.name.length + "em");
-  // .style("font-size", CONFIG.treemap.children.icon.fontSize);
+  // textBox
+  //   .filter((d) => d.data.children && d.depth > 0)
+  //   .append("xhtml:i")
+  //   .attr("class", CONFIG.treemap.classes.folderIcon)
+  //   .style("color", (d) => d.textColor)
+  //   .style("font-size", CONFIG.treemap.children.icon.fontSize)
+  //   .style("min-width", "0px")
+  //   .style("width", "100%");
 
   textBox
     .append("xhtml:p")
     .text((d) => {
       if (d.data.busFactorStatus) {
         if ("busFactor" in d.data.busFactorStatus)
-          return `[${d.data.busFactorStatus.busFactor}] ${d.data.name}`;
+          if (d.data.children)
+            return `\uF3D9 ${d.data.name}`;
+          return `${d.data.name}`;
+            // [${d.data.busFactorStatus.busFactor}]
       }
       return d.data.name;
     })
-    .attr("class", "text-truncate")
+    .attr("class", "text-truncate mb-0")
     .attr("id", (d) => `p-${d.nodeUid.id}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
-    .style("font-size", (d) => 0.7 + "em")
-    .style("text-align", "center");
+    .style("font-size", (d) => 0.9 + "em")
+    .style("min-width", "0px")
+    .style("width", "100%");
+
+  // textBox
+  //   .filter((d) => d.data.children && d.depth > 0)
+  //   .select("p")
+  //   .insert("xhtml:i")
+  //   .attr("class", CONFIG.treemap.classes.folderIcon)
+  //   .style("color", (d) => d.textColor)
+  //   .style("font-size", CONFIG.treemap.children.icon.fontSize)
+  //   .style("min-width", "0px")
+  //   .style("width", "100%");
 }

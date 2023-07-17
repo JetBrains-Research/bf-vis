@@ -17,12 +17,10 @@ import {
   applyRegExFilters,
   applyExtensionFilters,
 } from "../d3/treemap";
-
-import { sizeAscending } from "../d3/sort";
-import { squarify } from "../d3/tiling";
-import { handleZoom, resetZoom } from "../d3/zoom";
+import * as tiling from "../d3/tiling";
+import * as sorting from "../d3/sort";
 import * as d3 from "d3";
-import Button from "@jetbrains/ring-ui/dist/button/button";
+
 
 function TreeMap(props) {
   // assign these consts fallback values if prop is empty or throw errors;
@@ -36,21 +34,29 @@ function TreeMap(props) {
   const initialWidth = props.initialWidth;
   const padding = props.padding;
   const reduxNavFunctions = props.reduxNavFunctions;
+  const sortingKey = props.sortingKey;
+  const sortingFunctionStringId = props.sortingOrder;
   const setPathFunc = props.setPathFunc;
   const topPadding = props.topPadding;
   const treemapContainerId = props.containerId;
   const treemapSvgId = props.svgId;
   const type = props.type;
-  const tilingFunction = props.tilingFunction ? props.tilingFunction : squarify;
-  const zoom = d3.zoom().scaleExtent([1, 5]).translateExtent([[0, 0], [initialWidth, initialHeight]]).on("zoom", handleZoom);
+  const tilingFunctionStringId = props.tilingFunction ? props.tilingFunction : tiling.squarify;
+  const zoom = props.zoom;
 
   // redux related vars
   const regexFilters = useSelector(selectAllFilters);
   const extensionFilters = useSelector(selectExtensionFilters);
 
+
   useLayoutEffect(() => {
     // set data source
     const data = props.data;
+    
+    // Resolve tiling and sorting methods from text labels
+    // const sortingOrderResolved = sorting.sortingOrderMap[sortingFunctionStringId];
+    const tilingFunctionResolved = tiling.layoutAlgorithmsMap[tilingFunctionStringId];
+    const sortingFunction = sorting.sortingKeyMapFunction(sortingFunctionStringId, sortingKey);
 
     // Create treemap layout
     const treemapLayoutGenerator = (treemapData) =>
@@ -60,7 +66,7 @@ function TreeMap(props) {
         .padding(padding)
         .paddingTop(topPadding)
         .round(false)
-        .tile(tilingFunction)(treemapData);
+        .tile(tilingFunctionResolved)(treemapData);
 
     // Create SVG canvas
     const svg = createSVGInContainer(
@@ -69,7 +75,7 @@ function TreeMap(props) {
       initialHeight,
       initialWidth
     );
-    
+
     // Attach D3 zoom object to the new create svg canvas
     svg.call(zoom);
 
@@ -94,7 +100,7 @@ function TreeMap(props) {
     }
 
     // Sort the nodes for each level
-    rootHierarchyNode.sort(sizeAscending);
+    rootHierarchyNode.sort(sortingFunction);
 
     // get a d3.treemap from the d3.hierarchy object
     const treemapLayout = treemapLayoutGenerator(rootHierarchyNode);
@@ -124,6 +130,8 @@ function TreeMap(props) {
     currentColorThresholds,
     currentColorPalette,
     currentDataPath,
+    sortingKey,
+    sortingFunctionStringId,
     dataNormalizationFunction,
     regexFilters,
     extensionFilters,
@@ -132,7 +140,7 @@ function TreeMap(props) {
     padding,
     reduxNavFunctions,
     setPathFunc,
-    tilingFunction,
+    tilingFunctionStringId,
     topPadding,
     treemapContainerId,
     treemapSvgId,
@@ -143,9 +151,7 @@ function TreeMap(props) {
   return (
     <div
       id={treemapContainerId}
-      className="container-fluid">
-      <Button onClick={() => resetZoom(zoom)}>Reset Zoom</Button>
-    </div>
+      className="container-fluid"></div>
   );
 }
 
