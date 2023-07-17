@@ -17,7 +17,7 @@ import {
   scopeMiniTreemapIn,
   scopeMiniTreemapOut,
   scopeStatsIn,
-  selectAllFilters,
+  selectRegexFilters,
   selectCurrentStatsData,
   selectCurrentStatsPath,
   selectCurrentVisualizationData,
@@ -32,6 +32,7 @@ import {
   setSortingKey,
   setSortingOrder,
   setTilingFunction,
+  selectFolderFilter,
 } from "../reducers/treemapSlice";
 
 import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
@@ -61,7 +62,7 @@ function Visualization() {
   const currentStatsPath = useDeferredValue(
     useSelector(selectCurrentStatsPath)
   );
-  const filters = useDeferredValue(useSelector(selectAllFilters));
+  const filters = useDeferredValue(useSelector(selectRegexFilters));
 
   const currentSimulationModeData = useDeferredValue(
     useSelector(simulationVisualizationData)
@@ -78,6 +79,7 @@ function Visualization() {
   );
   const currentSortingKey = useDeferredValue(useSelector(selectSortingKey))
   const currentSortingOrder = useDeferredValue(useSelector(selectSortingOrder))
+  const currentFolderFilter = useDeferredValue(useSelector(selectFolderFilter));
 
   const reduxMiniTreemapNavFunctions = {
     dispatch,
@@ -171,6 +173,7 @@ function Visualization() {
             <Navigator
               dispatch={dispatch}
               filters={filters}
+              folderFilter={currentFolderFilter}
               path={currentVisualizationPath}
               reduxNavFunctions={reduxMiniTreemapNavFunctions}
               reduxTreemapLayoutFunctions={reduxTreemapLayoutFunctions}
@@ -198,6 +201,7 @@ function Visualization() {
               data={currentVisualizationData}
               dataNormalizationFunction={Math.log2}
               dataPath={currentVisualizationPath}
+              folderFilter={currentFolderFilter}
               filters={filters}
               initialHeight={window.innerHeight}
               initialWidth={window.innerWidth * 0.65}

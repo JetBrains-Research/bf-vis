@@ -72,6 +72,17 @@ export function applyRegExFilters(hierarchy, filters) {
   }
 }
 
+
+export function applyFolderFilter(hierarchy) {
+  if (hierarchy) {
+    hierarchy.eachAfter((d) => {
+      if (!d.hasOwnProperty("children")) {
+        d.value = 0
+      }
+    })
+  }
+}
+
 export function applyExtensionFilters(hierarchy, filters) {
   if (hierarchy) {
     if (filters) {

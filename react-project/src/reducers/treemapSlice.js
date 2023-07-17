@@ -72,6 +72,7 @@ function convertTreeToState(tree) {
     },
     extensionFilters: [],
     regexFilters: [],
+    folderFilter: false,
   };
 }
 
@@ -542,6 +543,12 @@ const treemapSlice = createSlice({
         }
       }
     },
+    toggleFolderFilter: (state) => {
+      return {
+        ...state,
+        folderFilter: !state.folderFilter
+      }
+    }
   },
 });
 
@@ -553,12 +560,13 @@ export const {
   scopeMainTreemapIn,
   scopeMainTreemapOut,
   returnMainTreemapHome,
-  // regex filter actions
+  // filter actions
   addFilter,
   addExtensionFilter,
   removeFilter,
   removeExtensionFilter,
   removeAllFilters,
+  toggleFolderFilter,
   // color and color threshold actions
   setColors,
   resetColorsToDefaults,
@@ -592,7 +600,8 @@ export const selectCurrentStatsData = (state) =>
 export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
-export const selectAllFilters = (state) => state.treemap.regexFilters;
+export const selectFolderFilter = (state) => state.treemap.folderFilter;
+export const selectRegexFilters = (state) => state.treemap.regexFilters;
 export const selectExtensionFilters = (state) => state.treemap.extensionFilters;
 //simulation mode selectors
 export const isSimulationMode = (state) =>

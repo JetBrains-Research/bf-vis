@@ -15,8 +15,9 @@ import {
   removeAllFilters,
   removeExtensionFilter,
   removeFilter,
-  selectAllFilters,
+  selectRegexFilters,
   selectExtensionFilters,
+  toggleFolderFilter,
 } from "../reducers/treemapSlice";
 import FilterWithInput from "./FilterWithInput";
 import SimulationModeModal from "./SimulationModeModal";
@@ -33,6 +34,8 @@ import Header from "@jetbrains/ring-ui/dist/island/header";
 import Content from "@jetbrains/ring-ui/dist/island/content";
 import updateIcon from "@jetbrains/icons/update";
 import Select from "@jetbrains/ring-ui/dist/select/select";
+import Toggle, { Size } from "@jetbrains/ring-ui/dist/toggle/toggle";
+import Text from "@jetbrains/ring-ui/dist/text/text";
 import { resetZoom } from "../d3/zoom";
 import { binary, layoutAlgorithmsMap, squarify } from "../d3/tiling";
 import { sortingOrderMap } from "../d3/sort";
@@ -40,6 +43,7 @@ import { sortingOrderMap } from "../d3/sort";
 function Navigator(props) {
   const dispatch = props.dispatch;
   const currentPath = props.path;
+  const folderFilter = props.currentFolderFilter;
   const reduxTreemapLayoutFunctions = props.reduxTreemapLayoutFunctions;
   const setPathFunc = props.setPathFunc;
   const simulationData = props.simulationData;
@@ -84,20 +88,18 @@ function Navigator(props) {
   };
 
   const handleLayoutAlgorithm = (e) => {
-    reduxTreemapLayoutFunctions.dispatch(
-      reduxTreemapLayoutFunctions.setTilingFunction(e.label)
-    );
+    dispatch(reduxTreemapLayoutFunctions.setTilingFunction(e.label));
   };
   const handleSortingKey = (e) => {
-    reduxTreemapLayoutFunctions.dispatch(
-      reduxTreemapLayoutFunctions.setSortingKey(e.key)
-    );
+    dispatch(reduxTreemapLayoutFunctions.setSortingKey(e.key));
   };
   const handleSortingOrder = (e) => {
     console.log(e.label);
-    reduxTreemapLayoutFunctions.dispatch(
-      reduxTreemapLayoutFunctions.setSortingOrder(e.label)
-    );
+    dispatch(reduxTreemapLayoutFunctions.setSortingOrder(e.label));
+  };
+  const handleFolderFilterToggle = (e) => {
+    console.log(e.target.checked);
+    dispatch(toggleFolderFilter());
   };
 
   const pathIsland = () => {
@@ -140,7 +142,7 @@ function Navigator(props) {
                     onClick={() =>
                       setPathFunc(generateBreadcrumb(i, currentPath))
                     }>
-                    {pathElement}
+                    <Text info>{pathElement}</Text>
                   </li>
                 ))}
               </ol>
@@ -190,29 +192,20 @@ function Navigator(props) {
               <Select
                 inputPlaceholder="Sorting Key"
                 onChange={handleSortingKey}
-                data={Object.keys(simulationData)
-                  .map((item, index) => {
-                    if (
-                      typeof simulationData[item] === "object" &&
-                      simulationData[item] !== null
-                    ) {
-                      if (item === "busFactorStatus") {
-                        if ("busFactor" in simulationData[item]) {
-                          return {
-                            label: "bus factor",
-                            key: "busFactor",
-                          };
-                        }
-                      } else {
-                        return null;
-                      }
-                    }
-                    return {
-                      label: item,
-                      key: item,
-                    };
-                  })
-                  .filter((sortingKeyObj) => sortingKeyObj !== null)}
+                data={[
+                  {
+                    label: "bus factor",
+                    item: "busFactor",
+                  },
+                  {
+                    label: "name",
+                    key: "name",
+                  },
+                  {
+                    label: "size",
+                    key: "size",
+                  },
+                ]}
                 selectedLabel="Sorting Key"
                 label="Select..."></Select>
             </div>
@@ -258,6 +251,15 @@ function Navigator(props) {
 
         <Content>
           <div className="filtersCollapsible collapse show">
+            <div className="mb-3">
+              <h6>Folders</h6>
+              <Toggle
+                size={Size.Size16}
+                checked={folderFilter}
+                onClick={handleFolderFilterToggle}>
+                <Text>Hide non-folder tiles</Text>
+              </Toggle>
+            </div>
             <FilterWithInput
               key="Regex"
               filterPropertyType="RegEx"
@@ -265,7 +267,7 @@ function Navigator(props) {
               addFunction={addFilter}
               removeFunction={removeFilter}
               removeAllFunction={removeAllFilters}
-              selector={selectAllFilters}
+              selector={selectRegexFilters}
               dispatch={dispatch}
               infoPanelDetails={[
                 t("filters.regex"),
