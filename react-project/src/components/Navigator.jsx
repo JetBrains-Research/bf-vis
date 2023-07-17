@@ -28,6 +28,8 @@ import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
 import Button from "@jetbrains/ring-ui/dist/button/button";
 import arrowUpIcon from "@jetbrains/icons/arrow-up";
 import archiveIcon from "@jetbrains/icons/archive";
+import search from "@jetbrains/icons/search";
+import searchError from "@jetbrains/icons/search-error";
 import Icon from "@jetbrains/ring-ui/dist/icon/icon";
 import Island from "@jetbrains/ring-ui/dist/island/island";
 import Header from "@jetbrains/ring-ui/dist/island/header";
@@ -102,6 +104,14 @@ function Navigator(props) {
     dispatch(toggleFolderFilter());
   };
 
+  const zoomIn = () => {
+    d3.select("svg g g").transition().call(zoom.scaleBy, 2);
+  };
+
+  const zoomOut = () => {
+    d3.select("svg g g").transition().call(zoom.scaleBy, 0.5);
+  };
+
   const pathIsland = () => {
     return (
       <Island>
@@ -171,7 +181,15 @@ function Navigator(props) {
                 <Button
                   danger
                   onClick={() => resetZoom(zoom)}>
-                  <Icon glyph={updateIcon} /> Reset Zoom
+                  <Icon glyph={search} /> Reset
+                </Button>
+                <Button
+                  onClick={() => zoomIn()}>
+                  <Icon glyph={search} /> In
+                </Button>
+                <Button
+                  onClick={() => zoomOut()}>
+                  <Icon glyph={searchError} /> Out
                 </Button>
               </ButtonSet>
             </div>
@@ -195,7 +213,7 @@ function Navigator(props) {
                 data={[
                   {
                     label: "bus factor",
-                    item: "busFactor",
+                    key: "busFactor",
                   },
                   {
                     label: "name",

@@ -24,14 +24,15 @@ export const sortingKeyMap = ["name", "size", "busFactor"];
 export const sortingKeyMapFunction = (sortingFunctionStringId, sortingKey) => {
   const sortingFunction = sortingOrderMap[sortingFunctionStringId];
 
-  if (sortingKey === "bytes") {
-    return (a, b) => sortingFunction(a.size, b.size);
+  if (sortingKey === "size") {
+    return (a, b) =>
+      sortingFunction(a.size, b.size) || ascending(a.data.name, b.data.name);
   } else if (sortingKey === "busFactor") {
     return (a, b) =>
       sortingFunction(
         a.data.busFactorStatus.busFactor,
         b.data.busFactorStatus.busFactor
-      );
+      ) || ascending(a.data.name, b.data.name);
   } else if (sortingKey === "name") {
     return (a, b) => sortingFunction(a.data.name, b.data.name);
   }
