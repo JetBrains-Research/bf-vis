@@ -32,15 +32,6 @@ export function handleZoom(e) {
     (d) => (d.x1 - d.x0) * e.transform.k - 4 + "px"
   );
 
-  // d3.selectAll("svg g g foreignObject div div i").style("transform", (d) => {
-  //   return "scale(" + 1 / e.transform.k + ")";
-  // });
-
-  // d3.selectAll("svg g g foreignObject div div i").style(
-  //   "transform-origin",
-  //   (d) => "50 0"
-  // );
-
 }
 
 export function resetZoom(zoom) {
