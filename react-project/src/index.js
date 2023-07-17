@@ -29,7 +29,7 @@ function AppM() {
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     dispatch(setNewTree(tree));
-  }, []);
+  }, [dispatch, tree]);
 
   return <Visualization />;
 }
