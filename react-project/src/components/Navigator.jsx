@@ -50,7 +50,11 @@ function Navigator(props) {
   const setPathFunc = props.setPathFunc;
   const simulationData = props.simulationData;
   const simulationPath = props.simulationPath;
+  const simulationZoom = props.simulationZoom;
+  const sortingKey = props.sortingKey;
+  const sortingOrder = props.sortingOrder;
   const statsData = props.statsData;
+  const tilingFunction = props.tilingFunction;
   const zoom = props.zoom;
 
   const filterTemplates = CONFIG.filters;
@@ -183,12 +187,10 @@ function Navigator(props) {
                   onClick={() => resetZoom(zoom)}>
                   <Icon glyph={search} /> Reset
                 </Button>
-                <Button
-                  onClick={() => zoomIn()}>
+                <Button onClick={() => zoomIn()}>
                   <Icon glyph={search} /> In
                 </Button>
-                <Button
-                  onClick={() => zoomOut()}>
+                <Button onClick={() => zoomOut()}>
                   <Icon glyph={searchError} /> Out
                 </Button>
               </ButtonSet>
@@ -331,10 +333,14 @@ function Navigator(props) {
       {addMargin(filterIsland())}
       {addMargin(
         <SimulationModeModal
-          statsData={statsData}
+          reduxNavFunctions={props.reduxNavFunctions}
           simulationData={simulationData}
           simulationPath={simulationPath}
-          reduxNavFunctions={props.reduxNavFunctions}></SimulationModeModal>
+          statsData={statsData}
+          sortingKey={sortingKey}
+          sortingOrder={sortingOrder}
+          tilingFunction={tilingFunction}
+          zoom={simulationZoom}></SimulationModeModal>
       )}
       <LegendSize></LegendSize>
     </>

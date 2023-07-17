@@ -291,17 +291,23 @@ node status: ${
         ? CONFIG.treemap.classes.rectWrapperChild
         : CONFIG.treemap.classes.rectWrapperParent
     )
-    .append("div");
+    .style("cursor", "pointer")
+    .append("div")
+    .attr("class", "p-1")
+    .style("display", "flex")
+    .style("min-width", "0px")
+    .style("align-items", "center")
+    .style("justify-content", "center");;
 
   textBox
     .filter((d) => d.data.children && d.depth > 0)
     .on("click", (_e, d) =>
       rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions)
     )
-    .append("xhtml:i")
-    .attr("class", CONFIG.treemap.classes.folderIcon)
-    .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.icon.miniFontSize);
+  //   .append("xhtml:i")
+  //   .attr("class", CONFIG.treemap.classes.folderIcon)
+  //   .style("color", (d) => d.textColor)
+  //   .style("font-size", CONFIG.treemap.children.icon.miniFontSize);
 
   textBox
     .append("xhtml:p")
@@ -312,11 +318,18 @@ node status: ${
           : ""
       } ${d.data.name}`;
     })
-    .attr("class", "text-truncate d-flex")
-    .attr("id", (d) => `p-${d.nodeUid}`)
+    .attr("class", "text-truncate mb-0")
+    .attr("id", (d) => `p-${d.nodeUid.id}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.p.miniFontSize);
+    .style("font-size", CONFIG.treemap.children.p.miniFontSize)
+    .style("min-width", "0px")
+    .style("width", "100%");
+    // .attr("class", "text-truncate d-flex")
+    // .attr("id", (d) => `p-${d.nodeUid}`)
+    // .style("overflow-wrap", "break-word")
+    // .style("color", (d) => d.textColor)
+    // .style("font-size", (d) => 0.9 + "em")
 }
 
 export function drawTreemapFromGeneratedLayout(

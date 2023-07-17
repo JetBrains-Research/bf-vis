@@ -77,8 +77,8 @@ function Visualization() {
   const currentTilingFunction = useDeferredValue(
     useSelector(selectTilingFunction)
   );
-  const currentSortingKey = useDeferredValue(useSelector(selectSortingKey))
-  const currentSortingOrder = useDeferredValue(useSelector(selectSortingOrder))
+  const currentSortingKey = useDeferredValue(useSelector(selectSortingKey));
+  const currentSortingOrder = useDeferredValue(useSelector(selectSortingOrder));
   const currentFolderFilter = useDeferredValue(useSelector(selectFolderFilter));
 
   const reduxMiniTreemapNavFunctions = {
@@ -92,14 +92,21 @@ function Visualization() {
     dispatch,
     setSortingKey,
     setSortingOrder,
-    setTilingFunction
-  }
+    setTilingFunction,
+  };
 
   const mainTreemapZoom = createZoom(
     1,
     10,
     window.innerWidth * 0.65,
     window.innerHeight
+  );
+
+  const simulationModeZoom = createZoom(
+    1,
+    10,
+    CONFIG.simulation.layout.width,
+    CONFIG.simulation.layout.height
   );
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -180,6 +187,7 @@ function Visualization() {
               setPathFunc={setURLPath}
               simulationData={currentSimulationModeData}
               simulationPath={currentSimulationModePath}
+              simulationZoom={simulationModeZoom}
               sortingKey={currentSortingKey}
               sortingOrder={currentSortingOrder}
               statsData={currentStatsData}
