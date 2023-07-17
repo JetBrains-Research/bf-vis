@@ -40,7 +40,7 @@ export const CONFIG = {
       maxBusFactorValue: 10,
     },
     classes: {
-      folderIcon: "bi bi-folder2",
+      folderIcon: "bi bi-folder2 mb-0",
       rectWrapperChild: "row p-0 m-0 align-items-center h-100",
       rectWrapperParent: "row px-1 fw-semibold",
     },
