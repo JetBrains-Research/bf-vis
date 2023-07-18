@@ -16,7 +16,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "@jetbrains/ring-ui/dist/style.css";
 import { setNewTree } from "./reducers/treemapSlice";
-import { gitRepoDirData } from "./data/project_data_recalculating";
+import gitRepoDirData from "./data/busFactor.json";
 
 const container = document.getElementById("appRoot");
 const root = createRoot(container);
@@ -24,7 +24,6 @@ const root = createRoot(container);
 
 function AppM() {
   const dispatch = useDispatch();
-
   const tree = gitRepoDirData;
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
