@@ -272,7 +272,7 @@ function Navigator(props) {
         <Content>
           <div className="filtersCollapsible collapse show">
             <div className="mb-3">
-              <h6>Folders</h6>
+              {/* <h6>Folders</h6> */}
               <Toggle
                 size={Size.Size16}
                 checked={folderFilter}
@@ -298,7 +298,7 @@ function Navigator(props) {
             <div
               className="dropdown open filtersCollapsible show row text-start"
               style={{
-                maxHeight: "15vh",
+                maxHeight: "10vh",
                 overflowY: "scroll",
               }}>
               <Form>
