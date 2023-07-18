@@ -175,7 +175,7 @@ function rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions) {
 }
 
 function rectangleOnClickHandlerMainTreemap(d, setPathFunction) {
-  if ("children" in d.data && d.data.children) {
+  if ("children" in d.data && d.data.children.length > 0) {
     setPathFunction(d.data.path);
   } else {
     setPathFunction("", d.data.path);
@@ -298,7 +298,7 @@ node status: ${
     .style("justify-content", "center");
 
   textBox
-    .filter((d) => d.data.children && d.depth > 0)
+    .filter((d) => d.data.children && d.data.children.length > 0 && d.depth > 0)
     .on("click", (_e, d) =>
       rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions)
     );
@@ -444,7 +444,7 @@ bus factor: ${
     });
 
   textBox
-    .filter((d) => d.data.children && d.depth > 0)
+    .filter((d) => d.data.children && d.data.children.length > 0 && d.depth > 0)
     .select("p")
     .append("xhtml:i")
     .lower()
