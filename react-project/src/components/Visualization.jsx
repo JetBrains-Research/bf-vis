@@ -1,6 +1,11 @@
 /** @format */
 
-import { useCallback, useDeferredValue, useLayoutEffect } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { CONFIG } from "../config";
@@ -12,7 +17,7 @@ import {
   scopeMiniTreemapIn,
   scopeMiniTreemapOut,
   scopeStatsIn,
-  selectAllFilters,
+  selectRegexFilters,
   selectCurrentStatsData,
   selectCurrentStatsPath,
   selectCurrentVisualizationData,
@@ -21,16 +26,26 @@ import {
   simulationVisualizationPath,
   selectColorThresholds,
   selectColorPalette,
+  selectTilingFunction,
+  selectSortingKey,
+  selectSortingOrder,
+  setSortingKey,
+  setSortingOrder,
+  setTilingFunction,
+  selectFolderFilter,
 } from "../reducers/treemapSlice";
 
 import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 
 import * as tiling from "../d3/tiling";
+import * as sorting from "../d3/sort";
+import * as d3 from "d3";
 
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
 import { Col, Grid, Row } from "@jetbrains/ring-ui/dist/grid/grid";
+import { createZoom } from "../d3/zoom";
 
 function Visualization() {
   const dispatch = useDispatch();
@@ -47,7 +62,7 @@ function Visualization() {
   const currentStatsPath = useDeferredValue(
     useSelector(selectCurrentStatsPath)
   );
-  const filters = useDeferredValue(useSelector(selectAllFilters));
+  const filters = useDeferredValue(useSelector(selectRegexFilters));
 
   const currentSimulationModeData = useDeferredValue(
     useSelector(simulationVisualizationData)
@@ -59,13 +74,40 @@ function Visualization() {
     useSelector(selectColorThresholds)
   );
   const currentColorPalette = useDeferredValue(useSelector(selectColorPalette));
+  const currentTilingFunction = useDeferredValue(
+    useSelector(selectTilingFunction)
+  );
+  const currentSortingKey = useDeferredValue(useSelector(selectSortingKey));
+  const currentSortingOrder = useDeferredValue(useSelector(selectSortingOrder));
+  const currentFolderFilter = useDeferredValue(useSelector(selectFolderFilter));
 
-  const reduxNavFunctions = {
+  const reduxMiniTreemapNavFunctions = {
     dispatch,
     scopeMiniTreemapIn,
     scopeMiniTreemapOut,
     returnMiniTreemapHome,
   };
+
+  const reduxTreemapLayoutFunctions = {
+    dispatch,
+    setSortingKey,
+    setSortingOrder,
+    setTilingFunction,
+  };
+
+  const mainTreemapZoom = createZoom(
+    1,
+    10,
+    window.innerWidth * 0.65,
+    window.innerHeight
+  );
+
+  const simulationModeZoom = createZoom(
+    1,
+    10,
+    CONFIG.simulation.layout.width,
+    CONFIG.simulation.layout.height
+  );
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -138,12 +180,19 @@ function Visualization() {
             <Navigator
               dispatch={dispatch}
               filters={filters}
+              folderFilter={currentFolderFilter}
               path={currentVisualizationPath}
-              reduxNavFunctions={reduxNavFunctions}
+              reduxNavFunctions={reduxMiniTreemapNavFunctions}
+              reduxTreemapLayoutFunctions={reduxTreemapLayoutFunctions}
               setPathFunc={setURLPath}
-              simulationPath={currentSimulationModePath}
               simulationData={currentSimulationModeData}
-              statsData={currentStatsData}></Navigator>
+              simulationPath={currentSimulationModePath}
+              simulationZoom={simulationModeZoom}
+              sortingKey={currentSortingKey}
+              sortingOrder={currentSortingOrder}
+              statsData={currentStatsData}
+              tilingFunction={currentTilingFunction}
+              zoom={mainTreemapZoom}></Navigator>
           </center>
         </Col>
         <Col
@@ -160,15 +209,19 @@ function Visualization() {
               data={currentVisualizationData}
               dataNormalizationFunction={Math.log2}
               dataPath={currentVisualizationPath}
+              folderFilter={currentFolderFilter}
               filters={filters}
               initialHeight={window.innerHeight}
               initialWidth={window.innerWidth * 0.65}
               padding={CONFIG.treemap.layout.overallPadding}
               setPathFunc={setURLPath}
+              sortingKey={currentSortingKey}
+              sortingOrder={currentSortingOrder}
               svgId={CONFIG.treemap.ids.treemapSvgId}
-              tilingFunction={tiling.squarify}
+              tilingFunction={currentTilingFunction}
               topPadding={CONFIG.treemap.layout.topPadding}
-              type="main"></TreeMap>
+              type="main"
+              zoom={mainTreemapZoom}></TreeMap>
           </center>
         </Col>
         <Col

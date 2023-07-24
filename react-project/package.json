@@ -16,7 +16,7 @@
     "@types/react-dom": "^18.0.11",
     "@types/websocket": "^1.0.5",
     "bootstrap": "^5.2.0",
-    "bootstrap-icons": "^1.9.1",
+    "bootstrap-icons": "^1.10.5",
     "d3": "^7.6.1",
     "eslint": "^8.22.0",
     "i18next": "^22.4.9",
