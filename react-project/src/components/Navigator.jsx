@@ -156,7 +156,7 @@ function Navigator(props) {
                     onClick={() =>
                       setPathFunc(generateBreadcrumb(i, currentPath))
                     }>
-                    <Text info>{pathElement}</Text>
+                    <span className="small">{pathElement}</span>
                   </li>
                 ))}
               </ol>
@@ -277,7 +277,7 @@ function Navigator(props) {
                 size={Size.Size16}
                 checked={folderFilter}
                 onClick={handleFolderFilterToggle}>
-                <Text>Hide non-folder tiles</Text>
+                <Text className="small">Hide non-folder tiles</Text>
               </Toggle>
             </div>
             <FilterWithInput
