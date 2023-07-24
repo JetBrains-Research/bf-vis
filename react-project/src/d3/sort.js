@@ -21,6 +21,17 @@ export const sortingOrderMap = {
 
 export const sortingKeyMap = ["name", "size", "busFactor"];
 
+const isBusFactorPresent = (d3Node) => {
+  if (Object.keys(d3Node).includes("data")) {
+    if (Object.keys(d3Node.data).includes("busFactorStatus")) {
+      if (Object.keys(d3Node.data.busFactorStatus).includes("busFactor")) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
 export const sortingKeyMapFunction = (sortingFunctionStringId, sortingKey) => {
   const sortingFunction = sortingOrderMap[sortingFunctionStringId];
 
@@ -28,11 +39,24 @@ export const sortingKeyMapFunction = (sortingFunctionStringId, sortingKey) => {
     return (a, b) =>
       sortingFunction(a.size, b.size) || ascending(a.data.name, b.data.name);
   } else if (sortingKey === "busFactor") {
-    return (a, b) =>
-      sortingFunction(
-        a.data.busFactorStatus.busFactor,
-        b.data.busFactorStatus.busFactor
-      ) || ascending(a.data.name, b.data.name);
+    return (a, b) => {
+      const busFactorExistsA = isBusFactorPresent(a);
+      const busFactorExistsB = isBusFactorPresent(b);
+      const nameOrder = ascending(a.data.name, b.data.name);
+
+      if (busFactorExistsA && busFactorExistsB) {
+        return sortingFunction(
+          a.data.busFactorStatus.busFactor,
+          b.data.busFactorStatus.busFactor
+        );
+      } else if (busFactorExistsA) {
+        return sortingFunction === "ascending" ? 1 : -1;
+      } else if (busFactorExistsB) {
+        return sortingFunction === "ascending" ? -1 : 1;
+      } else {
+        return 0;
+      }
+    };
   } else if (sortingKey === "name") {
     return (a, b) => sortingFunction(a.data.name, b.data.name);
   }
