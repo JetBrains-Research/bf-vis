@@ -64,11 +64,11 @@ This section shows hows to build and run the app as a Docker container
 
 The Dockerfile to use to build a container for the BFViz application is named Dockerfile-dev. The container can be built using the following command on command line:
 
-`docker build -t <CONTAINER_NAME>:<VERSION> Dockerfile-dev .`
+`docker build -t <IMAGE_NAME>:<VERSION> -f Dockerfile-dev .`
 
 where CONTAINER_NAME and VERSION can be set as you see fit. For example, we could run
 
-`docker build -t bfviz:2.0 Dockerfile-dev .`
+`docker build -t bfviz:2.0 -f Dockerfile-dev .`
 
 First time builds take a little bit of time, especially if the required base image is not present already.
 
@@ -77,7 +77,7 @@ First time builds take a little bit of time, especially if the required base ima
 The dev version of the container utilizes the `npm start` command to run the app in development mode. The Docker container itself can be run by
 
 ```
-docker run -d -it -p <PORT_TO_EXPOSE_APP_ON_THE_HOST>:3000 --memory="8g" --mount type=bind,source=<PATH_TO_FOLDER_CONTAINING_BUSFACTOR_JSON>,target=/app/src/data
+docker run -d -it -p <PORT_TO_EXPOSE_APP_ON_THE_HOST>:3000 --memory="8g" --mount type=bind,source=<PATH_TO_FOLDER_CONTAINING_BUSFACTOR_JSON>,target=/app/src/data <IMAGE_NAME>:<VERSION>
 ```
 
 There are two important sections in the command above.
@@ -89,7 +89,7 @@ The second option to configure is the folder mount. The application uses the fil
 An example is given below. In this, we choose port 8080 as the port on the host. For the directory mapping, we choose data folder in the src folder, which itself is a subfolder of the current working directory as we used the `pwd` shell command.
 
 ```
-docker run -d -it -p 8080:3000 --memory="8g" --mount type=bind,source="$(pwd)"/src/data,target=/app/src/data
+docker run -d -it -p 8080:3000 --memory="8g" --mount type=bind,source="$(pwd)"/src/data,target=/app/src/data bfviz:2.0
 ```
 
 The busFactor.json file itself should just contain the bus factor data for a GitHub repository. The data itself should be in JSON format.
