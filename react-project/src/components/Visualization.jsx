@@ -1,14 +1,9 @@
 /** @format */
 
-import {
-  useCallback,
-  useDeferredValue,
-  useLayoutEffect,
-  useState,
-} from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
-import { CONFIG } from "../config";
+import React, {useCallback, useDeferredValue, useLayoutEffect, useState,} from "react";
+import {batch, useDispatch, useSelector} from "react-redux";
+import {useSearchParams} from "react-router-dom";
+import {CONFIG} from "../config";
 
 import {
   returnMainTreemapHome,
@@ -17,35 +12,43 @@ import {
   scopeMiniTreemapIn,
   scopeMiniTreemapOut,
   scopeStatsIn,
-  selectRegexFilters,
+  selectColorPalette,
+  selectColorThresholds,
   selectCurrentStatsData,
   selectCurrentStatsPath,
   selectCurrentVisualizationData,
   selectCurrentVisualizationPath,
-  simulationVisualizationData,
-  simulationVisualizationPath,
-  selectColorThresholds,
-  selectColorPalette,
-  selectTilingFunction,
+  selectFolderFilter,
+  selectRegexFilters,
   selectSortingKey,
   selectSortingOrder,
+  selectTilingFunction,
   setSortingKey,
   setSortingOrder,
   setTilingFunction,
-  selectFolderFilter,
+  simulationVisualizationData,
+  simulationVisualizationPath, toggleFolderFilter,
 } from "../reducers/treemapSlice";
 
-import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
-
-import * as tiling from "../d3/tiling";
-import * as sorting from "../d3/sort";
-import * as d3 from "d3";
+import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
 
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
-import { Col, Grid, Row } from "@jetbrains/ring-ui/dist/grid/grid";
-import { createZoom } from "../d3/zoom";
+import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
+import {createZoom, resetZoom} from "../d3/zoom";
+import Island from "@jetbrains/ring-ui/dist/island/island";
+import {Content} from "@jetbrains/ring-ui/dist/island/island";
+import search from "@jetbrains/icons/search";
+import searchError from "@jetbrains/icons/search-error";
+import settingsIcon from "@jetbrains/icons/settings";
+import * as d3 from "d3";
+import Button from "@jetbrains/ring-ui/dist/button/button";
+import Dropdown from "@jetbrains/ring-ui/dist/dropdown/dropdown";
+import Popup from "@jetbrains/ring-ui/dist/popup/popup";
+import {layoutAlgorithmsMap} from "../d3/tiling";
+import {sortingOrderMap} from "../d3/sort";
+import Select from "@jetbrains/ring-ui/dist/select/select";
 
 function Visualization() {
   const dispatch = useDispatch();
@@ -167,6 +170,25 @@ function Visualization() {
     dispatch,
   ]);
 
+  const zoomIn = () => {
+    d3.select("svg g g").transition().call(mainTreemapZoom.scaleBy, 2);
+  };
+
+  const zoomOut = () => {
+    d3.select("svg g g").transition().call(mainTreemapZoom.scaleBy, 0.5);
+  };
+
+  const handleLayoutAlgorithm = (e) => {
+    dispatch(reduxTreemapLayoutFunctions.setTilingFunction(e.label));
+  };
+  const handleSortingKey = (e) => {
+    dispatch(reduxTreemapLayoutFunctions.setSortingKey(e.key));
+  };
+  const handleSortingOrder = (e) => {
+    console.log(e.label);
+    dispatch(reduxTreemapLayoutFunctions.setSortingOrder(e.label));
+  };
+
   return (
     <Grid>
       <Row>
@@ -183,7 +205,6 @@ function Visualization() {
               folderFilter={currentFolderFilter}
               path={currentVisualizationPath}
               reduxNavFunctions={reduxMiniTreemapNavFunctions}
-              reduxTreemapLayoutFunctions={reduxTreemapLayoutFunctions}
               setPathFunc={setURLPath}
               simulationData={currentSimulationModeData}
               simulationPath={currentSimulationModePath}
@@ -192,7 +213,7 @@ function Visualization() {
               sortingOrder={currentSortingOrder}
               statsData={currentStatsData}
               tilingFunction={currentTilingFunction}
-              zoom={mainTreemapZoom}></Navigator>
+            />
           </center>
         </Col>
         <Col
@@ -200,7 +221,7 @@ function Visualization() {
           sm={6}
           md={8}
           lg={8}>
-          <center>
+          <center style={{position: "relative"}} id={"treeMap"}>
             <TreeMap
               colorDefinitions={CONFIG.general.colors.jetbrains}
               colorPalette={currentColorPalette}
@@ -222,6 +243,94 @@ function Visualization() {
               topPadding={CONFIG.treemap.layout.topPadding}
               type="main"
               zoom={mainTreemapZoom}></TreeMap>
+
+            <Island style={{
+              position: "absolute",
+              top: 5,
+              right: 20,
+              flex: 1
+            }}>
+              <Content>
+                <Button
+                  onClick={() => zoomIn()}
+                  icon={search}
+                  title={"Zoom In"}
+                />
+                <Button
+                  onClick={() => zoomOut()}
+                  icon={searchError}
+                  title={"Zoom Out"}
+                />
+                  <Dropdown
+                    className="chevron"
+                    activeClassName="rotated"
+                    anchor={<Button title="Details" icon={settingsIcon}/>}
+                  >
+                    {/*TODO: add default value, reset*/}
+                    <Popup>
+                      <Island>
+                        <Content>
+                          <Button
+                            text
+                            danger
+                            onClick={() => resetZoom(mainTreemapZoom)}
+                            title={"Reset Zoom"}>
+                            reset
+                          </Button>
+                          <div className="d-flex mt-1">
+                            <Select
+                              inputPlaceholder="Layout Algorithm"
+                              onChange={handleLayoutAlgorithm}
+                              data={Object.keys(layoutAlgorithmsMap).map((element, index) => {
+                                return {
+                                  label: element,
+                                  key: index,
+                                };
+                              })}
+                              selectedLabel="Layout Algorithm"
+                              label="Select..."></Select>
+                          </div>
+                          <div className="d-flex mt-1">
+                            <Select
+                              inputPlaceholder="Sorting Key"
+                              onChange={handleSortingKey}
+                              data={[
+                                {
+                                  label: "bus factor",
+                                  key: "busFactor",
+                                },
+                                {
+                                  label: "name",
+                                  key: "name",
+                                },
+                                {
+                                  label: "size",
+                                  key: "size",
+                                },
+                              ]}
+                              selectedLabel="Sorting Key"
+                              label="Select..."></Select>
+                          </div>
+                          <div className="d-flex mt-1">
+                            <Select
+                              inputPlaceholder="Sorting Order"
+                              onChange={handleSortingOrder}
+                              data={Object.keys(sortingOrderMap).map((element, index) => {
+                                return {
+                                  label: element,
+                                  key: index,
+                                };
+                              })}
+                              selectedLabel="Sorting Order"
+                              label="Select..."></Select>
+                          </div>
+                        </Content>
+                      </Island>
+
+                    </Popup>
+                  </Dropdown>
+              </Content>
+            </Island>
           </center>
         </Col>
         <Col
