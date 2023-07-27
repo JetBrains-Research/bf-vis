@@ -247,8 +247,7 @@ function Visualization() {
             <Island style={{
               position: "absolute",
               top: 5,
-              right: 20,
-              flex: 1
+              right: 20
             }}>
               <Content>
                 <Button
