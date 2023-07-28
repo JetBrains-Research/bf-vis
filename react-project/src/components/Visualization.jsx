@@ -36,7 +36,7 @@ import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
 import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
-import {createZoom, resetZoom} from "../d3/zoom";
+import {createZoom} from "../d3/zoom";
 import Island from "@jetbrains/ring-ui/dist/island/island";
 import {Content} from "@jetbrains/ring-ui/dist/island/island";
 import search from "@jetbrains/icons/search";
@@ -274,13 +274,6 @@ function Visualization() {
                 <Popup>
                   <Island>
                     <Content>
-                      <Button
-                        text
-                        danger
-                        onClick={() => resetZoom(mainTreemapZoom)}
-                        title={"Reset Zoom"}>
-                        reset
-                      </Button>
                       <div className="d-flex mt-1">
                         <Select
                           inputPlaceholder="Layout Algorithm"
