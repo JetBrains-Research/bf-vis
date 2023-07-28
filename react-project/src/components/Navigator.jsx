@@ -131,7 +131,7 @@ function Navigator(props) {
                 ))}
               </ol>
             </nav>
-            <div className="d-flex mt-1">
+            <center>
               <ButtonSet>
                 <Button
                   onClick={() =>
@@ -149,7 +149,7 @@ function Navigator(props) {
                   <Icon glyph={archiveIcon} /> Home
                 </Button>
               </ButtonSet>
-            </div>
+            </center>
           </div>
         </Content>
       </Island>
