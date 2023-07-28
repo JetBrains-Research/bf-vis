@@ -1,6 +1,6 @@
 /** @format */
 
-import React, {useCallback, useDeferredValue, useLayoutEffect, useState,} from "react";
+import React, {useCallback, useDeferredValue, useLayoutEffect,} from "react";
 import {batch, useDispatch, useSelector} from "react-redux";
 import {useSearchParams} from "react-router-dom";
 import {CONFIG} from "../config";
@@ -27,7 +27,7 @@ import {
   setSortingOrder,
   setTilingFunction,
   simulationVisualizationData,
-  simulationVisualizationPath, toggleFolderFilter,
+  simulationVisualizationPath,
 } from "../reducers/treemapSlice";
 
 import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
@@ -37,8 +37,7 @@ import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
 import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
 import {createZoom} from "../d3/zoom";
-import Island from "@jetbrains/ring-ui/dist/island/island";
-import {Content} from "@jetbrains/ring-ui/dist/island/island";
+import Island, {Content} from "@jetbrains/ring-ui/dist/island/island";
 import search from "@jetbrains/icons/search";
 import searchError from "@jetbrains/icons/search-error";
 import settingsIcon from "@jetbrains/icons/settings";
@@ -307,30 +306,24 @@ function Visualization() {
                     <Content>
                       <div className="d-flex mt-1">
                         <Select
-                          inputPlaceholder="Layout Algorithm"
                           onChange={handleLayoutAlgorithm}
                           data={layoutAlgorithmSelectData}
                           selected={findSelectItem(layoutAlgorithmSelectData, currentTilingFunction)}
-                          selectedLabel="Layout Algorithm"
-                          label="Select..."></Select>
+                          selectedLabel="Layout Algorithm"></Select>
                       </div>
                       <div className="d-flex mt-1">
                         <Select
-                          inputPlaceholder="Sorting Key"
                           onChange={handleSortingKey}
                           data={sortKeySelectData}
                           selected={findSelectItem(sortKeySelectData, currentSortingKey)}
-                          selectedLabel="Sorting Key"
-                          label="Select..."></Select>
+                          selectedLabel="Sorting Key"></Select>
                       </div>
                       <div className="d-flex mt-1">
                         <Select
-                          inputPlaceholder="Sorting Order"
                           onChange={handleSortingOrder}
                           data={sortingOrderSelectData}
                           selected={findSelectItem(sortingOrderSelectData, currentSortingOrder)}
-                          selectedLabel="Sorting Order"
-                          label="Select..."></Select>
+                          selectedLabel="Sorting Order"></Select>
                       </div>
                     </Content>
                   </Island>
