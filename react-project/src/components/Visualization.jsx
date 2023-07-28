@@ -280,11 +280,11 @@ function Visualization() {
               top: 10,
               right: 25,
               display: "flex",
-              "flex-direction": "row",
+              flexDirection: "row",
               border: "1px solid black",
-              "border-radius": "10px",
-              "background-color": "white",
-              "box-shadow": "0 1px 2px black"
+              borderRadius: "10px",
+              backgroundColor: "white",
+              boxShadow: "0 1px 2px black"
             }}>
               <Button
                 onClick={() => zoomIn()}
