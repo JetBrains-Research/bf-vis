@@ -244,92 +244,96 @@ function Visualization() {
               type="main"
               zoom={mainTreemapZoom}></TreeMap>
 
-            <Island style={{
+            <div style={{
               position: "absolute",
               top: 5,
-              right: 20
+              right: 20,
+              display: "flex",
+              "flex-direction": "row",
+              border: "1px solid black",
+              "border-radius": "10px",
+              "background-color": "white",
+              "box-shadow": "0 1px 2px black"
             }}>
-              <Content>
-                <Button
-                  onClick={() => zoomIn()}
-                  icon={search}
-                  title={"Zoom In"}
-                />
-                <Button
-                  onClick={() => zoomOut()}
-                  icon={searchError}
-                  title={"Zoom Out"}
-                />
-                  <Dropdown
-                    className="chevron"
-                    activeClassName="rotated"
-                    anchor={<Button title="Details" icon={settingsIcon}/>}
-                  >
-                    {/*TODO: add default value, reset*/}
-                    <Popup>
-                      <Island>
-                        <Content>
-                          <Button
-                            text
-                            danger
-                            onClick={() => resetZoom(mainTreemapZoom)}
-                            title={"Reset Zoom"}>
-                            reset
-                          </Button>
-                          <div className="d-flex mt-1">
-                            <Select
-                              inputPlaceholder="Layout Algorithm"
-                              onChange={handleLayoutAlgorithm}
-                              data={Object.keys(layoutAlgorithmsMap).map((element, index) => {
-                                return {
-                                  label: element,
-                                  key: index,
-                                };
-                              })}
-                              selectedLabel="Layout Algorithm"
-                              label="Select..."></Select>
-                          </div>
-                          <div className="d-flex mt-1">
-                            <Select
-                              inputPlaceholder="Sorting Key"
-                              onChange={handleSortingKey}
-                              data={[
-                                {
-                                  label: "bus factor",
-                                  key: "busFactor",
-                                },
-                                {
-                                  label: "name",
-                                  key: "name",
-                                },
-                                {
-                                  label: "size",
-                                  key: "size",
-                                },
-                              ]}
-                              selectedLabel="Sorting Key"
-                              label="Select..."></Select>
-                          </div>
-                          <div className="d-flex mt-1">
-                            <Select
-                              inputPlaceholder="Sorting Order"
-                              onChange={handleSortingOrder}
-                              data={Object.keys(sortingOrderMap).map((element, index) => {
-                                return {
-                                  label: element,
-                                  key: index,
-                                };
-                              })}
-                              selectedLabel="Sorting Order"
-                              label="Select..."></Select>
-                          </div>
-                        </Content>
-                      </Island>
+              <Button
+                onClick={() => zoomIn()}
+                icon={search}
+                title={"Zoom In"}
+              />
+              <Button
+                onClick={() => zoomOut()}
+                icon={searchError}
+                title={"Zoom Out"}
+              />
+              <Dropdown
+                className="chevron"
+                activeClassName="rotated"
+                anchor={<Button title="Details" icon={settingsIcon}/>}
+              >
+                {/*TODO: add default value, reset*/}
+                <Popup>
+                  <Island>
+                    <Content>
+                      <Button
+                        text
+                        danger
+                        onClick={() => resetZoom(mainTreemapZoom)}
+                        title={"Reset Zoom"}>
+                        reset
+                      </Button>
+                      <div className="d-flex mt-1">
+                        <Select
+                          inputPlaceholder="Layout Algorithm"
+                          onChange={handleLayoutAlgorithm}
+                          data={Object.keys(layoutAlgorithmsMap).map((element, index) => {
+                            return {
+                              label: element,
+                              key: index,
+                            };
+                          })}
+                          selectedLabel="Layout Algorithm"
+                          label="Select..."></Select>
+                      </div>
+                      <div className="d-flex mt-1">
+                        <Select
+                          inputPlaceholder="Sorting Key"
+                          onChange={handleSortingKey}
+                          data={[
+                            {
+                              label: "bus factor",
+                              key: "busFactor",
+                            },
+                            {
+                              label: "name",
+                              key: "name",
+                            },
+                            {
+                              label: "size",
+                              key: "size",
+                            },
+                          ]}
+                          selectedLabel="Sorting Key"
+                          label="Select..."></Select>
+                      </div>
+                      <div className="d-flex mt-1">
+                        <Select
+                          inputPlaceholder="Sorting Order"
+                          onChange={handleSortingOrder}
+                          data={Object.keys(sortingOrderMap).map((element, index) => {
+                            return {
+                              label: element,
+                              key: index,
+                            };
+                          })}
+                          selectedLabel="Sorting Order"
+                          label="Select..."></Select>
+                      </div>
+                    </Content>
+                  </Island>
 
-                    </Popup>
-                  </Dropdown>
-              </Content>
-            </Island>
+                </Popup>
+              </Dropdown>
+            </div>
           </center>
         </Col>
         <Col
