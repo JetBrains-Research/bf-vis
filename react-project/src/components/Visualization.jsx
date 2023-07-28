@@ -179,15 +179,46 @@ function Visualization() {
   };
 
   const handleLayoutAlgorithm = (e) => {
-    dispatch(reduxTreemapLayoutFunctions.setTilingFunction(e.label));
+    dispatch(reduxTreemapLayoutFunctions.setTilingFunction(e.key));
   };
   const handleSortingKey = (e) => {
     dispatch(reduxTreemapLayoutFunctions.setSortingKey(e.key));
   };
   const handleSortingOrder = (e) => {
     console.log(e.label);
-    dispatch(reduxTreemapLayoutFunctions.setSortingOrder(e.label));
+    dispatch(reduxTreemapLayoutFunctions.setSortingOrder(e.key));
   };
+
+  const layoutAlgorithmSelectData = Object.keys(layoutAlgorithmsMap).map((element, index) => {
+    return {
+      label: element,
+      key: element,
+    };
+  })
+
+  const sortKeySelectData = [
+    {
+      label: "bus factor",
+      key: "busFactor",
+    },
+    {
+      label: "name",
+      key: "name",
+    },
+    {
+      label: "size",
+      key: "size",
+    },
+  ]
+
+  const sortingOrderSelectData = Object.keys(sortingOrderMap).map((element, index) => {
+    return {
+      label: element,
+      key: element,
+    };
+  })
+
+  const findSelectItem = (items, currentValue) => items.find(e => e.key === currentValue)
 
   return (
     <Grid>
@@ -246,8 +277,8 @@ function Visualization() {
 
             <div style={{
               position: "absolute",
-              top: 5,
-              right: 20,
+              top: 10,
+              right: 25,
               display: "flex",
               "flex-direction": "row",
               border: "1px solid black",
@@ -278,12 +309,8 @@ function Visualization() {
                         <Select
                           inputPlaceholder="Layout Algorithm"
                           onChange={handleLayoutAlgorithm}
-                          data={Object.keys(layoutAlgorithmsMap).map((element, index) => {
-                            return {
-                              label: element,
-                              key: index,
-                            };
-                          })}
+                          data={layoutAlgorithmSelectData}
+                          selected={findSelectItem(layoutAlgorithmSelectData, currentTilingFunction)}
                           selectedLabel="Layout Algorithm"
                           label="Select..."></Select>
                       </div>
@@ -291,20 +318,8 @@ function Visualization() {
                         <Select
                           inputPlaceholder="Sorting Key"
                           onChange={handleSortingKey}
-                          data={[
-                            {
-                              label: "bus factor",
-                              key: "busFactor",
-                            },
-                            {
-                              label: "name",
-                              key: "name",
-                            },
-                            {
-                              label: "size",
-                              key: "size",
-                            },
-                          ]}
+                          data={sortKeySelectData}
+                          selected={findSelectItem(sortKeySelectData, currentSortingKey)}
                           selectedLabel="Sorting Key"
                           label="Select..."></Select>
                       </div>
@@ -312,12 +327,8 @@ function Visualization() {
                         <Select
                           inputPlaceholder="Sorting Order"
                           onChange={handleSortingOrder}
-                          data={Object.keys(sortingOrderMap).map((element, index) => {
-                            return {
-                              label: element,
-                              key: index,
-                            };
-                          })}
+                          data={sortingOrderSelectData}
+                          selected={findSelectItem(sortingOrderSelectData, currentSortingOrder)}
                           selectedLabel="Sorting Order"
                           label="Select..."></Select>
                       </div>
