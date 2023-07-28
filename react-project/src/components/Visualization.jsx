@@ -300,7 +300,6 @@ function Visualization() {
                 activeClassName="rotated"
                 anchor={<Button title="Details" icon={settingsIcon}/>}
               >
-                {/*TODO: add default value, reset*/}
                 <Popup>
                   <Island>
                     <Content>
