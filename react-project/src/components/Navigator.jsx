@@ -28,25 +28,17 @@ import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
 import Button from "@jetbrains/ring-ui/dist/button/button";
 import arrowUpIcon from "@jetbrains/icons/arrow-up";
 import archiveIcon from "@jetbrains/icons/archive";
-import search from "@jetbrains/icons/search";
-import searchError from "@jetbrains/icons/search-error";
 import Icon from "@jetbrains/ring-ui/dist/icon/icon";
 import Island from "@jetbrains/ring-ui/dist/island/island";
 import Header from "@jetbrains/ring-ui/dist/island/header";
 import Content from "@jetbrains/ring-ui/dist/island/content";
-import updateIcon from "@jetbrains/icons/update";
-import Select from "@jetbrains/ring-ui/dist/select/select";
 import Toggle, { Size } from "@jetbrains/ring-ui/dist/toggle/toggle";
 import Text from "@jetbrains/ring-ui/dist/text/text";
-import { resetZoom } from "../d3/zoom";
-import { binary, layoutAlgorithmsMap, squarify } from "../d3/tiling";
-import { sortingOrderMap } from "../d3/sort";
 
 function Navigator(props) {
   const dispatch = props.dispatch;
   const currentPath = props.path;
   const folderFilter = props.currentFolderFilter;
-  const reduxTreemapLayoutFunctions = props.reduxTreemapLayoutFunctions;
   const setPathFunc = props.setPathFunc;
   const simulationData = props.simulationData;
   const simulationPath = props.simulationPath;
@@ -55,11 +47,7 @@ function Navigator(props) {
   const sortingOrder = props.sortingOrder;
   const statsData = props.statsData;
   const tilingFunction = props.tilingFunction;
-  const zoom = props.zoom;
 
-  const filterTemplates = CONFIG.filters;
-  const [isDotFilterApplied, setIsDotFilterApplied] = useState(false);
-  const [currentTemplate, setCurrentTemplate] = useState();
   const { t, i18n } = useTranslation();
 
   const currentExtensionsList = useMemo(() => {
@@ -93,27 +81,9 @@ function Navigator(props) {
     }
   };
 
-  const handleLayoutAlgorithm = (e) => {
-    dispatch(reduxTreemapLayoutFunctions.setTilingFunction(e.label));
-  };
-  const handleSortingKey = (e) => {
-    dispatch(reduxTreemapLayoutFunctions.setSortingKey(e.key));
-  };
-  const handleSortingOrder = (e) => {
-    console.log(e.label);
-    dispatch(reduxTreemapLayoutFunctions.setSortingOrder(e.label));
-  };
   const handleFolderFilterToggle = (e) => {
     console.log(e.target.checked);
     dispatch(toggleFolderFilter());
-  };
-
-  const zoomIn = () => {
-    d3.select("svg g g").transition().call(zoom.scaleBy, 2);
-  };
-
-  const zoomOut = () => {
-    d3.select("svg g g").transition().call(zoom.scaleBy, 0.5);
   };
 
   const pathIsland = () => {
@@ -161,7 +131,7 @@ function Navigator(props) {
                 ))}
               </ol>
             </nav>
-            <div className="d-flex mt-1">
+            <center>
               <ButtonSet>
                 <Button
                   onClick={() =>
@@ -179,69 +149,7 @@ function Navigator(props) {
                   <Icon glyph={archiveIcon} /> Home
                 </Button>
               </ButtonSet>
-            </div>
-            <div className="d-flex mt-1">
-              <ButtonSet>
-                <Button
-                  danger
-                  onClick={() => resetZoom(zoom)}>
-                  <Icon glyph={search} /> Reset
-                </Button>
-                <Button onClick={() => zoomIn()}>
-                  <Icon glyph={search} /> In
-                </Button>
-                <Button onClick={() => zoomOut()}>
-                  <Icon glyph={searchError} /> Out
-                </Button>
-              </ButtonSet>
-            </div>
-            <div className="d-flex mt-1">
-              <Select
-                inputPlaceholder="Layout Algorithm"
-                onChange={handleLayoutAlgorithm}
-                data={Object.keys(layoutAlgorithmsMap).map((element, index) => {
-                  return {
-                    label: element,
-                    key: index,
-                  };
-                })}
-                selectedLabel="Layout Algorithm"
-                label="Select..."></Select>
-            </div>
-            <div className="d-flex mt-1">
-              <Select
-                inputPlaceholder="Sorting Key"
-                onChange={handleSortingKey}
-                data={[
-                  {
-                    label: "bus factor",
-                    key: "busFactor",
-                  },
-                  {
-                    label: "name",
-                    key: "name",
-                  },
-                  {
-                    label: "size",
-                    key: "size",
-                  },
-                ]}
-                selectedLabel="Sorting Key"
-                label="Select..."></Select>
-            </div>
-            <div className="d-flex mt-1">
-              <Select
-                inputPlaceholder="Sorting Order"
-                onChange={handleSortingOrder}
-                data={Object.keys(sortingOrderMap).map((element, index) => {
-                  return {
-                    label: element,
-                    key: index,
-                  };
-                })}
-                selectedLabel="Sorting Order"
-                label="Select..."></Select>
-            </div>
+            </center>
           </div>
         </Content>
       </Island>
