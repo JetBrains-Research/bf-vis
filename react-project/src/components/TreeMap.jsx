@@ -22,13 +22,14 @@ import * as tiling from "../d3/tiling";
 import * as sorting from "../d3/sort";
 import * as d3 from "d3";
 
-
 function TreeMap(props) {
   // assign these consts fallback values if prop is empty or throw errors;
   const currentColorPalette = props.colorPalette;
   const currentColorThresholds = props.colorThresholds;
   const currentDataPath = props.dataPath;
-  const dataNormalizationFunction = props.dataNormalizationFunction ? props.dataNormalizationFunction : Math.log2;
+  const dataNormalizationFunction = props.dataNormalizationFunction
+    ? props.dataNormalizationFunction
+    : Math.log2;
   const folderFilter = props.folderFilter;
   const initialHeight = props.initialHeight;
   const initialWidth = props.initialWidth;
@@ -37,7 +38,9 @@ function TreeMap(props) {
   const setPathFunc = props.setPathFunc;
   const sortingFunctionStringId = props.sortingOrder;
   const sortingKey = props.sortingKey;
-  const tilingFunctionStringId = props.tilingFunction ? props.tilingFunction : tiling.squarify;
+  const tilingFunctionStringId = props.tilingFunction
+    ? props.tilingFunction
+    : tiling.squarify;
   const topPadding = props.topPadding;
   const treemapContainerId = props.containerId;
   const treemapSvgId = props.svgId;
@@ -48,15 +51,18 @@ function TreeMap(props) {
   const regexFilters = useSelector(selectRegexFilters);
   const extensionFilters = useSelector(selectExtensionFilters);
 
-
   useLayoutEffect(() => {
     // set data source
     const data = props.data;
-    
+
     // Resolve tiling and sorting methods from text labels
     // const sortingOrderResolved = sorting.sortingOrderMap[sortingFunctionStringId];
-    const tilingFunctionResolved = tiling.layoutAlgorithmsMap[tilingFunctionStringId];
-    const sortingFunction = sorting.sortingKeyMapFunction(sortingFunctionStringId, sortingKey);
+    const tilingFunctionResolved =
+      tiling.layoutAlgorithmsMap[tilingFunctionStringId];
+    const sortingFunction = sorting.sortingKeyMapFunction(
+      sortingFunctionStringId,
+      sortingKey
+    );
 
     // Create treemap layout
     const treemapLayoutGenerator = (treemapData) =>
@@ -84,7 +90,7 @@ function TreeMap(props) {
 
     // Apply filters if present
     if (folderFilter) {
-      applyFolderFilter(rootHierarchyNode)
+      applyFolderFilter(rootHierarchyNode);
     }
     if (regexFilters) {
       applyRegExFilters(rootHierarchyNode, regexFilters);
