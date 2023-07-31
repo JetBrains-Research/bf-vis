@@ -36,7 +36,7 @@ import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
 import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
-import {createZoom} from "../d3/zoom";
+import {createZoom, zoomIn, zoomOut} from "../d3/zoom";
 import Island, {Content} from "@jetbrains/ring-ui/dist/island/island";
 import search from "@jetbrains/icons/search";
 import searchError from "@jetbrains/icons/search-error";
@@ -45,8 +45,8 @@ import * as d3 from "d3";
 import Button from "@jetbrains/ring-ui/dist/button/button";
 import Dropdown from "@jetbrains/ring-ui/dist/dropdown/dropdown";
 import Popup from "@jetbrains/ring-ui/dist/popup/popup";
-import {layoutAlgorithmsMap} from "../d3/tiling";
-import {sortingOrderMap} from "../d3/sort";
+import {layoutAlgorithmSelectData, layoutAlgorithmsMap} from "../d3/tiling";
+import {findSelectItem, sortKeySelectData, sortingOrderMap, sortingOrderSelectData} from "../d3/sort";
 import Select from "@jetbrains/ring-ui/dist/select/select";
 
 function Visualization() {
@@ -169,14 +169,6 @@ function Visualization() {
     dispatch,
   ]);
 
-  const zoomIn = () => {
-    d3.select("#d3_treemap_svg").call(mainTreemapZoom.scaleBy, 1.5);
-  };
-
-  const zoomOut = () => {
-    d3.select("#d3_treemap_svg").call(mainTreemapZoom.scaleBy, 0.75);
-  };
-
   const handleLayoutAlgorithm = (e) => {
     dispatch(reduxTreemapLayoutFunctions.setTilingFunction(e.key));
   };
@@ -188,36 +180,6 @@ function Visualization() {
     dispatch(reduxTreemapLayoutFunctions.setSortingOrder(e.key));
   };
 
-  const layoutAlgorithmSelectData = Object.keys(layoutAlgorithmsMap).map((element, index) => {
-    return {
-      label: element,
-      key: element,
-    };
-  })
-
-  const sortKeySelectData = [
-    {
-      label: "bus factor",
-      key: "busFactor",
-    },
-    {
-      label: "name",
-      key: "name",
-    },
-    {
-      label: "size",
-      key: "size",
-    },
-  ]
-
-  const sortingOrderSelectData = Object.keys(sortingOrderMap).map((element, index) => {
-    return {
-      label: element,
-      key: element,
-    };
-  })
-
-  const findSelectItem = (items, currentValue) => items.find(e => e.key === currentValue)
 
   return (
     <Grid>
@@ -286,12 +248,12 @@ function Visualization() {
               boxShadow: "0 1px 2px black"
             }}>
               <Button
-                onClick={() => zoomIn()}
+                onClick={() => zoomIn(`#${CONFIG.treemap.ids.treemapSvgId}`, mainTreemapZoom)}
                 icon={search}
                 title={"Zoom In"}
               />
               <Button
-                onClick={() => zoomOut()}
+                onClick={() => zoomOut(`#${CONFIG.treemap.ids.treemapSvgId}`, mainTreemapZoom)}
                 icon={searchError}
                 title={"Zoom Out"}
               />

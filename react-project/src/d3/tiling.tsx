@@ -9,3 +9,4 @@ export const layoutAlgorithmsMap = {
 
 export const squarify = treemapSquarify;
 export const binary = treemapBinary;
+

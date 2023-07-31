@@ -31,6 +31,15 @@ export function handleZoom(e) {
     .style("min-width", (d) => (d.x1 - d.x0) * e.transform.k - 4 + "px");
 }
 
+
+export const zoomIn = (svgId, zoom) => {
+  d3.select(svgId).transition(500).call(zoom.scaleBy, 1.5);
+};
+
+export const zoomOut = (svgId, zoom) => {
+  d3.select(svgId).transition(500).call(zoom.scaleBy, 0.75);
+};
+
 export function resetZoom(zoom) {
   d3.selectAll("svg g g").transition(500).call(zoom.scaleTo, 1);
 }
@@ -45,3 +54,5 @@ export function createZoom(minScale, maxScale, width, height) {
     ])
     .on("zoom", handleZoom);
 }
+
+
