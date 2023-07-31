@@ -9,10 +9,16 @@ import { ascending } from "d3";
 
 const defaultColors = [
   CONFIG.general.colors.jetbrains.gray,
-  CONFIG.general.colors.jetbrains.darkRed,
-  CONFIG.general.colors.jetbrains.golden,
-  CONFIG.general.colors.jetbrains.white,
-];
+  CONFIG.general.colors.customPalette1.red,
+  CONFIG.general.colors.customPalette1.yellow,
+  CONFIG.general.colors.customPalette1.green,
+]
+// const defaultColors = [
+//   CONFIG.general.colors.jetbrains.gray,
+//   CONFIG.general.colors.jetbrains.darkRed,
+//   CONFIG.general.colors.jetbrains.golden,
+//   CONFIG.general.colors.jetbrains.white,
+// ];
 
 const defaultColorThresholds = [2, 5];
 

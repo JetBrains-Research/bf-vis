@@ -15,13 +15,8 @@ import { getFileExtension } from "../utils/url.tsx";
 
 // get max val from data and use it to set the upper limit in color selection
 const JETBRAINS_COLORS = CONFIG.general.colors.jetbrains;
+const PALETTE_COLORS = CONFIG.general.colors.customPalette1;
 const UNAVAILABLE_BF_COLOR = JETBRAINS_COLORS.gray;
-const MAX_BUS_FACTOR_COLOR_VALUE = CONFIG.treemap.logic.maxBusFactorValue;
-export const colorSequence = [
-  JETBRAINS_COLORS.brightRed,
-  JETBRAINS_COLORS.golden,
-  JETBRAINS_COLORS.white,
-];
 
 export const formatSI = d3.format(".2s");
 
@@ -136,7 +131,7 @@ function addColorsToMiniTreemap(treemap) {
     d.bgColor = color;
     d.textColor = pickTextColorBasedOnBgColor(
       color,
-      JETBRAINS_COLORS.gray,
+      JETBRAINS_COLORS.white,
       JETBRAINS_COLORS.black
     );
   });
@@ -154,15 +149,15 @@ function chooseRectangleFillColor(
 
 function chooseRectangleFillColorMiniTreemap(d) {
   if (d.data.busFactorStatus.nodeStatus === "original") {
-    return JETBRAINS_COLORS.gray;
+    return JETBRAINS_COLORS.white;
   }
 
   if (d.data.busFactorStatus.nodeStatus === "decrease") {
-    return JETBRAINS_COLORS.golden;
+    return PALETTE_COLORS.yellow;
   }
 
   if (d.data.busFactorStatus.nodeStatus === "lost") {
-    return JETBRAINS_COLORS.darkRed;
+    return PALETTE_COLORS.red;
   }
 
   return UNAVAILABLE_BF_COLOR;
@@ -289,13 +284,7 @@ node status: ${
         ? CONFIG.treemap.classes.rectWrapperChild
         : CONFIG.treemap.classes.rectWrapperParent
     )
-    .style("cursor", "pointer")
-    .append("div")
-    .attr("class", "p-1")
-    .style("display", "flex")
-    .style("min-width", "0px")
-    .style("align-items", "center")
-    .style("justify-content", "center");
+    .style("cursor", "pointer");
 
   textBox
     .filter((d) => d.data.children && d.data.children.length > 0 && d.depth > 0)
@@ -303,7 +292,15 @@ node status: ${
       rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions)
     );
 
-  textBox
+  const pBox = textBox
+    .append("div")
+    .attr("class", "p-1")
+    .style("display", "flex")
+    .style("min-width", "0px")
+    .style("align-items", "center")
+    .style("justify-content", "center");
+
+  pBox
     .append("xhtml:p")
     .text((d) => {
       return ` ${
@@ -317,6 +314,17 @@ node status: ${
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
     .style("font-size", CONFIG.treemap.children.p.miniFontSize)
+    .style("min-width", "0px")
+    .style("width", "100%");
+
+  pBox
+    .filter((d) => d.data.children && d.data.children.length > 0 && d.depth > 0)
+    .select("p")
+    .append("xhtml:i")
+    .lower()
+    .attr("class", CONFIG.treemap.classes.folderIcon)
+    .style("color", (d) => d.textColor)
+    .style("font-size", CONFIG.treemap.children.icon.fontSize)
     .style("min-width", "0px")
     .style("width", "100%");
 }
@@ -453,5 +461,4 @@ bus factor: ${
     .style("font-size", CONFIG.treemap.children.icon.fontSize)
     .style("min-width", "0px")
     .style("width", "100%");
-
 }

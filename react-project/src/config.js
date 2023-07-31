@@ -69,7 +69,7 @@ export const CONFIG = {
   },
   simulation: {
     layout: {
-      height: 600,
+      height: 550,
       width: 1000,
       overallPadding: window.innerHeight * 0.01,
       topPadding: window.innerHeight * 0.05,
