@@ -170,11 +170,11 @@ function Visualization() {
   ]);
 
   const zoomIn = () => {
-    d3.select("svg g g").transition().call(mainTreemapZoom.scaleBy, 2);
+    d3.select("#d3_treemap_svg").call(mainTreemapZoom.scaleBy, 1.5);
   };
 
   const zoomOut = () => {
-    d3.select("svg g g").transition().call(mainTreemapZoom.scaleBy, 0.5);
+    d3.select("#d3_treemap_svg").call(mainTreemapZoom.scaleBy, 0.75);
   };
 
   const handleLayoutAlgorithm = (e) => {
