@@ -70,15 +70,15 @@ function SimulationModeModal(props) {
   const [show, setShow] = useState(false);
 
   const setTreemapPathOutFunc = (path) => {
-    props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapOut(
+    reduxMiniTreemapFunctions.dispatch(
+      reduxMiniTreemapFunctions.scopeMiniTreemapOut(
         payloadGenerator("path", path)
       )
     );
   };
   const returnTreeMapHome = () => {
-    props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator("path", "."))
+    reduxMiniTreemapFunctions.dispatch(
+      reduxMiniTreemapFunctions.scopeMiniTreemapIn(payloadGenerator("path", "."))
     );
   };
 
@@ -120,15 +120,15 @@ function SimulationModeModal(props) {
 
   const handleAuthorCheckmark = (authorEmail) => {
     if (!removedAuthorsList.includes(authorEmail)) {
-      props.reduxNavFunctions.dispatch(addAuthorToRemovalList([authorEmail]));
-      props.reduxNavFunctions.dispatch(
+      reduxMiniTreemapFunctions.dispatch(addAuthorToRemovalList([authorEmail]));
+      reduxMiniTreemapFunctions.dispatch(
         scopeMiniTreemapIn(
           payloadGenerator("path", simulationVisualizationPath)
         )
       );
     } else {
-      props.reduxNavFunctions.dispatch(undoAuthorRemoval([authorEmail]));
-      props.reduxNavFunctions.dispatch(
+      reduxMiniTreemapFunctions.dispatch(undoAuthorRemoval([authorEmail]));
+      reduxMiniTreemapFunctions.dispatch(
         scopeMiniTreemapIn(
           payloadGenerator("path", simulationVisualizationPath)
         )
@@ -215,7 +215,7 @@ function SimulationModeModal(props) {
           <Modal.Title>Simulate Author Removal</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body className="onTopLevel0">
+        <Modal.Body>
           <Grid>
             <Row>
               <Col
@@ -241,7 +241,7 @@ function SimulationModeModal(props) {
                     tilingFunction={tilingFunction}
                     topPadding={CONFIG.simulation.layout.topPadding}
                     type="mini"
-                    reduxNavFunctions={props.reduxNavFunctions}
+                    reduxNavFunctions={reduxMiniTreemapFunctions}
                     zoom={zoom}></TreeMap>
 
                   <div
