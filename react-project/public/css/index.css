@@ -124,3 +124,20 @@ td {
   border: 4px solid gray;
   border-radius: 20%;
 }
+
+.onTopLevel0 {
+  z-index: 3000 !important;
+}
+
+.onTopLevel1 {
+  z-index: 10010 !important;
+}
+
+.onTopLevel2 {
+  z-index: 10020 !important;
+  position: fixed !important;
+}
+
+.menu-overflow {
+  overflow-y: visible;
+}

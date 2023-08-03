@@ -1,9 +1,9 @@
 /** @format */
 
-import React, {useCallback, useDeferredValue, useLayoutEffect,} from "react";
-import {batch, useDispatch, useSelector} from "react-redux";
-import {useSearchParams} from "react-router-dom";
-import {CONFIG} from "../config";
+import React, { useCallback, useDeferredValue, useLayoutEffect } from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import { CONFIG } from "../config";
 
 import {
   returnMainTreemapHome,
@@ -23,21 +23,27 @@ import {
   selectSortingKey,
   selectSortingOrder,
   selectTilingFunction,
+  selectSimSortingKey,
+  selectSimSortingOrder,
+  selectSimTilingFunction,
   setSortingKey,
   setSortingOrder,
   setTilingFunction,
+  setSimSortingKey,
+  setSimSortingOrder,
+  setSimTilingFunction,
   simulationVisualizationData,
   simulationVisualizationPath,
 } from "../reducers/treemapSlice";
 
-import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 
 import Navigator from "./Navigator";
 import TreeMap from "./TreeMap";
 import RightColumn from "./RightColumn";
-import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
-import {createZoom, zoomIn, zoomOut} from "../d3/zoom";
-import Island, {Content} from "@jetbrains/ring-ui/dist/island/island";
+import { Col, Grid, Row } from "@jetbrains/ring-ui/dist/grid/grid";
+import { createZoom, zoomIn, zoomOut } from "../d3/zoom";
+import Island, { Content } from "@jetbrains/ring-ui/dist/island/island";
 import search from "@jetbrains/icons/search";
 import searchError from "@jetbrains/icons/search-error";
 import settingsIcon from "@jetbrains/icons/settings";
@@ -45,8 +51,13 @@ import * as d3 from "d3";
 import Button from "@jetbrains/ring-ui/dist/button/button";
 import Dropdown from "@jetbrains/ring-ui/dist/dropdown/dropdown";
 import Popup from "@jetbrains/ring-ui/dist/popup/popup";
-import {layoutAlgorithmSelectData, layoutAlgorithmsMap} from "../d3/tiling";
-import {findSelectItem, sortKeySelectData, sortingOrderMap, sortingOrderSelectData} from "../d3/sort";
+import { layoutAlgorithmSelectData, layoutAlgorithmsMap } from "../d3/tiling";
+import {
+  findSelectItem,
+  sortKeySelectData,
+  sortingOrderMap,
+  sortingOrderSelectData,
+} from "../d3/sort";
 import Select from "@jetbrains/ring-ui/dist/select/select";
 
 function Visualization() {
@@ -83,11 +94,20 @@ function Visualization() {
   const currentSortingOrder = useDeferredValue(useSelector(selectSortingOrder));
   const currentFolderFilter = useDeferredValue(useSelector(selectFolderFilter));
 
-  const reduxMiniTreemapNavFunctions = {
+  const currentSimSortingKey = useDeferredValue(useSelector(selectSimSortingKey));
+  const currentSimSortingOrder = useDeferredValue(useSelector(selectSimSortingOrder));
+  const currentSimTilingFunction = useDeferredValue(
+    useSelector(selectSimTilingFunction)
+  );
+
+  const reduxMiniTreemapFunctions = {
     dispatch,
     scopeMiniTreemapIn,
     scopeMiniTreemapOut,
     returnMiniTreemapHome,
+    setSimSortingKey,
+    setSimSortingOrder,
+    setSimTilingFunction,
   };
 
   const reduxTreemapLayoutFunctions = {
@@ -180,7 +200,6 @@ function Visualization() {
     dispatch(reduxTreemapLayoutFunctions.setSortingOrder(e.key));
   };
 
-
   return (
     <Grid>
       <Row>
@@ -196,15 +215,16 @@ function Visualization() {
               filters={filters}
               folderFilter={currentFolderFilter}
               path={currentVisualizationPath}
-              reduxNavFunctions={reduxMiniTreemapNavFunctions}
+              reduxMiniTreemapFunctions={reduxMiniTreemapFunctions}
+              reduxTreemapLayoutFunctions={reduxTreemapLayoutFunctions}
               setPathFunc={setURLPath}
               simulationData={currentSimulationModeData}
               simulationPath={currentSimulationModePath}
               simulationZoom={simulationModeZoom}
-              sortingKey={currentSortingKey}
-              sortingOrder={currentSortingOrder}
+              sortingKey={currentSimSortingKey}
+              sortingOrder={currentSimSortingOrder}
               statsData={currentStatsData}
-              tilingFunction={currentTilingFunction}
+              tilingFunction={currentSimTilingFunction}
             />
           </center>
         </Col>
@@ -213,7 +233,9 @@ function Visualization() {
           sm={6}
           md={8}
           lg={8}>
-          <center style={{position: "relative"}} id={"treeMap"}>
+          <center
+            style={{ position: "relative" }}
+            id={"treeMap"}>
             <TreeMap
               colorDefinitions={CONFIG.general.colors.jetbrains}
               colorPalette={currentColorPalette}
@@ -236,32 +258,44 @@ function Visualization() {
               type="main"
               zoom={mainTreemapZoom}></TreeMap>
 
-            <div style={{
-              position: "absolute",
-              top: 10,
-              right: 25,
-              display: "flex",
-              flexDirection: "row",
-              border: "1px solid black",
-              borderRadius: "10px",
-              backgroundColor: "white",
-              boxShadow: "0 1px 2px black"
-            }}>
+            <div
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 25,
+                display: "flex",
+                flexDirection: "row",
+                border: "1px solid black",
+                borderRadius: "10px",
+                backgroundColor: "white",
+                boxShadow: "0 1px 2px black",
+              }}>
               <Button
-                onClick={() => zoomIn(`#${CONFIG.treemap.ids.treemapSvgId}`, mainTreemapZoom)}
+                onClick={() =>
+                  zoomIn(`#${CONFIG.treemap.ids.treemapSvgId}`, mainTreemapZoom)
+                }
                 icon={search}
                 title={"Zoom In"}
               />
               <Button
-                onClick={() => zoomOut(`#${CONFIG.treemap.ids.treemapSvgId}`, mainTreemapZoom)}
+                onClick={() =>
+                  zoomOut(
+                    `#${CONFIG.treemap.ids.treemapSvgId}`,
+                    mainTreemapZoom
+                  )
+                }
                 icon={searchError}
                 title={"Zoom Out"}
               />
               <Dropdown
                 className="chevron"
                 activeClassName="rotated"
-                anchor={<Button title="Details" icon={settingsIcon}/>}
-              >
+                anchor={
+                  <Button
+                    title="Details"
+                    icon={settingsIcon}
+                  />
+                }>
                 <Popup>
                   <Island>
                     <Content>
@@ -269,26 +303,34 @@ function Visualization() {
                         <Select
                           onChange={handleLayoutAlgorithm}
                           data={layoutAlgorithmSelectData}
-                          selected={findSelectItem(layoutAlgorithmSelectData, currentTilingFunction)}
+                          selected={findSelectItem(
+                            layoutAlgorithmSelectData,
+                            currentTilingFunction
+                          )}
                           selectedLabel="Layout Algorithm"></Select>
                       </div>
                       <div className="d-flex mt-1">
                         <Select
                           onChange={handleSortingKey}
                           data={sortKeySelectData}
-                          selected={findSelectItem(sortKeySelectData, currentSortingKey)}
+                          selected={findSelectItem(
+                            sortKeySelectData,
+                            currentSortingKey
+                          )}
                           selectedLabel="Sorting Key"></Select>
                       </div>
                       <div className="d-flex mt-1">
                         <Select
                           onChange={handleSortingOrder}
                           data={sortingOrderSelectData}
-                          selected={findSelectItem(sortingOrderSelectData, currentSortingOrder)}
+                          selected={findSelectItem(
+                            sortingOrderSelectData,
+                            currentSortingOrder
+                          )}
                           selectedLabel="Sorting Order"></Select>
                       </div>
                     </Content>
                   </Island>
-
                 </Popup>
               </Dropdown>
             </div>

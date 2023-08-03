@@ -10,3 +10,9 @@ export const layoutAlgorithmsMap = {
 export const squarify = treemapSquarify;
 export const binary = treemapBinary;
 
+export const layoutAlgorithmSelectData = Object.keys(layoutAlgorithmsMap).map((element, index) => {
+  return {
+    label: element,
+    key: element,
+  };
+})

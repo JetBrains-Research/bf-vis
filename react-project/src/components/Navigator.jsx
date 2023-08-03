@@ -47,6 +47,7 @@ function Navigator(props) {
   const sortingOrder = props.sortingOrder;
   const statsData = props.statsData;
   const tilingFunction = props.tilingFunction;
+  const treemapLayoutFunctions = props.reduxTreemapLayoutFunctions;
 
   const { t, i18n } = useTranslation();
 
@@ -241,7 +242,7 @@ function Navigator(props) {
       {addMargin(filterIsland())}
       {addMargin(
         <SimulationModeModal
-          reduxNavFunctions={props.reduxNavFunctions}
+          reduxMiniTreemapFunctions={props.reduxMiniTreemapFunctions}
           simulationData={simulationData}
           simulationPath={simulationPath}
           statsData={statsData}

@@ -3,22 +3,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { calculateBusFactor } from "../utils/BusFactorUtil";
 import { CONFIG } from "../config";
-import { binary, squarify } from "../d3/tiling";
-import { ascending } from "d3";
-
 
 const defaultColors = [
   CONFIG.general.colors.jetbrains.gray,
   CONFIG.general.colors.customPalette1.red,
   CONFIG.general.colors.customPalette1.yellow,
   CONFIG.general.colors.customPalette1.green,
-]
-// const defaultColors = [
-//   CONFIG.general.colors.jetbrains.gray,
-//   CONFIG.general.colors.jetbrains.darkRed,
-//   CONFIG.general.colors.jetbrains.golden,
-//   CONFIG.general.colors.jetbrains.white,
-// ];
+];
 
 const defaultColorThresholds = [2, 5];
 
@@ -73,6 +64,9 @@ function convertTreeToState(tree) {
         previousPathStack: [],
         previousVisualizationData: [],
         visualizationPath: tree.path,
+        tilingFunction: defaultTilingFunction,
+        sortingKey: defaultSortingKey,
+        sortingOrder: defaultSortingOrder,
       },
       removedAuthors: [],
     },
@@ -403,7 +397,9 @@ const treemapSlice = createSlice({
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
         return {
           ...state,
-          extensionFilters: [...new Set(state.extensionFilters.concat(newFilterExps))],
+          extensionFilters: [
+            ...new Set(state.extensionFilters.concat(newFilterExps)),
+          ],
         };
       }
     },
@@ -519,15 +515,54 @@ const treemapSlice = createSlice({
         },
       };
     },
+    setSimTilingFunction: (state, action) => {
+      const newTilingFunction = action.payload;
+      return {
+        ...state,
+        simulation: {
+          ...state.simulation,
+          miniTreemap: {
+            ...state.simulation.miniTreemap,
+            tilingFunction: newTilingFunction,
+          },
+        },
+      };
+    },
+    setSimSortingKey: (state, action) => {
+      const newSortingKey = action.payload;
+      return {
+        ...state,
+        simulation: {
+          ...state.simulation,
+          miniTreemap: {
+            ...state.simulation.miniTreemap,
+            sortingKey: newSortingKey,
+          },
+        },
+      };
+    },
+    setSimSortingOrder: (state, action) => {
+      const newSortingOrder = action.payload;
+      return {
+        ...state,
+        simulation: {
+          ...state.simulation,
+          miniTreemap: {
+            ...state.simulation.miniTreemap,
+            sortingOrder: newSortingOrder,
+          },
+        },
+      };
+    },
     setTilingFunction: (state, action) => {
       const newTilingFunction = action.payload;
       return {
         ...state,
         mainTreemap: {
           ...state.mainTreemap,
-          tilingFunction: newTilingFunction
-        }
-      }
+          tilingFunction: newTilingFunction,
+        },
+      };
     },
     setSortingKey: (state, action) => {
       const newSortingKey = action.payload;
@@ -535,9 +570,9 @@ const treemapSlice = createSlice({
         ...state,
         mainTreemap: {
           ...state.mainTreemap,
-          sortingKey: newSortingKey
-        }
-      }
+          sortingKey: newSortingKey,
+        },
+      };
     },
     setSortingOrder: (state, action) => {
       const newSortingOrder = action.payload;
@@ -545,16 +580,16 @@ const treemapSlice = createSlice({
         ...state,
         mainTreemap: {
           ...state.mainTreemap,
-          sortingOrder: newSortingOrder
-        }
-      }
+          sortingOrder: newSortingOrder,
+        },
+      };
     },
     toggleFolderFilter: (state) => {
       return {
         ...state,
-        folderFilter: !state.folderFilter
-      }
-    }
+        folderFilter: !state.folderFilter,
+      };
+    },
   },
 });
 
@@ -590,6 +625,9 @@ export const {
   setSortingKey,
   setSortingOrder,
   setTilingFunction,
+  setSimSortingKey,
+  setSimSortingOrder,
+  setSimTilingFunction,
 } = treemapSlice.actions;
 //treemap data selectors
 export const selectFullData = (state) => state.treemap.mainTreemap.fullData;
@@ -638,8 +676,17 @@ export const simulationVisualizationPath = (state) =>
   state.treemap.simulation.miniTreemap.visualizationPath;
 export const selectRemovedAuthors = (state) =>
   state.treemap.simulation.removedAuthors;
-export const selectTilingFunction = (state) => state.treemap.mainTreemap.tilingFunction;
-export const selectSortingOrder = (state) => state.treemap.mainTreemap.sortingOrder;
-export const selectSortingKey = (state) => state.treemap.mainTreemap.sortingKey;
+export const selectTilingFunction = (state) =>
+  state.treemap.mainTreemap.tilingFunction;
+export const selectSortingOrder = (state) =>
+  state.treemap.mainTreemap.sortingOrder;
+export const selectSortingKey = (state) =>
+  state.treemap.mainTreemap.sortingKey;
+export const selectSimTilingFunction = (state) =>
+  state.treemap.simulation.miniTreemap.tilingFunction;
+export const selectSimSortingOrder = (state) =>
+  state.treemap.simulation.miniTreemap.sortingOrder;
+export const selectSimSortingKey = (state) =>
+  state.treemap.simulation.miniTreemap.sortingKey;
 
 export default treemapSlice.reducer;
