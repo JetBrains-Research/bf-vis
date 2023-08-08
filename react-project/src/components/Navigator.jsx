@@ -90,8 +90,8 @@ function Navigator(props) {
   const pathIsland = () => {
     return (
       <Island>
-        <Header border>
-          Navigation{" "}
+        <Header border >
+          Current Path {" "}
           <InfoPanel
             divName="currentPathInfoPanel"
             header="What is the current path"
@@ -132,25 +132,6 @@ function Navigator(props) {
                 ))}
               </ol>
             </nav>
-            <center>
-              <ButtonSet>
-                <Button
-                  onClick={() =>
-                    currentPath.split("/").filter((r) => r !== "").length > 1
-                      ? setPathFunc(
-                          currentPath.split("/").slice(0, -1).join("/")
-                        )
-                      : setPathFunc(".")
-                  }>
-                  <Icon glyph={arrowUpIcon} /> Up
-                </Button>
-                <Button
-                  primary
-                  onClick={() => setPathFunc(".")}>
-                  <Icon glyph={archiveIcon} /> Home
-                </Button>
-              </ButtonSet>
-            </center>
           </div>
         </Content>
       </Island>

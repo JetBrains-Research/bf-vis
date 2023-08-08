@@ -44,8 +44,10 @@ import RightColumn from "./RightColumn";
 import { Col, Grid, Row } from "@jetbrains/ring-ui/dist/grid/grid";
 import { createZoom, zoomIn, zoomOut } from "../d3/zoom";
 import Island, { Content } from "@jetbrains/ring-ui/dist/island/island";
-import search from "@jetbrains/icons/search";
-import searchError from "@jetbrains/icons/search-error";
+import zoomInIcon from "@jetbrains/icons/search";
+import zoomOutIcon from "@jetbrains/icons/search-error";
+import arrowUpIcon from "@jetbrains/icons/arrow-up";
+import archiveIcon from "@jetbrains/icons/archive";
 import settingsIcon from "@jetbrains/icons/settings";
 import * as d3 from "d3";
 import Button from "@jetbrains/ring-ui/dist/button/button";
@@ -94,8 +96,12 @@ function Visualization() {
   const currentSortingOrder = useDeferredValue(useSelector(selectSortingOrder));
   const currentFolderFilter = useDeferredValue(useSelector(selectFolderFilter));
 
-  const currentSimSortingKey = useDeferredValue(useSelector(selectSimSortingKey));
-  const currentSimSortingOrder = useDeferredValue(useSelector(selectSimSortingOrder));
+  const currentSimSortingKey = useDeferredValue(
+    useSelector(selectSimSortingKey)
+  );
+  const currentSimSortingOrder = useDeferredValue(
+    useSelector(selectSimSortingOrder)
+  );
   const currentSimTilingFunction = useDeferredValue(
     useSelector(selectSimTilingFunction)
   );
@@ -257,6 +263,43 @@ function Visualization() {
               topPadding={CONFIG.treemap.layout.topPadding}
               type="main"
               zoom={mainTreemapZoom}></TreeMap>
+            <div
+              style={{
+                position: "absolute",
+                top: 10,
+                left: 25,
+                display: "flex",
+                flexDirection: "row",
+                border: "1px solid black",
+                borderRadius: "10px",
+                backgroundColor: "white",
+                boxShadow: "0 1px 2px black",
+              }}>
+              <Button
+                onClick={() =>
+                  currentVisualizationPath.split("/").filter((r) => r !== "")
+                    .length > 1
+                    ? setURLPath(
+                        currentVisualizationPath
+                          .split("/")
+                          .slice(0, -1)
+                          .join("/")
+                      )
+                    : setURLPath(".")
+                }
+                icon={arrowUpIcon}
+                title={"Navigate to Parent Directory"}>
+                {" "}
+                Up{" "}
+              </Button>
+              <Button
+                onClick={() => setURLPath(".")}
+                icon={archiveIcon}
+                title={"Home"}>
+                {" "}
+                Home
+              </Button>
+            </div>
 
             <div
               style={{
@@ -274,7 +317,7 @@ function Visualization() {
                 onClick={() =>
                   zoomIn(`#${CONFIG.treemap.ids.treemapSvgId}`, mainTreemapZoom)
                 }
-                icon={search}
+                icon={zoomInIcon}
                 title={"Zoom In"}
               />
               <Button
@@ -284,7 +327,7 @@ function Visualization() {
                     mainTreemapZoom
                   )
                 }
-                icon={searchError}
+                icon={zoomOutIcon}
                 title={"Zoom Out"}
               />
               <Dropdown
