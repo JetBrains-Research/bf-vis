@@ -78,7 +78,9 @@ function SimulationModeModal(props) {
   };
   const returnTreeMapHome = () => {
     reduxMiniTreemapFunctions.dispatch(
-      reduxMiniTreemapFunctions.scopeMiniTreemapIn(payloadGenerator("path", "."))
+      reduxMiniTreemapFunctions.scopeMiniTreemapIn(
+        payloadGenerator("path", ".")
+      )
     );
   };
 
@@ -247,6 +249,45 @@ function SimulationModeModal(props) {
                   <div
                     style={{
                       position: "absolute",
+                      top: 10,
+                      left: 25,
+                      display: "flex",
+                      flexDirection: "row",
+                      border: "1px solid black",
+                      borderRadius: "10px",
+                      backgroundColor: "white",
+                      boxShadow: "0 1px 2px black",
+                    }}>
+                    <Button
+                      onClick={() =>
+                        simulationVisualizationPath
+                          .split("/")
+                          .filter((r) => r !== "").length > 1
+                          ? setTreemapPathOutFunc(
+                              simulationVisualizationPath
+                                .split("/")
+                                .slice(0, -1)
+                                .join("/")
+                            )
+                          : setTreemapPathOutFunc(".")
+                      }
+                      icon={arrowUpIcon}
+                      title={"Navigate to Parent Directory"}>
+                      {" "}
+                      Up{" "}
+                    </Button>
+                    <Button
+                      onClick={() => returnTreeMapHome()}
+                      icon={archiveIcon}
+                      title={"Home"}>
+                      {" "}
+                      Home
+                    </Button>
+                  </div>
+
+                  <div
+                    style={{
+                      position: "absolute",
                       top: "1em",
                       right: "2.5em",
                       display: "flex",
@@ -292,7 +333,10 @@ function SimulationModeModal(props) {
                                 )}
                                 selectedLabel="Layout Algorithm"
                                 ringPopupTarget="mini-treemap-select-algo-target"
-                                maxHeight={(tiling.layoutAlgorithmSelectData.length * 2) + "em" }></Select>
+                                maxHeight={
+                                  tiling.layoutAlgorithmSelectData.length * 2 +
+                                  "em"
+                                }></Select>
                             </div>
                             <div
                               className="onTopLevel2"
@@ -307,7 +351,9 @@ function SimulationModeModal(props) {
                                 )}
                                 selectedLabel="Sorting Key"
                                 ringPopupTarget="mini-treemap-select-sortkey-target"
-                                maxHeight={(sortKeySelectData.length * 2) + "em" }></Select>
+                                maxHeight={
+                                  sortKeySelectData.length * 2 + "em"
+                                }></Select>
                             </div>
                             <div
                               className="onTopLevel2 menu-overflow"
@@ -323,7 +369,7 @@ function SimulationModeModal(props) {
                                 )}
                                 selectedLabel="Sorting Order"
                                 ringPopupTarget="mini-treemap-select-sortorder-target"
-                              maxHeight="10em"></Select>
+                                maxHeight="10em"></Select>
                             </div>
                             <div
                               className="onTopLevel2 menu-overflow"
@@ -342,7 +388,9 @@ function SimulationModeModal(props) {
                 lg={3}>
                 <div style={{ marginBottom: 20 }}>
                   <nav aria-label="breadcrumb">
-                    <strong>Path:</strong>
+                    <center>
+                      <strong>Current Path</strong>
+                    </center>
                     <ol className="breadcrumb">
                       {simulationVisualizationPath
                         .split("/")
@@ -368,36 +416,13 @@ function SimulationModeModal(props) {
                         ))}
                     </ol>
                   </nav>
-
-                  <center>
-                    <ButtonSet>
-                      <Button
-                        onClick={() =>
-                          simulationVisualizationPath
-                            .split("/")
-                            .filter((r) => r !== "").length > 1
-                            ? setTreemapPathOutFunc(
-                                simulationVisualizationPath
-                                  .split("/")
-                                  .slice(0, -1)
-                                  .join("/")
-                              )
-                            : setTreemapPathOutFunc(".")
-                        }>
-                        <Icon glyph={arrowUpIcon} /> Up
-                      </Button>
-                      <Button
-                        primary
-                        onClick={() => returnTreeMapHome()}>
-                        <Icon glyph={archiveIcon} /> Home
-                      </Button>
-                    </ButtonSet>
-                  </center>
                 </div>
 
                 {/*TODO: add same width for input and list*/}
                 <center>
+                  <strong>Authors List</strong>
                   <Input
+                    placeholder="Search for authors' git emails..."
                     onChange={handleSearchTextChange}
                     size={Size.M}></Input>
                 </center>
