@@ -9,18 +9,24 @@ import { useTranslation } from "react-i18next";
 function LegendSimColor(props) {
   const { t } = useTranslation();
   const jetbrainsColors = CONFIG.general.colors.jetbrains;
+  const PALETTE_COLORS = CONFIG.general.colors.customPalette1;
   const scale = [
     {
-      color: jetbrainsColors.golden,
-      label: "Bus Factor decreased",
-    },
-    {
-      color: jetbrainsColors.brightRed,
+      color: PALETTE_COLORS.red,
       label: "Bus Factor decreased to 0",
     },
     {
+      color: PALETTE_COLORS.yellow,
+      label: "Bus Factor decreased",
+    },
+
+    {
+      color: jetbrainsColors.white,
+      label: "Bus Factor did not change",
+    },
+    {
       color: jetbrainsColors.gray,
-      label: "No change",
+      label: "Bus Factor not available",
     },
   ];
 
@@ -29,13 +35,14 @@ function LegendSimColor(props) {
       <div
         id="legend-color-mini"
         className="row mt-2 mx-2">
-          <h6> Color </h6>
+        <h6> Color </h6>
         {scale.map((element) => {
           return (
             <div
               key={element.label}
               className="col-auto mx-0 my-2">
-              {generateSvgSquare("1.5rem", element.color)} <strong>{element.label}</strong>
+              {generateSvgSquare("1.5rem", element.color)}{" "}
+              <strong>{element.label}</strong>
             </div>
           );
         })}

@@ -3,6 +3,11 @@
 export const CONFIG = {
   general: {
     colors: {
+      customPalette1: {
+        green: "rgb(69,170,26)",
+        yellow: "rgb(255,228,109)",
+        red: "rgb(198,38,30)",
+      },
       jetbrains: {
         black: "rgb(0,0,0)",
         blue: "rgb(8,124,250)",
@@ -58,13 +63,13 @@ export const CONFIG = {
       },
       p: {
         fontSize: "0.7em",
-        miniFontSize: "0.6em"
+        miniFontSize: "0.7em"
       },
     },
   },
   simulation: {
     layout: {
-      height: 600,
+      height: 550,
       width: 1000,
       overallPadding: window.innerHeight * 0.01,
       topPadding: window.innerHeight * 0.05,

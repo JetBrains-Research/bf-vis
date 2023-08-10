@@ -3,23 +3,35 @@
 import { ascending, descending } from "d3";
 // functions for sorting to make prevalent sorting methods easily accessible and switchable for d3.treemap and d3.hierarchy objects
 
-export const sizeAscending = (a, b) => ascending(a.size, b.size);
-export const sizeDescending = (a, b) => descending(a.size, b.size);
-
-export const nameAscending = (a, b) => ascending(a.name, b.name);
-export const nameDescending = (a, b) => descending(a.name, b.name);
-
-export const busFactorAscending = (a, b) =>
-  ascending(a.data.busFactor, b.data.busFactor);
-export const busFactorDescending = (a, b) =>
-  descending(a.data.busFactor, b.data.busFactor);
+export const sortKeySelectData = [
+    {
+      label: "bus factor",
+      key: "busFactor",
+    },
+    {
+      label: "name",
+      key: "name",
+    },
+    {
+      label: "size",
+      key: "size",
+    },
+  ]
 
 export const sortingOrderMap = {
   ascending: ascending,
   descending: descending,
 };
+export const sortingOrderSelectData = Object.keys(sortingOrderMap).map((element, index) => {
+  return {
+    label: element,
+    key: element,
+  };
+})
 
 export const sortingKeyMap = ["name", "size", "busFactor"];
+
+export const findSelectItem = (items, currentValue) => items.find(e => e.key === currentValue)
 
 const isBusFactorPresent = (d3Node) => {
   if (Object.keys(d3Node).includes("data")) {

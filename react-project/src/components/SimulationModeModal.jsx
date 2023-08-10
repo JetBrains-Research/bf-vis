@@ -37,11 +37,23 @@ import arrowUpIcon from "@jetbrains/icons/arrow-up";
 import archiveIcon from "@jetbrains/icons/archive";
 import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
 import { Col, Grid, Row } from "@jetbrains/ring-ui/dist/grid/grid";
+import Popup from "@jetbrains/ring-ui/dist/popup/popup.js";
+import Dropdown from "@jetbrains/ring-ui/dist/dropdown/dropdown.js";
+import Select from "@jetbrains/ring-ui/dist/select/select.js";
+import search from "@jetbrains/icons/search";
+import searchError from "@jetbrains/icons/search-error";
+import settingsIcon from "@jetbrains/icons/settings";
+import { zoomIn, zoomOut } from "../d3/zoom.js";
+import {
+  findSelectItem,
+  sortKeySelectData,
+  sortingOrderSelectData,
+} from "../d3/sort.js";
+import SelectPopup from "@jetbrains/ring-ui/dist/select/select__popup.js";
 
 function SimulationModeModal(props) {
   const { t, i18n } = useTranslation();
   const formatPercentage = format(",.1%");
-  const formatSI = format(".3s");
 
   const simulationVisualizationData = props.simulationData;
   const simulationVisualizationPath = props.simulationPath;
@@ -49,6 +61,8 @@ function SimulationModeModal(props) {
   const sortingOrder = props.sortingOrder;
   const tilingFunction = props.tilingFunction;
   const zoom = props.zoom;
+  const reduxMiniTreemapFunctions = props.reduxMiniTreemapFunctions;
+
   const authorsList =
     "users" in simulationVisualizationData
       ? [...simulationVisualizationData.users]
@@ -56,15 +70,17 @@ function SimulationModeModal(props) {
   const [show, setShow] = useState(false);
 
   const setTreemapPathOutFunc = (path) => {
-    props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapOut(
+    reduxMiniTreemapFunctions.dispatch(
+      reduxMiniTreemapFunctions.scopeMiniTreemapOut(
         payloadGenerator("path", path)
       )
     );
   };
   const returnTreeMapHome = () => {
-    props.reduxNavFunctions.dispatch(
-      props.reduxNavFunctions.scopeMiniTreemapIn(payloadGenerator("path", "."))
+    reduxMiniTreemapFunctions.dispatch(
+      reduxMiniTreemapFunctions.scopeMiniTreemapIn(
+        payloadGenerator("path", ".")
+      )
     );
   };
 
@@ -106,15 +122,15 @@ function SimulationModeModal(props) {
 
   const handleAuthorCheckmark = (authorEmail) => {
     if (!removedAuthorsList.includes(authorEmail)) {
-      props.reduxNavFunctions.dispatch(addAuthorToRemovalList([authorEmail]));
-      props.reduxNavFunctions.dispatch(
+      reduxMiniTreemapFunctions.dispatch(addAuthorToRemovalList([authorEmail]));
+      reduxMiniTreemapFunctions.dispatch(
         scopeMiniTreemapIn(
           payloadGenerator("path", simulationVisualizationPath)
         )
       );
     } else {
-      props.reduxNavFunctions.dispatch(undoAuthorRemoval([authorEmail]));
-      props.reduxNavFunctions.dispatch(
+      reduxMiniTreemapFunctions.dispatch(undoAuthorRemoval([authorEmail]));
+      reduxMiniTreemapFunctions.dispatch(
         scopeMiniTreemapIn(
           payloadGenerator("path", simulationVisualizationPath)
         )
@@ -124,11 +140,28 @@ function SimulationModeModal(props) {
 
   const handleClose = () => {
     setShow(false);
-    props.reduxNavFunctions.dispatch(disableSimulationMode());
+    reduxMiniTreemapFunctions.dispatch(disableSimulationMode());
   };
   const handleShow = () => {
     setShow(true);
-    props.reduxNavFunctions.dispatch(enableSimulationMode());
+    reduxMiniTreemapFunctions.dispatch(enableSimulationMode());
+  };
+
+  const handleLayoutAlgorithm = (e) => {
+    reduxMiniTreemapFunctions.dispatch(
+      reduxMiniTreemapFunctions.setSimTilingFunction(e.key)
+    );
+  };
+  const handleSortingKey = (e) => {
+    reduxMiniTreemapFunctions.dispatch(
+      reduxMiniTreemapFunctions.setSimSortingKey(e.key)
+    );
+  };
+  const handleSortingOrder = (e) => {
+    console.log(e.label);
+    reduxMiniTreemapFunctions.dispatch(
+      reduxMiniTreemapFunctions.setSimSortingOrder(e.key)
+    );
   };
 
   return (
@@ -176,6 +209,7 @@ function SimulationModeModal(props) {
 
       {/* Modal */}
       <Modal
+        className="onTopLevel0"
         show={show}
         onHide={handleClose}
         size="fullscreen">
@@ -191,7 +225,9 @@ function SimulationModeModal(props) {
                 sm={9}
                 md={9}
                 lg={9}>
-                <center>
+                <center
+                  style={{ position: "relative" }}
+                  id={"simTreeMap"}>
                   <TreeMap
                     colorDefinitions={CONFIG.general.colors.jetbrains}
                     containerId={CONFIG.simulation.ids.treemapContainerId}
@@ -207,8 +243,142 @@ function SimulationModeModal(props) {
                     tilingFunction={tilingFunction}
                     topPadding={CONFIG.simulation.layout.topPadding}
                     type="mini"
-                    reduxNavFunctions={props.reduxNavFunctions}
+                    reduxNavFunctions={reduxMiniTreemapFunctions}
                     zoom={zoom}></TreeMap>
+
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 10,
+                      left: 25,
+                      display: "flex",
+                      flexDirection: "row",
+                      border: "1px solid black",
+                      borderRadius: "10px",
+                      backgroundColor: "white",
+                      boxShadow: "0 1px 2px black",
+                    }}>
+                    <Button
+                      onClick={() =>
+                        simulationVisualizationPath
+                          .split("/")
+                          .filter((r) => r !== "").length > 1
+                          ? setTreemapPathOutFunc(
+                              simulationVisualizationPath
+                                .split("/")
+                                .slice(0, -1)
+                                .join("/")
+                            )
+                          : setTreemapPathOutFunc(".")
+                      }
+                      icon={arrowUpIcon}
+                      title={"Navigate to Parent Directory"}>
+                      {" "}
+                      Up{" "}
+                    </Button>
+                    <Button
+                      onClick={() => returnTreeMapHome()}
+                      icon={archiveIcon}
+                      title={"Home"}>
+                      {" "}
+                      Home
+                    </Button>
+                  </div>
+
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "1em",
+                      right: "2.5em",
+                      display: "flex",
+                      flexDirection: "row",
+                      border: "1px solid black",
+                      borderRadius: "10px",
+                      backgroundColor: "white",
+                      boxShadow: "0 1px 2px black",
+                    }}>
+                    <Button
+                      onClick={() =>
+                        zoomIn(`#${CONFIG.simulation.ids.treemapSvgId}`, zoom)
+                      }
+                      icon={search}
+                      title={"Zoom In"}
+                    />
+                    <Button
+                      onClick={() =>
+                        zoomOut(`#${CONFIG.simulation.ids.treemapSvgId}`, zoom)
+                      }
+                      icon={searchError}
+                      title={"Zoom Out"}
+                    />
+                    <Dropdown
+                      className="chevron"
+                      activeClassName="rotated"
+                      anchor={
+                        <Button
+                          title="Details"
+                          icon={settingsIcon}
+                        />
+                      }>
+                      <Popup className="onTopLevel1">
+                        <Island>
+                          <Content>
+                            <div className="d-flex mt-1">
+                              <Select
+                                onChange={handleLayoutAlgorithm}
+                                data={tiling.layoutAlgorithmSelectData}
+                                selected={findSelectItem(
+                                  tiling.layoutAlgorithmSelectData,
+                                  tilingFunction
+                                )}
+                                selectedLabel="Layout Algorithm"
+                                ringPopupTarget="mini-treemap-select-algo-target"
+                                maxHeight={
+                                  tiling.layoutAlgorithmSelectData.length * 2 +
+                                  "em"
+                                }></Select>
+                            </div>
+                            <div
+                              className="onTopLevel2"
+                              data-portaltarget="mini-treemap-select-algo-target"></div>
+                            <div className="d-flex mt-1">
+                              <Select
+                                onChange={handleSortingKey}
+                                data={sortKeySelectData}
+                                selected={findSelectItem(
+                                  sortKeySelectData,
+                                  sortingKey
+                                )}
+                                selectedLabel="Sorting Key"
+                                ringPopupTarget="mini-treemap-select-sortkey-target"
+                                maxHeight={
+                                  sortKeySelectData.length * 2 + "em"
+                                }></Select>
+                            </div>
+                            <div
+                              className="onTopLevel2 menu-overflow"
+                              data-portaltarget="mini-treemap-select-sortkey-target"></div>
+                            <div className="d-flex mt-1">
+                              <Select
+                                className=""
+                                onChange={handleSortingOrder}
+                                data={sortingOrderSelectData}
+                                selected={findSelectItem(
+                                  sortingOrderSelectData,
+                                  sortingOrder
+                                )}
+                                selectedLabel="Sorting Order"
+                                ringPopupTarget="mini-treemap-select-sortorder-target"
+                                maxHeight="10em"></Select>
+                            </div>
+                            <div
+                              className="onTopLevel2 menu-overflow"
+                              data-portaltarget="mini-treemap-select-sortorder-target"></div>
+                          </Content>
+                        </Island>
+                      </Popup>
+                    </Dropdown>
+                  </div>
                 </center>
               </Col>
               <Col
@@ -218,7 +388,9 @@ function SimulationModeModal(props) {
                 lg={3}>
                 <div style={{ marginBottom: 20 }}>
                   <nav aria-label="breadcrumb">
-                    <strong>Path:</strong>
+                    <center>
+                      <strong>Current Path</strong>
+                    </center>
                     <ol className="breadcrumb">
                       {simulationVisualizationPath
                         .split("/")
@@ -244,40 +416,18 @@ function SimulationModeModal(props) {
                         ))}
                     </ol>
                   </nav>
-
-                  <center>
-                    <ButtonSet>
-                      <Button
-                        onClick={() =>
-                          simulationVisualizationPath
-                            .split("/")
-                            .filter((r) => r !== "").length > 1
-                            ? setTreemapPathOutFunc(
-                                simulationVisualizationPath
-                                  .split("/")
-                                  .slice(0, -1)
-                                  .join("/")
-                              )
-                            : setTreemapPathOutFunc(".")
-                        }>
-                        <Icon glyph={arrowUpIcon} /> Up
-                      </Button>
-                      <Button
-                        primary
-                        onClick={() => returnTreeMapHome()}>
-                        <Icon glyph={archiveIcon} /> Home
-                      </Button>
-                    </ButtonSet>
-                  </center>
                 </div>
 
                 {/*TODO: add same width for input and list*/}
-                <Input
-                  onChange={handleSearchTextChange}
-                  size={Size.L}></Input>
-
+                <center>
+                  <strong>Authors List</strong>
+                  <Input
+                    placeholder="Search for authors' git emails..."
+                    onChange={handleSearchTextChange}
+                    size={Size.M}></Input>
+                </center>
                 <List
-                  maxHeight={600}
+                  maxHeight={CONFIG.simulation.layout.height * 0.75}
                   shortcuts={true}
                   onSelect={(item, e) => {
                     handleAuthorCheckmark(item.label);

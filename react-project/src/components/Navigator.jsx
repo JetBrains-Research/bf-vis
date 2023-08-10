@@ -24,11 +24,6 @@ import SimulationModeModal from "./SimulationModeModal";
 import LegendSize from "./LegendSize";
 import { generateBreadcrumb, getFileExtension } from "../utils/url.tsx";
 import { Form } from "react-bootstrap";
-import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
-import Button from "@jetbrains/ring-ui/dist/button/button";
-import arrowUpIcon from "@jetbrains/icons/arrow-up";
-import archiveIcon from "@jetbrains/icons/archive";
-import Icon from "@jetbrains/ring-ui/dist/icon/icon";
 import Island from "@jetbrains/ring-ui/dist/island/island";
 import Header from "@jetbrains/ring-ui/dist/island/header";
 import Content from "@jetbrains/ring-ui/dist/island/content";
@@ -47,6 +42,7 @@ function Navigator(props) {
   const sortingOrder = props.sortingOrder;
   const statsData = props.statsData;
   const tilingFunction = props.tilingFunction;
+  const reduxMiniTreemapFunctions = props.reduxMiniTreemapFunctions;
 
   const { t, i18n } = useTranslation();
 
@@ -89,8 +85,8 @@ function Navigator(props) {
   const pathIsland = () => {
     return (
       <Island>
-        <Header border>
-          Navigation{" "}
+        <Header border >
+          Current Path {" "}
           <InfoPanel
             divName="currentPathInfoPanel"
             header="What is the current path"
@@ -131,25 +127,6 @@ function Navigator(props) {
                 ))}
               </ol>
             </nav>
-            <center>
-              <ButtonSet>
-                <Button
-                  onClick={() =>
-                    currentPath.split("/").filter((r) => r !== "").length > 1
-                      ? setPathFunc(
-                          currentPath.split("/").slice(0, -1).join("/")
-                        )
-                      : setPathFunc(".")
-                  }>
-                  <Icon glyph={arrowUpIcon} /> Up
-                </Button>
-                <Button
-                  primary
-                  onClick={() => setPathFunc(".")}>
-                  <Icon glyph={archiveIcon} /> Home
-                </Button>
-              </ButtonSet>
-            </center>
           </div>
         </Content>
       </Island>
@@ -241,7 +218,7 @@ function Navigator(props) {
       {addMargin(filterIsland())}
       {addMargin(
         <SimulationModeModal
-          reduxNavFunctions={props.reduxNavFunctions}
+          reduxMiniTreemapFunctions={reduxMiniTreemapFunctions}
           simulationData={simulationData}
           simulationPath={simulationPath}
           statsData={statsData}
